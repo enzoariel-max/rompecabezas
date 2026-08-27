@@ -2,127 +2,157 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rompecabezas Interactivos 3x3</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Rompecabezas Curvo Celular</title>
     <style>
         :root {
-            --puzzle-size: 300px;
-            --rows: 3;
-            --cols: 3;
+            --puzzle-size: min(90vw, 360px);
+            --cell-size: calc(var(--puzzle-size) / 3);
         }
 
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f0f2f5;
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: #1e1e24;
+            color: #fff;
             display: flex;
             flex-direction: column;
             align-items: center;
             margin: 0;
-            padding: 20px;
+            padding: 10px;
+            overflow-x: hidden;
+            user-select: none;
+            -webkit-user-select: none;
         }
 
         h1 {
-            color: #333;
-            margin-bottom: 10px;
+            font-size: 1.5rem;
+            margin: 10px 0;
+            text-align: center;
         }
 
-        /* Contenedor principal del tablero (Destino) */
         #board {
             width: var(--puzzle-size);
             height: var(--puzzle-size);
             display: grid;
-            grid-template-columns: repeat(var(--cols), 1fr);
-            grid-template-rows: repeat(var(--rows), 1fr);
-            border: 2px solid #333;
-            background-color: #fff;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(3, 1fr);
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 2px solid #444;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
             position: relative;
         }
 
-        /* Celdas invisibles del tablero donde caen las piezas */
         .cell {
-            border: 1px dashed #ccc;
+            width: var(--cell-size);
+            height: var(--cell-size);
             box-sizing: border-box;
+            border: 1px dashed rgba(255, 255, 255, 0.15);
             position: relative;
         }
 
-        /* Contenedor inferior para las piezas mezcladas */
         #pieces-container {
-            width: var(--puzzle-size);
-            min-height: 120px;
-            margin-top: 30px;
-            padding: 10px;
-            background-color: #e4e6eb;
-            border-radius: 8px;
-            border: 2px dashed #999;
+            width: min(95vw, 400px);
+            min-height: 140px;
+            margin-top: 20px;
+            padding: 15px 5px;
+            background-color: #2a2a35;
+            border-radius: 12px;
+            border: 2px dashed #555;
             display: flex;
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 12px;
             justify-content: center;
             align-items: center;
+            box-sizing: border-box;
         }
 
-        /* Estilo de cada pieza del rompecabezas */
         .piece {
-            width: calc(var(--puzzle-size) / var(--cols));
-            height: calc(var(--puzzle-size) / var(--rows));
+            width: var(--cell-size);
+            height: var(--cell-size);
             background-repeat: no-repeat;
             background-size: var(--puzzle-size) var(--puzzle-size);
-            cursor: grab;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-            border: 1px solid rgba(255,255,255,0.4);
             box-sizing: border-box;
-            user-select: none;
-            touch-action: none; /* Crucial para móviles */
+            touch-action: none;
+            position: relative;
+            filter: drop-shadow(0px 2px 3px rgba(0,0,0,0.4));
         }
 
-        .piece:active {
-            cursor: grabbing;
-        }
+        #p-0-0 { clip-path: url(#shape-0-0); }
+        #p-0-1 { clip-path: url(#shape-0-1); }
+        #p-0-2 { clip-path: url(#shape-0-2); }
+        #p-1-0 { clip-path: url(#shape-1-0); }
+        #p-1-1 { clip-path: url(#shape-1-1); }
+        #p-1-2 { clip-path: url(#shape-1-2); }
+        #p-2-0 { clip-path: url(#shape-2-0); }
+        #p-2-1 { clip-path: url(#shape-2-1); }
+        #p-2-2 { clip-path: url(#shape-2-2); }
 
-        /* Mensaje de victoria */
         #win-message {
             margin-top: 15px;
             font-size: 1.2rem;
+            color: #4caf50;
             font-weight: bold;
-            color: #28a745;
             display: none;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
         }
 
         button {
-            margin-top: 15px;
-            padding: 10px 20px;
+            margin-top: 10px;
+            padding: 12px 28px;
             font-size: 1rem;
-            background-color: #007bff;
+            font-weight: bold;
+            background-color: #ff4757;
             color: white;
             border: none;
-            border-radius: 5px;
+            border-radius: 25px;
             cursor: pointer;
-        }
-
-        button:hover {
-            background-color: #0056b3;
+            box-shadow: 0 4px 10px rgba(255, 71, 87, 0.4);
         }
     </style>
 </head>
 <body>
 
     <h1>Rompecabezas 3x3</h1>
-    
-    <!-- Tablero de juego -->
     <div id="board"></div>
-
-    <!-- Mensaje de éxito -->
-    <div id="win-message">¡Felicidades! Lo lograste. 🎉</div>
-    <button onclick="initGame()">Reiniciar Juego</button>
-
-    <!-- Zona inferior donde aparecen las piezas -->
+    <div id="win-message">¡Completado con éxito! 🎉</div>
+    <button onclick="initGame()">Mezclar Piezas</button>
     <div id="pieces-container"></div>
 
+    <svg width="0" height="0" style="position:absolute;">
+        <defs>
+            <clipPath id="shape-0-0" clipPathUnits="objectBoundingBox">
+                <path d="M 0,0 H 1 V 0.35 C 0.85,0.35 0.85,0.65 1,0.65 V 1 H 0.65 C 0.65,0.85 0.35,0.85 0.35,1 H 0 Z"/>
+            </clipPath>
+            <clipPath id="shape-0-1" clipPathUnits="objectBoundingBox">
+                <path d="M 0,0 H 1 V 0.35 C 0.85,0.35 0.85,0.65 1,0.65 V 1 H 0.65 C 0.65,1.15 0.35,1.15 0.35,1 H 0 V 0.65 C 0.15,0.65 0.15,0.35 0,0.35 Z"/>
+            </clipPath>
+            <clipPath id="shape-0-2" clipPathUnits="objectBoundingBox">
+                <path d="M 0,0 H 1 V 1 H 0.65 C 0.65,0.85 0.35,0.85 0.35,1 H 0 V 0.65 C 0.15,0.65 0.15,0.35 0,0.35 Z"/>
+            </clipPath>
+            <clipPath id="shape-1-0" clipPathUnits="objectBoundingBox">
+                <path d="M 0,0 H 0.35 C 0.35,0.15 0.65,0.15 0.65,0 H 1 V 0.35 C 0.85,0.35 0.85,0.65 1,0.65 V 1 H 0 Z"/>
+            </clipPath>
+            <clipPath id="shape-1-1" clipPathUnits="objectBoundingBox">
+                <path d="M 0,0 H 0.35 C 0.35,-0.15 0.65,-0.15 0.65,0 H 1 V 0.35 C 1.15,0.35 1.15,0.65 1,0.65 V 1 H 0.65 C 0.65,0.85 0.35,0.85 0.35,1 H 0 V 0.65 C 0.15,0.65 0.15,0.35 0,0.35 Z"/>
+            </clipPath>
+            <clipPath id="shape-1-2" clipPathUnits="objectBoundingBox">
+                <path d="M 0,0 H 0.35 C 0.35,0.15 0.65,0.15 0.65,0 H 1 V 1 H 0.65 C 0.65,0.85 0.35,0.85 0.35,1 H 0 V 0.65 C 0.85,0.65 0.85,0.35 0,0.35 Z"/>
+            </clipPath>
+            <clipPath id="shape-2-0" clipPathUnits="objectBoundingBox">
+                <path d="M 0,0 H 1 V 1 H 0 V 0.35 C 0.15,0.35 0.15,0.65 0,0.65 Z"/>
+            </clipPath>
+            <clipPath id="shape-2-1" clipPathUnits="objectBoundingBox">
+                <path d="M 0,0 H 0.35 C 0.35,0.15 0.65,0.15 0.65,0 H 1 V 1 H 0 V 0.35 C 0.15,0.35 0.15,0.65 0,0.65 Z"/>
+            </clipPath>
+            <clipPath id="shape-2-2" clipPathUnits="objectBoundingBox">
+                <path d="M 0,0 H 0.35 C 0.35,0.15 0.65,0.15 0.65,0 H 1 V 1 H 0 Z"/>
+            </clipPath>
+        </defs>
+    </svg>
     <script>
         const rows = 3;
         const cols = 3;
-        // Puedes cambiar esta URL por cualquier imagen que quieras usar
+        // Imagen aleatoria cuadrada optimizada para dispositivos móviles
         const imageUrl = 'https://picsum.photos'; 
 
         const board = document.getElementById('board');
@@ -130,8 +160,9 @@
         const winMessage = document.getElementById('win-message');
 
         let draggedPiece = null;
+        let startX = 0;
+        let startY = 0;
 
-        // Inicializa o reinicia el juego
         function initGame() {
             board.innerHTML = '';
             piecesContainer.innerHTML = '';
@@ -139,38 +170,26 @@
 
             const pieces = [];
 
-            // 1. Crear las celdas del tablero y las piezas lógicas
             for (let r = 0; r < rows; r++) {
                 for (let c = 0; c < cols; c++) {
-                    // Crear celda en el tablero
                     const cell = document.createElement('div');
                     cell.classList.add('cell');
                     cell.dataset.row = r;
                     cell.dataset.col = c;
-                    
-                    // Configurar eventos de soltar (drag & drop)
-                    cell.addEventListener('dragover', dragOver);
-                    cell.addEventListener('drop', dropPiece);
                     board.appendChild(cell);
 
-                    // Crear pieza correspondiente
                     const piece = document.createElement('div');
                     piece.classList.add('piece');
-                    piece.draggable = true;
+                    piece.id = `p-${r}-${c}`;
                     piece.dataset.correctRow = r;
                     piece.dataset.correctCol = c;
                     
-                    // Cortar la sección de la imagen usando posiciones de fondo
                     piece.style.backgroundImage = `url('${imageUrl}')`;
+                    
                     const posX = (c / (cols - 1)) * 100;
                     const posY = (r / (rows - 1)) * 100;
                     piece.style.backgroundPosition = `${posX}% ${posY}%`;
 
-                    // Eventos para arrastrar (PC)
-                    piece.addEventListener('dragstart', dragStart);
-                    piece.addEventListener('dragend', dragEnd);
-
-                    // Eventos para arrastrar (Móviles/Táctil)
                     piece.addEventListener('touchstart', touchStart, { passive: false });
                     piece.addEventListener('touchmove', touchMove, { passive: false });
                     piece.addEventListener('touchend', touchEnd);
@@ -179,73 +198,51 @@
                 }
             }
 
-            // 2. Barajar las piezas aleatoriamente
             pieces.sort(() => Math.random() - 0.5);
-
-            // 3. Insertar las piezas en el contenedor de abajo
-            pieces.forEach(piece => piecesContainer.appendChild(piece));
+            pieces.forEach(p => piecesContainer.appendChild(p));
         }
-
-        // --- FUNCIONES DRAG & DROP (Mover con Ratón) ---
-        function dragStart(e) {
-            draggedPiece = this;
-            setTimeout(() => this.style.opacity = '0.5', 0);
-        }
-
-        function dragEnd() {
-            this.style.opacity = '1';
-            draggedPiece = null;
-            checkWin();
-        }
-
-        function dragOver(e) {
-            e.preventDefault(); // Permite que se pueda soltar aquí
-        }
-
-        function dropPiece(e) {
-            e.preventDefault();
-            // Evita colocar más de una pieza en la misma celda del tablero
-            if (this.children.length === 0 && draggedPiece) {
-                this.appendChild(draggedPiece);
-            }
-        }
-
-        // --- FUNCIONES PARA SOPORTE TÁCTIL (Móviles) ---
-        let touchStartX = 0;
-        let touchStartY = 0;
 
         function touchStart(e) {
             draggedPiece = this;
             const touch = e.touches[0];
-            touchStartX = touch.clientX - this.offsetLeft;
-            touchStartY = touch.clientY - this.offsetTop;
-            this.style.position = 'absolute';
+            
+            startX = touch.clientX - this.getBoundingClientRect().left;
+            startY = touch.clientY - this.getBoundingClientRect().top;
+            
+            this.style.position = 'fixed';
             this.style.zIndex = '1000';
+            this.style.width = 'calc(var(--puzzle-size) / 3)';
+            this.style.height = 'calc(var(--puzzle-size) / 3)';
+            
+            moveAt(touch.clientX, touch.clientY);
+        }
+
+        function moveAt(clientX, clientY) {
+            if (!draggedPiece) return;
+            draggedPiece.style.left = `${clientX - startX}px`;
+            draggedPiece.style.top = `${clientY - startY}px`;
         }
 
         function touchMove(e) {
             if (!draggedPiece) return;
             e.preventDefault();
             const touch = e.touches[0];
-            draggedPiece.style.left = `${touch.clientX - touchStartX}px`;
-            draggedPiece.style.top = `${touch.clientY - touchStartY}px`;
+            moveAt(touch.clientX, touch.clientY);
         }
 
         function touchEnd(e) {
             if (!draggedPiece) return;
             
+            const touch = e.changedTouches[0];
             draggedPiece.style.position = 'static';
             draggedPiece.style.zIndex = '';
             
-            const touch = e.changedTouches[0];
-            // Encontrar el elemento debajo del dedo al levantar la pantalla
             const elementUnder = document.elementFromPoint(touch.clientX, touch.clientY);
             const targetCell = elementUnder ? elementUnder.closest('.cell') : null;
 
             if (targetCell && targetCell.children.length === 0) {
                 targetCell.appendChild(draggedPiece);
             } else {
-                // Si se suelta fuera o sobre una celda ocupada, regresa abajo
                 piecesContainer.appendChild(draggedPiece);
             }
             
@@ -253,29 +250,24 @@
             checkWin();
         }
 
-        // --- VERIFICACIÓN DE VICTORIA ---
         function checkWin() {
             const cells = document.querySelectorAll('.cell');
-            let correctCount = 0;
+            let correct = 0;
 
             cells.forEach(cell => {
                 const piece = cell.firstElementChild;
-                if (piece) {
-                    // Validar si la pieza coincide con la fila/columna de la celda
-                    if (piece.dataset.correctRow === cell.dataset.row && 
-                        piece.dataset.correctCol === cell.dataset.col) {
-                        correctCount++;
-                    }
+                if (piece && 
+                    piece.dataset.correctRow === cell.dataset.row && 
+                    piece.dataset.correctCol === cell.dataset.col) {
+                    correct++;
                 }
             });
 
-            // Si las 9 piezas están en su lugar correcto
-            if (correctCount === rows * cols) {
+            if (correct === 9) {
                 winMessage.style.display = 'block';
             }
         }
 
-        // Ejecutar al cargar la página
         window.onload = initGame;
     </script>
 </body>
