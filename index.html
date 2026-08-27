@@ -1,276 +1,1067 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Rompecabezas Curvo Celular</title>
-    <style>
-        :root {
-            --puzzle-size: min(85vw, 340px);
-            --cell-size: calc(var(--puzzle-size) / 3);
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Rompecabezas 3x3</title>
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: #1a1a1f;
-            color: #fff;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin: 0;
-            padding: 15px 5px;
-            overflow-x: hidden;
-            user-select: none;
-            -webkit-user-select: none;
-        }
+  <style>
+    :root {
+      --background: #080b16;
+      --panel: #11182b;
+      --panel-light: #19233c;
+      --text: #f4f7ff;
+      --muted: #9ba7c2;
+      --accent: #6ee7c8;
+      --accent-strong: #35caa5;
+      --border: rgba(255, 255, 255, 0.12);
+    }
 
-        h1 {
-            font-size: 1.4rem;
-            margin: 5px 0 15px 0;
-            text-align: center;
-        }
+    * {
+      box-sizing: border-box;
+    }
 
-        #board {
-            width: var(--puzzle-size);
-            height: var(--puzzle-size);
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            grid-template-rows: repeat(3, 1fr);
-            background-color: rgba(255, 255, 255, 0.03);
-            border: 2px solid #333;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.6);
-            position: relative;
-        }
+    html,
+    body {
+      margin: 0;
+      min-height: 100%;
+      font-family: Arial, Helvetica, sans-serif;
+      background:
+        radial-gradient(circle at 50% -10%, #202c52 0%, transparent 42%),
+        var(--background);
+      color: var(--text);
+    }
 
-        .cell {
-            width: var(--cell-size);
-            height: var(--cell-size);
-            box-sizing: border-box;
-            border: 1px dashed rgba(255, 255, 255, 0.1);
-            position: relative;
-        }
+    body {
+      min-height: 100vh;
+      min-height: 100dvh;
+      overflow-x: hidden;
+    }
 
-        #pieces-container {
-            width: var(--puzzle-size);
-            min-height: 140px;
-            margin-top: 25px;
-            padding: 10px;
-            background-color: #24242e;
-            border-radius: 12px;
-            border: 2px dashed #444;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            justify-content: center;
-            align-items: center;
-            box-sizing: border-box;
-        }
+    body.dragging-piece {
+      overflow: hidden;
+    }
 
-        .piece {
-            width: var(--cell-size);
-            height: var(--cell-size);
-            background-repeat: no-repeat;
-            background-size: var(--puzzle-size) var(--puzzle-size);
-            box-sizing: border-box;
-            touch-action: none;
-            position: relative;
-        }
+    button {
+      font: inherit;
+    }
 
-        /* Máscaras con compatibilidad completa para todos los navegadores móviles */
-        #p-0-0 { clip-path: url(#shape-0-0); -webkit-clip-path: url(#shape-0-0); }
-        #p-0-1 { clip-path: url(#shape-0-1); -webkit-clip-path: url(#shape-0-1); }
-        #p-0-2 { clip-path: url(#shape-0-2); -webkit-clip-path: url(#shape-0-2); }
-        #p-1-0 { clip-path: url(#shape-1-0); -webkit-clip-path: url(#shape-1-0); }
-        #p-1-1 { clip-path: url(#shape-1-1); -webkit-clip-path: url(#shape-1-1); }
-        #p-1-2 { clip-path: url(#shape-1-2); -webkit-clip-path: url(#shape-1-2); }
-        #p-2-0 { clip-path: url(#shape-2-0); -webkit-clip-path: url(#shape-2-0); }
-        #p-2-1 { clip-path: url(#shape-2-1); -webkit-clip-path: url(#shape-2-1); }
-        #p-2-2 { clip-path: url(#shape-2-2); -webkit-clip-path: url(#shape-2-2); }
+    .app {
+      width: min(100%, 560px);
+      margin: 0 auto;
+      padding: 24px 14px 42px;
+    }
 
-        #win-message {
-            margin: 15px 0;
-            font-size: 1.2rem;
-            color: #2ecc71;
-            font-weight: bold;
-            display: none;
-        }
+    .header {
+      text-align: center;
+      margin-bottom: 18px;
+    }
 
-        button {
-            margin-top: 15px;
-            padding: 10px 24px;
-            font-size: 0.95rem;
-            font-weight: bold;
-            background-color: #e74c3c;
-            color: white;
-            border: none;
-            border-radius: 20px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-        }
-    </style>
+    .eyebrow {
+      margin: 0 0 8px;
+      color: var(--accent);
+      font-size: 0.75rem;
+      font-weight: bold;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(1.8rem, 7vw, 2.8rem);
+      line-height: 1;
+    }
+
+    .subtitle {
+      max-width: 400px;
+      margin: 12px auto 0;
+      color: var(--muted);
+      font-size: 0.95rem;
+      line-height: 1.45;
+    }
+
+    .status-line {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      width: min(100%, 430px);
+      margin: 0 auto 13px;
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+
+    .counter {
+      min-width: 48px;
+      padding: 5px 9px;
+      border: 1px solid rgba(110, 231, 200, 0.25);
+      border-radius: 999px;
+      color: var(--accent);
+      text-align: center;
+      font-weight: bold;
+    }
+
+    .board {
+      position: relative;
+      width: min(91vw, 430px);
+      aspect-ratio: 1 / 1;
+      margin: 0 auto;
+      border-radius: 22px;
+      background: #10172a;
+      box-shadow:
+        0 0 0 2px rgba(255, 255, 255, 0.12),
+        0 18px 45px rgba(0, 0, 0, 0.38);
+      isolation: isolate;
+      overflow: visible;
+    }
+
+    .board::before {
+      content: "";
+      position: absolute;
+      z-index: 0;
+      inset: 0;
+      border-radius: inherit;
+      background-image: var(--puzzle-image);
+      background-position: center;
+      background-size: 100% 100%;
+      opacity: 0.16;
+      pointer-events: none;
+    }
+
+    .board::after {
+      content: "";
+      position: absolute;
+      z-index: 0;
+      inset: 0;
+      border-radius: inherit;
+      background:
+        linear-gradient(
+          to right,
+          transparent 33.15%,
+          rgba(255, 255, 255, 0.1) 33.25%,
+          transparent 33.35%,
+          transparent 66.48%,
+          rgba(255, 255, 255, 0.1) 66.58%,
+          transparent 66.68%
+        ),
+        linear-gradient(
+          to bottom,
+          transparent 33.15%,
+          rgba(255, 255, 255, 0.1) 33.25%,
+          transparent 33.35%,
+          transparent 66.48%,
+          rgba(255, 255, 255, 0.1) 66.58%,
+          transparent 66.68%
+        );
+      pointer-events: none;
+    }
+
+    .slot {
+      position: absolute;
+      z-index: 1;
+      border: 1px dashed rgba(255, 255, 255, 0.14);
+      border-radius: 8px;
+      pointer-events: none;
+    }
+
+    .hint {
+      margin: 13px 0 16px;
+      color: var(--muted);
+      font-size: 0.84rem;
+      text-align: center;
+    }
+
+    .tray-panel {
+      width: min(100%, 500px);
+      margin: 0 auto;
+      padding: 13px 10px 10px;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      background:
+        linear-gradient(145deg, rgba(255, 255, 255, 0.05), transparent 45%),
+        var(--panel);
+      box-shadow: 0 15px 38px rgba(0, 0, 0, 0.22);
+    }
+
+    .tray-title {
+      margin-bottom: 2px;
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: bold;
+      letter-spacing: 0.1em;
+      text-align: center;
+      text-transform: uppercase;
+    }
+
+    .tray {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      align-content: center;
+      gap: 8px;
+      min-height: 245px;
+      padding: 15px 8px 18px;
+      touch-action: pan-y;
+    }
+
+    .piece {
+      position: relative;
+      flex: 0 0 auto;
+      display: block;
+      padding: 0;
+      margin: 0;
+      border: 0;
+      background: transparent;
+      cursor: grab;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-user-drag: none;
+      touch-action: none;
+      filter: drop-shadow(0 7px 7px rgba(0, 0, 0, 0.34));
+      transition: filter 0.15s ease, transform 0.15s ease;
+      z-index: 5;
+    }
+
+    .piece:hover {
+      filter: drop-shadow(0 9px 10px rgba(0, 0, 0, 0.48));
+      transform: translateY(-2px);
+    }
+
+    .piece:active {
+      cursor: grabbing;
+    }
+
+    .piece.dragging {
+      position: fixed !important;
+      z-index: 1000;
+      margin: 0 !important;
+      cursor: grabbing;
+      filter:
+        drop-shadow(0 19px 17px rgba(0, 0, 0, 0.48))
+        drop-shadow(0 0 8px rgba(110, 231, 200, 0.25));
+      transform: rotate(1.5deg) scale(1.025);
+      transition: none;
+    }
+
+    .piece.placed {
+      z-index: 3;
+      cursor: default;
+      pointer-events: none;
+      filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.27));
+      transition: none;
+    }
+
+    .piece.returning {
+      animation: returnBump 0.24s ease;
+    }
+
+    .piece svg {
+      display: block;
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+      pointer-events: none;
+    }
+
+    @keyframes returnBump {
+      0% {
+        transform: scale(0.94);
+      }
+      65% {
+        transform: scale(1.04);
+      }
+      100% {
+        transform: scale(1);
+      }
+    }
+
+    .win-panel {
+      margin: 16px auto 0;
+      padding: 15px 16px;
+      border: 1px solid rgba(110, 231, 200, 0.38);
+      border-radius: 16px;
+      background: rgba(41, 155, 126, 0.14);
+      color: var(--accent);
+      font-weight: bold;
+      text-align: center;
+      animation: appear 0.35s ease;
+    }
+
+    .win-panel[hidden] {
+      display: none;
+    }
+
+    @keyframes appear {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .shuffle-button {
+      display: block;
+      width: min(100%, 300px);
+      margin: 18px auto 0;
+      padding: 13px 18px;
+      border: 1px solid rgba(110, 231, 200, 0.4);
+      border-radius: 13px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+      color: #06251f;
+      cursor: pointer;
+      font-weight: bold;
+      box-shadow: 0 8px 20px rgba(53, 202, 165, 0.18);
+      transition: transform 0.15s ease, filter 0.15s ease;
+    }
+
+    .shuffle-button:hover {
+      filter: brightness(1.08);
+      transform: translateY(-1px);
+    }
+
+    .shuffle-button:active {
+      transform: translateY(1px) scale(0.99);
+    }
+
+    @media (max-width: 380px) {
+      .app {
+        padding-top: 18px;
+      }
+
+      .subtitle {
+        font-size: 0.87rem;
+      }
+
+      .tray {
+        min-height: 225px;
+        gap: 6px;
+        padding-inline: 4px;
+      }
+
+      .tray-panel {
+        padding-inline: 7px;
+      }
+    }
+  </style>
 </head>
+
 <body>
+  <main class="app">
+    <header class="header">
+      <p class="eyebrow">Juego táctil</p>
+      <h1>Rompecabezas 3x3</h1>
+      <p class="subtitle">
+        Arrastra cada pieza desde la bandeja inferior hasta su lugar correspondiente.
+      </p>
+    </header>
 
-    <h1>Rompecabezas 3x3</h1>
-    <div id="board"></div>
-    <div id="win-message">¡Completado con éxito! 🎉</div>
-    <button onclick="initGame()">Mezclar Piezas</button>
-    <div id="pieces-container"></div>
+    <div class="status-line" aria-live="polite">
+      <span id="status">Mezcla las piezas para comenzar.</span>
+      <span class="counter" id="counter">0/9</span>
+    </div>
 
-    <svg width="0" height="0" style="position:absolute;">
+    <section aria-label="Área del rompecabezas">
+      <div
+        id="board"
+        class="board"
+        aria-label="Tablero del rompecabezas"
+      ></div>
+
+      <p class="hint">Las piezas incorrectas vuelven automáticamente a la bandeja.</p>
+
+      <div class="tray-panel">
+        <div class="tray-title">Piezas disponibles</div>
+        <div id="tray" class="tray" aria-label="Bandeja de piezas"></div>
+      </div>
+
+      <div id="winPanel" class="win-panel" hidden>
+        🎉 ¡Excelente! Has completado el rompecabezas.
+      </div>
+
+      <button id="shuffleButton" class="shuffle-button" type="button">
+        Volver a mezclar y reiniciar
+      </button>
+    </section>
+  </main>
+
+  <script>
+    const SIZE = 3;
+    const TOTAL_PIECES = SIZE * SIZE;
+
+    const board = document.getElementById("board");
+    const tray = document.getElementById("tray");
+    const status = document.getElementById("status");
+    const counter = document.getElementById("counter");
+    const winPanel = document.getElementById("winPanel");
+    const shuffleButton = document.getElementById("shuffleButton");
+
+    /*
+      Imagen integrada en formato SVG.
+      Puedes sustituirla por una imagen propia usando, por ejemplo:
+      const puzzleImage = "https://tu-sitio.com/imagen.jpg";
+    */
+    const imageSvg = `
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 900">
         <defs>
-            <clipPath id="shape-0-0" clipPathUnits="objectBoundingBox">
-                <path d="M 0,0 H 1 V 0.35 C 0.85,0.35 0.85,0.65 1,0.65 V 1 H 0.65 C 0.65,0.85 0.35,0.85 0.35,1 H 0 Z"/>
-            </clipPath>
-            <clipPath id="shape-0-1" clipPathUnits="objectBoundingBox">
-                <path d="M 0,0 H 1 V 0.35 C 0.85,0.35 0.85,0.65 1,0.65 V 1 H 0.65 C 0.65,1.15 0.35,1.15 0.35,1 H 0 V 0.65 C 0.15,0.65 0.15,0.35 0,0.35 Z"/>
-            </clipPath>
-            <clipPath id="shape-0-2" clipPathUnits="objectBoundingBox">
-                <path d="M 0,0 H 1 V 1 H 0.65 C 0.65,0.85 0.35,0.85 0.35,1 H 0 V 0.65 C 0.15,0.65 0.15,0.35 0,0.35 Z"/>
-            </clipPath>
-            <clipPath id="shape-1-0" clipPathUnits="objectBoundingBox">
-                <path d="M 0,0 H 0.35 C 0.35,0.15 0.65,0.15 0.65,0 H 1 V 0.35 C 0.85,0.35 0.85,0.65 1,0.65 V 1 H 0 Z"/>
-            </clipPath>
-            <clipPath id="shape-1-1" clipPathUnits="objectBoundingBox">
-                <path d="M 0,0 H 0.35 C 0.35,-0.15 0.65,-0.15 0.65,0 H 1 V 0.35 C 1.15,0.35 1.15,0.65 1,0.65 V 1 H 0.65 C 0.65,0.85 0.35,0.85 0.35,1 H 0 V 0.65 C 0.15,0.65 0.15,0.35 0,0.35 Z"/>
-            </clipPath>
-            <clipPath id="shape-1-2" clipPathUnits="objectBoundingBox">
-                <path d="M 0,0 H 0.35 C 0.35,0.15 0.65,0.15 0.65,0 H 1 V 1 H 0.65 C 0.65,0.85 0.35,0.85 0.35,1 H 0 V 0.65 C 0.85,0.65 0.85,0.35 0,0.35 Z"/>
-            </clipPath>
-            <clipPath id="shape-2-0" clipPathUnits="objectBoundingBox">
-                <path d="M 0,0 H 1 V 1 H 0 V 0.35 C 0.15,0.35 0.15,0.65 0,0.65 Z"/>
-            </clipPath>
-            <clipPath id="shape-2-1" clipPathUnits="objectBoundingBox">
-                <path d="M 0,0 H 0.35 C 0.35,0.15 0.65,0.15 0.65,0 H 1 V 1 H 0 V 0.35 C 0.15,0.35 0.15,0.65 0,0.65 Z"/>
-            </clipPath>
-            <clipPath id="shape-2-2" clipPathUnits="objectBoundingBox">
-                <path d="M 0,0 H 0.35 C 0.35,0.15 0.65,0.15 0.65,0 H 1 V 1 H 0 Z"/>
-            </clipPath>
+          <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#07152f"/>
+            <stop offset="55%" stop-color="#236b91"/>
+            <stop offset="100%" stop-color="#f0a566"/>
+          </linearGradient>
+
+          <linearGradient id="water" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#256b91"/>
+            <stop offset="100%" stop-color="#08172e"/>
+          </linearGradient>
+
+          <radialGradient id="sun">
+            <stop offset="0%" stop-color="#fffbd0"/>
+            <stop offset="45%" stop-color="#ffd878"/>
+            <stop offset="100%" stop-color="#ff9d5c"/>
+          </radialGradient>
+
+          <linearGradient id="mountainBack" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#7298b0"/>
+            <stop offset="100%" stop-color="#345273"/>
+          </linearGradient>
+
+          <linearGradient id="mountainFront" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#213a5b"/>
+            <stop offset="100%" stop-color="#081527"/>
+          </linearGradient>
+
+          <filter id="glow">
+            <feGaussianBlur stdDeviation="18"/>
+          </filter>
         </defs>
-    </svg>
-    <script>
-        const rows = 3;
-        const cols = 3;
-        // Imagen estable y limpia de un paisaje para asegurar la carga inmediata
-        const imageUrl = 'https://picsum.photos'; 
 
-        const board = document.getElementById('board');
-        const piecesContainer = document.getElementById('pieces-container');
-        const winMessage = document.getElementById('win-message');
+        <rect width="900" height="900" fill="url(#sky)"/>
 
-        let draggedPiece = null;
-        let startX = 0;
-        let startY = 0;
+        <circle cx="675" cy="220" r="118" fill="#ffd890" opacity="0.28" filter="url(#glow)"/>
+        <circle cx="675" cy="220" r="76" fill="url(#sun)"/>
 
-        function initGame() {
-            board.innerHTML = '';
-            piecesContainer.innerHTML = '';
-            winMessage.style.display = 'none';
+        <g fill="#fff5d6" opacity="0.75">
+          <circle cx="120" cy="130" r="3"/>
+          <circle cx="210" cy="250" r="4"/>
+          <circle cx="330" cy="105" r="3"/>
+          <circle cx="465" cy="190" r="3"/>
+          <circle cx="790" cy="95" r="3"/>
+          <circle cx="835" cy="310" r="4"/>
+        </g>
 
-            const pieces = [];
+        <path
+          d="M0 500 L150 350 L220 420 L355 235 L505 415 L625 300 L900 510 L900 900 L0 900 Z"
+          fill="url(#mountainBack)"
+        />
 
-            for (let r = 0; r < rows; r++) {
-                for (let c = 0; c < cols; c++) {
-                    const cell = document.createElement('div');
-                    cell.classList.add('cell');
-                    cell.dataset.row = r;
-                    cell.dataset.col = c;
-                    board.appendChild(cell);
+        <path
+          d="M0 620 L150 440 L270 555 L410 350 L555 535 L700 410 L900 595 L900 900 L0 900 Z"
+          fill="url(#mountainFront)"
+        />
 
-                    const piece = document.createElement('div');
-                    piece.classList.add('piece');
-                    piece.id = `p-${r}-${c}`;
-                    piece.dataset.correctRow = r;
-                    piece.dataset.correctCol = c;
-                    
-                    piece.style.backgroundImage = `url('${imageUrl}')`;
-                    
-                    const posX = (c / (cols - 1)) * 100;
-                    const posY = (r / (rows - 1)) * 100;
-                    piece.style.backgroundPosition = `${posX}% ${posY}%`;
+        <path
+          d="M410 350 L365 412 L410 390 L445 420 L490 410 Z"
+          fill="#d9edf0"
+          opacity="0.82"
+        />
 
-                    // Eventos táctiles corregidos para celulares
-                    piece.addEventListener('touchstart', touchStart, { passive: false });
-                    piece.addEventListener('touchmove', touchMove, { passive: false });
-                    piece.addEventListener('touchend', touchEnd);
+        <path
+          d="M0 585
+             C145 555 238 600 360 570
+             C505 535 650 585 900 548
+             L900 900 L0 900 Z"
+          fill="url(#water)"
+        />
 
-                    pieces.push(piece);
-                }
-            }
+        <g opacity="0.27" fill="#ffd889">
+          <path d="M620 590 L760 590 L795 620 L600 620 Z"/>
+          <path d="M650 650 L735 650 L770 670 L625 670 Z"/>
+          <path d="M675 705 L725 705 L750 720 L650 720 Z"/>
+        </g>
 
-            // Mezclar e inyectar piezas
-            pieces.sort(() => Math.random() - 0.5);
-            pieces.forEach(p => piecesContainer.appendChild(p));
+        <g fill="#071326">
+          <path d="M75 760 L115 585 L155 760 Z"/>
+          <path d="M120 790 L170 555 L220 790 Z"/>
+          <path d="M755 805 L805 570 L855 805 Z"/>
+          <path d="M700 820 L748 625 L796 820 Z"/>
+        </g>
+
+        <g fill="#10253e">
+          <path d="M0 805 L45 635 L90 805 Z"/>
+          <path d="M830 850 L875 650 L920 850 Z"/>
+        </g>
+
+        <path
+          d="M0 815 C160 780 280 835 450 800 C620 765 770 820 900 790 L900 900 L0 900 Z"
+          fill="#050c19"
+          opacity="0.72"
+        />
+      </svg>
+    `;
+
+    const puzzleImage =
+      "data:image/svg+xml;charset=utf-8," + encodeURIComponent(imageSvg.trim());
+
+    board.style.setProperty("--puzzle-image", `url("${puzzleImage}")`);
+
+    /*
+      Cada valor -1 o 1 define si una pestaña es entrante o saliente.
+      Las piezas vecinas reciben valores opuestos para que encajen.
+    */
+    const connectors = createConnectors();
+
+    const pieces = [];
+    let placedCount = 0;
+    let activeDrag = null;
+
+    let geometry = {
+      cellWidth: 0,
+      cellHeight: 0,
+      tab: 0,
+      fullWidth: 0,
+      fullHeight: 0,
+      trayScale: 0.7
+    };
+
+    createBoardSlots();
+    createPieces();
+    updateGeometry();
+    resetGame();
+
+    shuffleButton.addEventListener("click", resetGame);
+
+    window.addEventListener("resize", () => {
+      requestAnimationFrame(updateGeometry);
+    });
+
+    window.addEventListener(
+      "pointermove",
+      moveDrag,
+      { passive: false }
+    );
+
+    window.addEventListener(
+      "pointerup",
+      endDrag,
+      { passive: false }
+    );
+
+    window.addEventListener(
+      "pointercancel",
+      cancelDrag,
+      { passive: false }
+    );
+
+    function createConnectors() {
+      const horizontal = Array.from(
+        { length: SIZE },
+        () => Array(SIZE - 1).fill(0)
+      );
+
+      const vertical = Array.from(
+        { length: SIZE - 1 },
+        () => Array(SIZE).fill(0)
+      );
+
+      for (let row = 0; row < SIZE; row++) {
+        for (let col = 0; col < SIZE - 1; col++) {
+          horizontal[row][col] = Math.random() < 0.5 ? -1 : 1;
+        }
+      }
+
+      for (let row = 0; row < SIZE - 1; row++) {
+        for (let col = 0; col < SIZE; col++) {
+          vertical[row][col] = Math.random() < 0.5 ? -1 : 1;
+        }
+      }
+
+      return { horizontal, vertical };
+    }
+
+    function createBoardSlots() {
+      for (let row = 0; row < SIZE; row++) {
+        for (let col = 0; col < SIZE; col++) {
+          const slot = document.createElement("div");
+
+          slot.className = "slot";
+          slot.style.left = `${(col * 100) / SIZE}%`;
+          slot.style.top = `${(row * 100) / SIZE}%`;
+          slot.style.width = `${100 / SIZE}%`;
+          slot.style.height = `${100 / SIZE}%`;
+
+          board.appendChild(slot);
+        }
+      }
+    }
+
+    function createPieces() {
+      for (let row = 0; row < SIZE; row++) {
+        for (let col = 0; col < SIZE; col++) {
+          const index = row * SIZE + col;
+          const piece = document.createElement("div");
+
+          piece.className = "piece";
+          piece.dataset.index = index;
+          piece.dataset.row = row;
+          piece.dataset.col = col;
+          piece.setAttribute(
+            "aria-label",
+            `Pieza ${index + 1} del rompecabezas`
+          );
+
+          piece.addEventListener("pointerdown", startDrag);
+          pieces.push(piece);
+          tray.appendChild(piece);
+        }
+      }
+    }
+
+    function updateGeometry() {
+      const boardSize = board.clientWidth;
+
+      if (!boardSize) {
+        return;
+      }
+
+      geometry.cellWidth = boardSize / SIZE;
+      geometry.cellHeight = boardSize / SIZE;
+      geometry.tab = Math.max(7, geometry.cellWidth * 0.17);
+      geometry.fullWidth = geometry.cellWidth + geometry.tab * 2;
+      geometry.fullHeight = geometry.cellHeight + geometry.tab * 2;
+
+      const trayContentWidth = Math.max(180, tray.clientWidth - 16);
+      const gap = 8;
+
+      const calculatedScale =
+        (trayContentWidth - gap * (SIZE - 1)) /
+        (SIZE * geometry.fullWidth);
+
+      geometry.trayScale = Math.max(
+        0.52,
+        Math.min(0.78, calculatedScale)
+      );
+
+      for (const piece of pieces) {
+        renderPiece(piece);
+
+        if (activeDrag && activeDrag.piece === piece) {
+          piece.style.width = `${geometry.fullWidth}px`;
+          piece.style.height = `${geometry.fullHeight}px`;
+          continue;
         }
 
-        function touchStart(e) {
-            draggedPiece = this;
-            const touch = e.touches[0];
-            
-            startX = touch.clientX - this.getBoundingClientRect().left;
-            startY = touch.clientY - this.getBoundingClientRect().top;
-            
-            this.style.position = 'fixed';
-            this.style.zIndex = '1000';
-            this.style.width = 'var(--cell-size)';
-            this.style.height = 'var(--cell-size)';
-            
-            moveAt(touch.clientX, touch.clientY);
+        if (piece.classList.contains("placed")) {
+          const row = Number(piece.dataset.row);
+          const col = Number(piece.dataset.col);
+
+          piece.style.position = "absolute";
+          piece.style.width = `${geometry.fullWidth}px`;
+          piece.style.height = `${geometry.fullHeight}px`;
+          piece.style.left = `${col * geometry.cellWidth - geometry.tab}px`;
+          piece.style.top = `${row * geometry.cellHeight - geometry.tab}px`;
+        } else {
+          piece.style.position = "";
+          piece.style.left = "";
+          piece.style.top = "";
+          piece.style.width = `${geometry.fullWidth * geometry.trayScale}px`;
+          piece.style.height = `${geometry.fullHeight * geometry.trayScale}px`;
         }
+      }
+    }
 
-        function moveAt(clientX, clientY) {
-            if (!draggedPiece) return;
-            draggedPiece.style.left = `${clientX - startX}px`;
-            draggedPiece.style.top = `${clientY - startY}px`;
+    function renderPiece(piece) {
+      const index = Number(piece.dataset.index);
+      const row = Number(piece.dataset.row);
+      const col = Number(piece.dataset.col);
+
+      const width = geometry.cellWidth;
+      const height = geometry.cellHeight;
+      const tab = geometry.tab;
+
+      const path = getPiecePath(row, col, width, height, tab);
+      const clipId = `piece-clip-${index}`;
+
+      piece.innerHTML = `
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          xmlns:xlink="http://www.w3.org/1999/xlink"
+          viewBox="${-tab} ${-tab} ${width + tab * 2} ${height + tab * 2}"
+          preserveAspectRatio="none"
+          aria-hidden="true"
+        >
+          <defs>
+            <clipPath id="${clipId}" clipPathUnits="userSpaceOnUse">
+              <path d="${path}"></path>
+            </clipPath>
+          </defs>
+
+          <image
+            href="${puzzleImage}"
+            xlink:href="${puzzleImage}"
+            x="${-col * width}"
+            y="${-row * height}"
+            width="${SIZE * width}"
+            height="${SIZE * height}"
+            preserveAspectRatio="none"
+            clip-path="url(#${clipId})"
+          ></image>
+
+          <path
+            d="${path}"
+            fill="none"
+            stroke="rgba(255,255,255,0.78)"
+            stroke-width="1.7"
+            stroke-linejoin="round"
+            vector-effect="non-scaling-stroke"
+          ></path>
+        </svg>
+      `;
+    }
+
+    function getPiecePath(row, col, width, height, tab) {
+      const topValue =
+        row === 0 ? 0 : -connectors.vertical[row - 1][col];
+
+      const rightValue =
+        col === SIZE - 1 ? 0 : connectors.horizontal[row][col];
+
+      const bottomValue =
+        row === SIZE - 1 ? 0 : connectors.vertical[row][col];
+
+      const leftValue =
+        col === 0 ? 0 : -connectors.horizontal[row][col - 1];
+
+      const topOffset = -topValue * tab;
+      const rightOffset = rightValue * tab;
+      const bottomOffset = bottomValue * tab;
+      const leftOffset = -leftValue * tab;
+
+      return [
+        "M 0 0",
+        horizontalEdge(0, 0, width, topOffset),
+        verticalEdge(width, 0, height, rightOffset),
+        horizontalEdge(width, height, 0, bottomOffset),
+        verticalEdge(0, height, 0, leftOffset),
+        "Z"
+      ].join(" ");
+    }
+
+    function horizontalEdge(x1, y, x2, offset) {
+      const length = Math.abs(x2 - x1);
+
+      if (length < 0.01) {
+        return "";
+      }
+
+      if (Math.abs(offset) < 0.1) {
+        return `L ${x2} ${y}`;
+      }
+
+      const direction = x2 >= x1 ? 1 : -1;
+      const at = (percentage) =>
+        x1 + direction * length * percentage;
+
+      return [
+        `L ${at(0.31)} ${y}`,
+        `C ${at(0.34)} ${y},
+           ${at(0.36)} ${y + offset * 0.72},
+           ${at(0.39)} ${y + offset * 0.94}`,
+        `C ${at(0.42)} ${y + offset * 1.08},
+           ${at(0.47)} ${y + offset},
+           ${at(0.50)} ${y + offset}`,
+        `C ${at(0.53)} ${y + offset},
+           ${at(0.58)} ${y + offset * 1.08},
+           ${at(0.61)} ${y + offset * 0.94}`,
+        `C ${at(0.64)} ${y + offset * 0.72},
+           ${at(0.66)} ${y},
+           ${at(0.69)} ${y}`,
+        `L ${x2} ${y}`
+      ].join(" ");
+    }
+
+    function verticalEdge(x, y1, y2, offset) {
+      const length = Math.abs(y2 - y1);
+
+      if (length < 0.01) {
+        return "";
+      }
+
+      if (Math.abs(offset) < 0.1) {
+        return `L ${x} ${y2}`;
+      }
+
+      const direction = y2 >= y1 ? 1 : -1;
+      const at = (percentage) =>
+        y1 + direction * length * percentage;
+
+      return [
+        `L ${x} ${at(0.31)}`,
+        `C ${x} ${at(0.34)},
+           ${x + offset * 0.72} ${at(0.36)},
+           ${x + offset * 0.94} ${at(0.39)}`,
+        `C ${x + offset * 1.08} ${at(0.42)},
+           ${x + offset} ${at(0.47)},
+           ${x + offset} ${at(0.50)}`,
+        `C ${x + offset} ${at(0.53)},
+           ${x + offset * 1.08} ${at(0.58)},
+           ${x + offset * 0.94} ${at(0.61)}`,
+        `C ${x + offset * 0.72} ${at(0.64)},
+           ${x} ${at(0.66)},
+           ${x} ${at(0.69)}`,
+        `L ${x} ${y2}`
+      ].join(" ");
+    }
+
+    function startDrag(event) {
+      const piece = event.currentTarget;
+
+      if (
+        piece.classList.contains("placed") ||
+        activeDrag ||
+        (event.pointerType === "mouse" && event.button !== 0)
+      ) {
+        return;
+      }
+
+      event.preventDefault();
+
+      const rect = piece.getBoundingClientRect();
+
+      activeDrag = {
+        piece,
+        pointerId: event.pointerId,
+        grabRatioX: (event.clientX - rect.left) / rect.width,
+        grabRatioY: (event.clientY - rect.top) / rect.height
+      };
+
+      piece.classList.add("dragging");
+      piece.style.position = "fixed";
+      piece.style.width = `${geometry.fullWidth}px`;
+      piece.style.height = `${geometry.fullHeight}px`;
+      piece.style.left = `${
+        event.clientX -
+        activeDrag.grabRatioX * geometry.fullWidth
+      }px`;
+      piece.style.top = `${
+        event.clientY -
+        activeDrag.grabRatioY * geometry.fullHeight
+      }px`;
+
+      document.body.classList.add("dragging-piece");
+
+      try {
+        piece.setPointerCapture(event.pointerId);
+      } catch (error) {
+        // Algunos navegadores móviles no soportan pointer capture.
+      }
+    }
+
+    function moveDrag(event) {
+      if (!activeDrag || event.pointerId !== activeDrag.pointerId) {
+        return;
+      }
+
+      event.preventDefault();
+
+      const { piece, grabRatioX, grabRatioY } = activeDrag;
+
+      piece.style.left = `${
+        event.clientX - grabRatioX * geometry.fullWidth
+      }px`;
+
+      piece.style.top = `${
+        event.clientY - grabRatioY * geometry.fullHeight
+      }px`;
+    }
+
+    function endDrag(event) {
+      finishDrag(event, false);
+    }
+
+    function cancelDrag(event) {
+      finishDrag(event, true);
+    }
+
+    function finishDrag(event, wasCancelled) {
+      if (
+        !activeDrag ||
+        event.pointerId !== activeDrag.pointerId
+      ) {
+        return;
+      }
+
+      event.preventDefault();
+
+      const drag = activeDrag;
+      const piece = drag.piece;
+
+      if (!wasCancelled && Number.isFinite(event.clientX)) {
+        piece.style.left = `${
+          event.clientX - drag.grabRatioX * geometry.fullWidth
+        }px`;
+
+        piece.style.top = `${
+          event.clientY - drag.grabRatioY * geometry.fullHeight
+        }px`;
+      }
+
+      activeDrag = null;
+      document.body.classList.remove("dragging-piece");
+
+      try {
+        piece.releasePointerCapture(drag.pointerId);
+      } catch (error) {
+        // No pasa nada si el navegador ya liberó el pointer.
+      }
+
+      if (wasCancelled) {
+        returnPieceToTray(piece);
+        return;
+      }
+
+      const pieceRect = piece.getBoundingClientRect();
+      const centerX = pieceRect.left + pieceRect.width / 2;
+      const centerY = pieceRect.top + pieceRect.height / 2;
+
+      const boardRect = board.getBoundingClientRect();
+      const localX = centerX - boardRect.left;
+      const localY = centerY - boardRect.top;
+
+      const isInsideBoard =
+        localX >= 0 &&
+        localX < boardRect.width &&
+        localY >= 0 &&
+        localY < boardRect.height;
+
+      if (!isInsideBoard) {
+        returnPieceToTray(piece);
+        return;
+      }
+
+      const cellWidth = boardRect.width / SIZE;
+      const cellHeight = boardRect.height / SIZE;
+
+      const targetCol = Math.floor(localX / cellWidth);
+      const targetRow = Math.floor(localY / cellHeight);
+
+      const correctRow = Number(piece.dataset.row);
+      const correctCol = Number(piece.dataset.col);
+
+      if (
+        targetRow === correctRow &&
+        targetCol === correctCol
+      ) {
+        placePiece(piece, targetRow, targetCol);
+      } else {
+        returnPieceToTray(piece);
+      }
+    }
+
+    function placePiece(piece, row, col) {
+      board.appendChild(piece);
+
+      piece.classList.remove("dragging", "returning");
+      piece.classList.add("placed");
+
+      piece.style.position = "absolute";
+      piece.style.width = `${geometry.fullWidth}px`;
+      piece.style.height = `${geometry.fullHeight}px`;
+      piece.style.left = `${col * geometry.cellWidth - geometry.tab}px`;
+      piece.style.top = `${row * geometry.cellHeight - geometry.tab}px`;
+
+      placedCount++;
+      updateStatus();
+
+      if (placedCount === TOTAL_PIECES) {
+        winPanel.hidden = false;
+        status.textContent = "¡Rompecabezas completado!";
+      }
+    }
+
+    function returnPieceToTray(piece) {
+      piece.classList.remove("dragging", "placed");
+      piece.style.position = "";
+      piece.style.left = "";
+      piece.style.top = "";
+      piece.style.zIndex = "";
+      piece.style.width = "";
+      piece.style.height = "";
+
+      if (piece.parentElement !== tray) {
+        tray.appendChild(piece);
+      }
+
+      piece.classList.add("returning");
+
+      setTimeout(() => {
+        piece.classList.remove("returning");
+      }, 260);
+
+      updateGeometry();
+    }
+
+    function resetGame() {
+      if (activeDrag) {
+        document.body.classList.remove("dragging-piece");
+        activeDrag = null;
+      }
+
+      placedCount = 0;
+      winPanel.hidden = true;
+
+      const shuffledPieces = shuffleUntilDifferent([...pieces]);
+
+      for (const piece of pieces) {
+        piece.classList.remove("placed", "dragging", "returning");
+        piece.style.position = "";
+        piece.style.left = "";
+        piece.style.top = "";
+        piece.style.zIndex = "";
+        piece.style.width = "";
+        piece.style.height = "";
+      }
+
+      for (const piece of shuffledPieces) {
+        tray.appendChild(piece);
+      }
+
+      updateStatus();
+      updateGeometry();
+    }
+
+    function shuffleUntilDifferent(list) {
+      let shuffled = [...list];
+
+      do {
+        for (let i = shuffled.length - 1; i > 0; i--) {
+          const randomIndex = Math.floor(Math.random() * (i + 1));
+          [shuffled[i], shuffled[randomIndex]] = [
+            shuffled[randomIndex],
+            shuffled[i]
+          ];
         }
+      } while (
+        shuffled.every((piece, index) => piece === pieces[index])
+      );
 
-        function touchMove(e) {
-            if (!draggedPiece) return;
-            e.preventDefault(); // Detiene el scroll del móvil
-            const touch = e.touches[0];
-            moveAt(touch.clientX, touch.clientY);
-        }
+      return shuffled;
+    }
 
-        function touchEnd(e) {
-            if (!draggedPiece) return;
-            
-            const touch = e.changedTouches[0];
-            draggedPiece.style.position = 'static';
-            draggedPiece.style.zIndex = '';
-            draggedPiece.style.width = '';
-            draggedPiece.style.height = '';
-            
-            const elementUnder = document.elementFromPoint(touch.clientX, touch.clientY);
-            const targetCell = elementUnder ? elementUnder.closest('.cell') : null;
+    function updateStatus() {
+      counter.textContent = `${placedCount}/${TOTAL_PIECES}`;
 
-            if (targetCell && targetCell.children.length === 0) {
-                targetCell.appendChild(draggedPiece);
-            } else {
-                piecesContainer.appendChild(draggedPiece);
-            }
-            
-            draggedPiece = null;
-            checkWin();
-        }
-
-        function checkWin() {
-            const cells = document.querySelectorAll('.cell');
-            let correct = 0;
-
-            cells.forEach(cell => {
-                const piece = cell.firstElementChild;
-                if (piece && 
-                    piece.dataset.correctRow === cell.dataset.row && 
-                    piece.dataset.correctCol === cell.dataset.col) {
-                    correct++;
-                }
-            });
-
-            if (correct === 9) {
-                winMessage.style.display = 'block';
-            }
-        }
-
-        window.onload = initGame;
-    </script>
+      if (placedCount === 0) {
+        status.textContent = "Arrastra las piezas al tablero.";
+      } else if (placedCount < TOTAL_PIECES) {
+        status.textContent = "¡Muy bien! Continúa colocando piezas.";
+      } else {
+        status.textContent = "¡Rompecabezas completado!";
+      }
+    }
+  </script>
 </body>
 </html>
