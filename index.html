@@ -6,27 +6,27 @@
     <title>Rompecabezas Curvo Celular</title>
     <style>
         :root {
-            --puzzle-size: min(90vw, 360px);
+            --puzzle-size: min(85vw, 340px);
             --cell-size: calc(var(--puzzle-size) / 3);
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-            background-color: #1e1e24;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: #1a1a1f;
             color: #fff;
             display: flex;
             flex-direction: column;
             align-items: center;
             margin: 0;
-            padding: 10px;
+            padding: 15px 5px;
             overflow-x: hidden;
             user-select: none;
             -webkit-user-select: none;
         }
 
         h1 {
-            font-size: 1.5rem;
-            margin: 10px 0;
+            font-size: 1.4rem;
+            margin: 5px 0 15px 0;
             text-align: center;
         }
 
@@ -36,9 +36,9 @@
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             grid-template-rows: repeat(3, 1fr);
-            background-color: rgba(255, 255, 255, 0.05);
-            border: 2px solid #444;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+            background-color: rgba(255, 255, 255, 0.03);
+            border: 2px solid #333;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.6);
             position: relative;
         }
 
@@ -46,21 +46,21 @@
             width: var(--cell-size);
             height: var(--cell-size);
             box-sizing: border-box;
-            border: 1px dashed rgba(255, 255, 255, 0.15);
+            border: 1px dashed rgba(255, 255, 255, 0.1);
             position: relative;
         }
 
         #pieces-container {
-            width: min(95vw, 400px);
+            width: var(--puzzle-size);
             min-height: 140px;
-            margin-top: 20px;
-            padding: 15px 5px;
-            background-color: #2a2a35;
+            margin-top: 25px;
+            padding: 10px;
+            background-color: #24242e;
             border-radius: 12px;
-            border: 2px dashed #555;
+            border: 2px dashed #444;
             display: flex;
             flex-wrap: wrap;
-            gap: 12px;
+            gap: 10px;
             justify-content: center;
             align-items: center;
             box-sizing: border-box;
@@ -74,9 +74,9 @@
             box-sizing: border-box;
             touch-action: none;
             position: relative;
-            filter: drop-shadow(0px 2px 3px rgba(0,0,0,0.4));
         }
 
+        /* Máscaras con compatibilidad completa para todos los navegadores móviles */
         #p-0-0 { clip-path: url(#shape-0-0); -webkit-clip-path: url(#shape-0-0); }
         #p-0-1 { clip-path: url(#shape-0-1); -webkit-clip-path: url(#shape-0-1); }
         #p-0-2 { clip-path: url(#shape-0-2); -webkit-clip-path: url(#shape-0-2); }
@@ -88,25 +88,23 @@
         #p-2-2 { clip-path: url(#shape-2-2); -webkit-clip-path: url(#shape-2-2); }
 
         #win-message {
-            margin-top: 15px;
+            margin: 15px 0;
             font-size: 1.2rem;
-            color: #4caf50;
+            color: #2ecc71;
             font-weight: bold;
             display: none;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
         }
 
         button {
-            margin-top: 10px;
-            padding: 12px 28px;
-            font-size: 1rem;
+            margin-top: 15px;
+            padding: 10px 24px;
+            font-size: 0.95rem;
             font-weight: bold;
-            background-color: #ff4757;
+            background-color: #e74c3c;
             color: white;
             border: none;
-            border-radius: 25px;
-            cursor: pointer;
-            box-shadow: 0 4px 10px rgba(255, 71, 87, 0.4);
+            border-radius: 20px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
         }
     </style>
 </head>
@@ -152,6 +150,7 @@
     <script>
         const rows = 3;
         const cols = 3;
+        // Imagen estable y limpia de un paisaje para asegurar la carga inmediata
         const imageUrl = 'https://picsum.photos'; 
 
         const board = document.getElementById('board');
@@ -170,25 +169,26 @@
             const pieces = [];
 
             for (let r = 0; r < rows; r++) {
-                for (let r_idx = 0; r_idx < cols; r_idx++) {
+                for (let c = 0; c < cols; c++) {
                     const cell = document.createElement('div');
                     cell.classList.add('cell');
                     cell.dataset.row = r;
-                    cell.dataset.col = r_idx;
+                    cell.dataset.col = c;
                     board.appendChild(cell);
 
                     const piece = document.createElement('div');
                     piece.classList.add('piece');
-                    piece.id = `p-${r}-${r_idx}`;
+                    piece.id = `p-${r}-${c}`;
                     piece.dataset.correctRow = r;
-                    piece.dataset.correctCol = r_idx;
+                    piece.dataset.correctCol = c;
                     
                     piece.style.backgroundImage = `url('${imageUrl}')`;
                     
-                    const posX = (r_idx / (cols - 1)) * 100;
+                    const posX = (c / (cols - 1)) * 100;
                     const posY = (r / (rows - 1)) * 100;
                     piece.style.backgroundPosition = `${posX}% ${posY}%`;
 
+                    // Eventos táctiles corregidos para celulares
                     piece.addEventListener('touchstart', touchStart, { passive: false });
                     piece.addEventListener('touchmove', touchMove, { passive: false });
                     piece.addEventListener('touchend', touchEnd);
@@ -197,6 +197,7 @@
                 }
             }
 
+            // Mezclar e inyectar piezas
             pieces.sort(() => Math.random() - 0.5);
             pieces.forEach(p => piecesContainer.appendChild(p));
         }
@@ -210,8 +211,8 @@
             
             this.style.position = 'fixed';
             this.style.zIndex = '1000';
-            this.style.width = 'calc(var(--puzzle-size) / 3)';
-            this.style.height = 'calc(var(--puzzle-size) / 3)';
+            this.style.width = 'var(--cell-size)';
+            this.style.height = 'var(--cell-size)';
             
             moveAt(touch.clientX, touch.clientY);
         }
@@ -224,7 +225,7 @@
 
         function touchMove(e) {
             if (!draggedPiece) return;
-            e.preventDefault();
+            e.preventDefault(); // Detiene el scroll del móvil
             const touch = e.touches[0];
             moveAt(touch.clientX, touch.clientY);
         }
@@ -235,6 +236,8 @@
             const touch = e.changedTouches[0];
             draggedPiece.style.position = 'static';
             draggedPiece.style.zIndex = '';
+            draggedPiece.style.width = '';
+            draggedPiece.style.height = '';
             
             const elementUnder = document.elementFromPoint(touch.clientX, touch.clientY);
             const targetCell = elementUnder ? elementUnder.closest('.cell') : null;
