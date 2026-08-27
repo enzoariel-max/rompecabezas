@@ -6,7 +6,6 @@
     <title>Rompecabezas Seguro Real</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        
         body {
             font-family: 'Segoe UI', Arial, sans-serif;
             text-align: center;
@@ -20,11 +19,9 @@
             overflow: hidden;
             position: relative;
         }
-
         .encabezado { margin-top: 10px; margin-bottom: 15px; z-index: 10; }
         h1 { color: #ffffff; font-size: clamp(1.2rem, 5vw, 1.8rem); }
         p { color: #bdc3c7; font-size: clamp(0.8rem, 3.5vw, 1rem); }
-
         #tablero-destino {
             --tamano: min(85vw, 38vh, 300px); 
             display: grid;
@@ -41,77 +38,36 @@
             z-index: 5;
             padding: 2px;
         }
-
-        /* DISEÑO DE LAS GUÍAS DEL TABLERO USANDO BORDES COMPATIBLES */
         .celda-guia {
-            width: 100%;
-            height: 100%;
-            position: relative;
+            width: 100%; height: 100%; position: relative;
             border: 2px dashed rgba(255, 255, 255, 0.25);
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            display: flex; justify-content: center; align-items: center;
         }
-
-        /* Generamos curvas visuales de encaje en las esquinas de las guías internas */
         .celda-guia::after {
-            content: "";
-            position: absolute;
-            width: 25%; height: 25%;
+            content: ""; position: absolute; width: 25%; height: 25%;
             border: 2px dashed rgba(255, 255, 255, 0.2);
-            border-radius: 50%;
-            background-color: #2c3e50;
+            border-radius: 50%; background-color: #2c3e50;
         }
-
-        /* PIEZAS JUGABLES CON BORDES CURVOS COMPATIBLES */
         .pieza {
             position: absolute;
             width: min(24vw, 11vh, 90px);
             height: min(24vw, 11vh, 90px);
-            cursor: grab;
-            touch-action: none;
-            z-index: 50;
-            background-size: 300% 300%;
-            border: 2px solid #ffffff;
+            cursor: grab; touch-action: none; z-index: 50;
+            background-size: 300% 300%; border: 2px solid #ffffff;
             box-shadow: 0 5px 10px rgba(0,0,0,0.4);
-            
-            /* Genera esquinas súper estilizadas emulando las curvas de encastre */
             border-radius: 24px 8px 24px 8px; 
         }
-
-        /* Alternamos el sentido de las curvas según la pieza para que encajen visualmente */
-        .pieza:nth-child(even) {
-            border-radius: 8px 24px 8px 24px;
-        }
-
-        .pieza:active {
-            cursor: grabbing;
-            z-index: 999;
-            transform: scale(1.05);
-        }
-
-        /* Ajuste milimétrico y plano al succionarse dentro del tablero central */
+        .pieza:nth-child(even) { border-radius: 8px 24px 8px 24px; }
+        .pieza:active { cursor: grabbing; z-index: 999; transform: scale(1.05); }
         .celda-guia .pieza {
-            position: absolute !important;
-            top: 0 !important; left: 0 !important;
+            position: absolute !important; top: 0 !important; left: 0 !important;
             width: 100% !important; height: 100% !important;
-            box-shadow: none;
-            border: 1px solid rgba(255,255,255,0.4);
+            box-shadow: none; border: 1px solid rgba(255,255,255,0.4);
         }
-
         button {
-            background-color: #e74c3c;
-            color: white;
-            border: none;
-            padding: 10px 24px;
-            font-size: 15px;
-            font-weight: bold;
-            border-radius: 20px;
-            cursor: pointer;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-            position: fixed;
-            bottom: 15px;
-            z-index: 100;
+            background-color: #e74c3c; color: white; border: none; padding: 10px 24px;
+            font-size: 15px; font-weight: bold; border-radius: 20px; cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3); position: fixed; bottom: 15px; z-index: 100;
         }
     </style>
 </head>
@@ -120,69 +76,57 @@
         <h1>Rompecabezas Curvo</h1>
         <p>Arrastra las piezas de abajo y encájalas en su posición</p>
     </div>
-    
     <div id="tablero-destino"></div>
-
     <button onclick="iniciarJuego()">Mezclar de Nuevo</button>
-
     <script>
-        // Los 3 rompecabezas aleatorios basados en imágenes estables de internet
         const IMAGENES_JUEGOS = [
             "https://picsum.photos", 
             "https://picsum.photos", 
             "https://picsum.photos"
         ];
-
-        let piezaActiva = null;
-        let despliegueX = 0; let despliegueY = 0;
+        let piezaActiva = null; let despliegueX = 0; let despliegueY = 0;
 
         function iniciarJuego() {
             const tablero = document.getElementById("tablero-destino");
             document.querySelectorAll('body > .pieza').forEach(p => p.remove());
             tablero.innerHTML = ""; 
 
-            // Crear las celdas guía en el tablero central
             for (let i = 0; i < 9; i++) {
                 const celda = document.createElement("div");
                 celda.classList.add("celda-guia");
                 celda.setAttribute("data-pos-correcta", i);
-                
                 celda.addEventListener('dragover', (e) => e.preventDefault());
                 celda.addEventListener('drop', (e) => {
                     e.preventDefault();
                     if (celda.children.length === 0 && piezaActiva) {
-                        celda.appendChild(piezaActiva);
-                        piezaActiva = null;
-                        verificarVictoria();
+                        celda.appendChild(piezaActiva); piezaActiva = null; verificarVictoria();
                     }
                 });
                 tablero.appendChild(celda);
             }
 
             const imagenActual = IMAGENES_JUEGOS[Math.floor(Math.random() * IMAGENES_JUEGOS.length)];
-            let lista = "0,1,2,3,4,5,6,7,8".split(",");
-            lista.sort(() => Math.random() - 0.5); 
+            
+            // Lógica súper simplificada sin caracteres que confundan al editor de código
+            let misPiezas =;
+            misPiezas.sort(function() { return Math.random() - 0.5; });
 
-            lista.forEach((idStr, indice) => {
-                let idOriginal = parseInt(idStr);
+            misPiezas.forEach(function(idOriginal, indice) {
                 const pieza = document.createElement("div");
                 pieza.classList.add("pieza");
                 pieza.setAttribute("draggable", "true");
                 pieza.setAttribute("data-id-original", idOriginal);
                 
-                // Mapeo perfecto de la porción de imagen
-                pieza.style.backgroundImage = `url('${imagenActual}')`;
+                pieza.style.backgroundImage = "url('" + imagenActual + "')";
                 let xPorcentaje = (idOriginal % 3) * 50; 
                 let yPorcentaje = Math.floor(idOriginal / 3) * 50; 
-                pieza.style.backgroundPosition = `${xPorcentaje}% ${yPorcentaje}%`;
+                pieza.style.backgroundPosition = xPorcentaje + "% " + yPorcentaje + "%";
 
                 esparcirAbajo(pieza, indice);
 
-                // CONTROLES MOUSE (PC)
-                pieza.addEventListener('dragstart', (e) => { piezaActiva = e.target; });
+                pieza.addEventListener('dragstart', function(e) { piezaActiva = e.target; });
 
-                // CONTROLES TÁCTILES (CELULAR)
-                pieza.addEventListener('touchstart', (e) => {
+                pieza.addEventListener('touchstart', function(e) {
                     if (pieza.parentElement.classList.contains('celda-guia')) return;
                     piezaActiva = e.target;
                     let toque = e.touches[0];
@@ -190,7 +134,7 @@
                     despliegueY = toque.clientY - piezaActiva.offsetTop;
                 }, { passive: true });
 
-                pieza.addEventListener('touchmove', (e) => {
+                pieza.addEventListener('touchmove', function(e) {
                     if (!piezaActiva || piezaActiva.parentElement !== document.body) return;
                     e.preventDefault(); 
                     let toque = e.touches[0];
@@ -198,7 +142,7 @@
                     piezaActiva.style.top = (toque.clientY - despliegueY) + 'px';
                 }, { passive: false });
 
-                pieza.addEventListener('touchend', (e) => {
+                pieza.addEventListener('touchend', function(e) {
                     if (!piezaActiva) return;
                     let toque = e.changedTouches[0];
                     evaluarSoltar(toque.clientX, toque.clientY, piezaActiva);
@@ -214,7 +158,6 @@
             let columnas = indice % 3;
             let margenIzquierdo = 6 + (columnas * 30);
             let margenSuperior = 54 + (filas * 13);
-
             pieza.style.left = margenIzquierdo + 'vw';
             pieza.style.top = margenSuperior + 'vh';
         }
@@ -222,22 +165,15 @@
         function evaluarSoltar(clientX, clientY, piezaAEv) {
             const celdas = document.querySelectorAll('.celda-guia');
             let imantado = false;
-
-            celdas.forEach(celda => {
+            celdas.forEach(function(celda) {
                 if (celda.children.length > 0) return;
                 const rect = celda.getBoundingClientRect();
-                
                 const distanciaX = Math.abs(clientX - (rect.left + rect.width / 2));
                 const distanciaY = Math.abs(clientY - (rect.top + rect.height / 2));
-                
-                // Rango de absorción del imán
                 if (distanciaX < 45 && distanciaY < 45) {
-                    celda.appendChild(piezaAEv);
-                    imantado = true;
-                    verificarVictoria();
+                    celda.appendChild(piezaAEv); imantado = true; verificarVictoria();
                 }
             });
-
             if (!imantado) {
                 let idOriginal = parseInt(piezaAEv.getAttribute('data-id-original'));
                 esparcirAbajo(piezaAEv, idOriginal);
@@ -247,22 +183,15 @@
         function verificarVictoria() {
             const celdas = document.querySelectorAll('.celda-guia');
             let ganar = true; let completadas = 0;
-
-            celdas.forEach(celda => {
+            celdas.forEach(function(celda) {
                 const piezaDins = celda.querySelector('.pieza');
                 if (piezaDins) {
                     completadas++;
-                    if (celda.getAttribute('data-pos-correcta') !== piezaDins.getAttribute('data-id-original')) {
-                        ganar = false;
-                    }
+                    if (celda.getAttribute('data-pos-correcta') !== piezaDins.getAttribute('data-id-original')) { ganar = false; }
                 } else { ganar = false; }
             });
-
-            if (ganar && completadas === 9) {
-                setTimeout(() => { alert("¡Espectacular! Completaste el rompecabezas real 🏆"); }, 200);
-            }
+            if (ganar && completadas === 9) { setTimeout(function() { alert("¡Espectacular! Completaste el rompecabezas real 🏆"); }, 200); }
         }
-
         window.onload = iniciarJuego;
     </script>
 </body>
