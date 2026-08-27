@@ -6,6 +6,7 @@
     <title>Rompecabezas Curvo Real</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
+        
         body {
             font-family: 'Segoe UI', Arial, sans-serif;
             text-align: center;
@@ -19,9 +20,11 @@
             overflow: hidden;
             position: relative;
         }
+
         .encabezado { margin-top: 10px; margin-bottom: 15px; z-index: 10; }
         h1 { color: #ffffff; font-size: clamp(1.2rem, 5vw, 1.8rem); }
         p { color: #bdc3c7; font-size: clamp(0.8rem, 3.5vw, 1rem); }
+
         #tablero-destino {
             --tamano: min(85vw, 38vh, 300px); 
             display: grid;
@@ -37,19 +40,43 @@
             position: relative;
             z-index: 5;
         }
+
+        /* LAS CELDAS GUÍA AHORA TIENEN BORDES VECTORIALES CURVOS */
         .celda-guia {
-            width: 100%; height: 100%; position: relative;
-            outline: 1px dashed rgba(255,255,255,0.15);
+            width: 100%;
+            height: 100%;
+            position: relative;
+            background-size: 100% 100%;
+            background-repeat: no-repeat;
+            opacity: 0.4; /* Se ve transparente como una plantilla de guía */
         }
+
+        /* Diseños curvos idénticos para el fondo del tablero (Líneas guía tipo rompecabezas) */
+        .celda-guia[data-pos-correcta="0"] { background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://w3.org" viewBox="0 0 100 100"><path d="M0,0 H100 Q85,0 85,15 Q85,30 100,30 V100 H0 Z" fill="none" stroke="white" stroke-width="3" stroke-dasharray="4,4"/></svg>'); }
+        .celda-guia[data-pos-correcta="1"] { background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://w3.org" viewBox="0 0 100 100"><path d="M0,0 H100 V100 H0 Q15,100 15,85 Q15,70 0,70 Z" fill="none" stroke="white" stroke-width="3" stroke-dasharray="4,4"/></svg>'); }
+        .celda-guia[data-pos-correcta="2"] { background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://w3.org" viewBox="0 0 100 100"><path d="M0,0 H100 V70 Q85,70 85,85 Q85,100 70,100 H0 Z" fill="none" stroke="white" stroke-width="3" stroke-dasharray="4,4"/></svg>'); }
+        .celda-guia[data-pos-correcta="3"] { background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://w3.org" viewBox="0 0 100 100"><path d="M0,0 H100 V100 H0 Q30,100 30,85 Q30,70 0,70 Z" fill="none" stroke="white" stroke-width="3" stroke-dasharray="4,4"/></svg>'); }
+        .celda-guia[data-pos-correcta="4"] { background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://w3.org" viewBox="0 0 100 100"><path d="M0,0 H100 V100 H0 Z" fill="none" stroke="white" stroke-width="3" stroke-dasharray="4,4"/></svg>'); }
+        .celda-guia[data-pos-correcta="5"] { background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://w3.org" viewBox="0 0 100 100"><path d="M0,0 H100 Q85,0 85,15 Q85,30 100,30 V100 H0 Z" fill="none" stroke="white" stroke-width="3" stroke-dasharray="4,4"/></svg>'); }
+        .celda-guia[data-pos-correcta="6"] { background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://w3.org" viewBox="0 0 100 100"><path d="M0,0 H100 V100 H0 Z" fill="none" stroke="white" stroke-width="3" stroke-dasharray="4,4"/></svg>'); }
+        .celda-guia[data-pos-correcta="7"] { background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://w3.org" viewBox="0 0 100 100"><path d="M0,0 H100 V70 Q85,70 85,85 Q85,100 70,100 H0 Z" fill="none" stroke="white" stroke-width="3" stroke-dasharray="4,4"/></svg>'); }
+        .celda-guia[data-pos-correcta="8"] { background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://w3.org" viewBox="0 0 100 100"><path d="M0,0 H100 V100 H0 Q15,100 15,85 Q15,70 0,70 Z" fill="none" stroke="white" stroke-width="3" stroke-dasharray="4,4"/></svg>'); }
+
         .pieza {
             position: absolute;
             width: min(26vw, 12vh, 100px);
             height: min(26vw, 12vh, 100px);
-            cursor: grab; touch-action: none; z-index: 50;
+            cursor: grab;
+            touch-action: none;
+            z-index: 50;
             background-size: 300% 300%;
-            -webkit-mask-size: 100% 100%; mask-size: 100% 100%;
-            -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+            -webkit-mask-size: 100% 100%;
+            mask-size: 100% 100%;
+            -webkit-mask-repeat: no-repeat;
+            mask-repeat: no-repeat;
         }
+
+        /* Máscaras para recortar los moldes curvos de las piezas movibles */
         .pieza[data-id-original="0"] { -webkit-mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://w3.org" viewBox="0 0 100 100"><path d="M0,0 H100 Q85,0 85,15 Q85,30 100,30 V100 H0 Z" fill="black"/></svg>'); mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://w3.org" viewBox="0 0 100 100"><path d="M0,0 H100 Q85,0 85,15 Q85,30 100,30 V100 H0 Z" fill="black"/></svg>'); }
         .pieza[data-id-original="1"] { -webkit-mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://w3.org" viewBox="0 0 100 100"><path d="M0,0 H100 V100 H0 Q15,100 15,85 Q15,70 0,70 Z" fill="black"/></svg>'); mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://w3.org" viewBox="0 0 100 100"><path d="M0,0 H100 V100 H0 Q15,100 15,85 Q15,70 0,70 Z" fill="black"/></svg>'); }
         .pieza[data-id-original="2"] { -webkit-mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://w3.org" viewBox="0 0 100 100"><path d="M0,0 H100 V70 Q85,70 85,85 Q85,100 70,100 H0 Z" fill="black"/></svg>'); mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://w3.org" viewBox="0 0 100 100"><path d="M0,0 H100 V70 Q85,70 85,85 Q85,100 70,100 H0 Z" fill="black"/></svg>'); }
@@ -59,9 +86,33 @@
         .pieza[data-id-original="6"] { -webkit-mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://w3.org" viewBox="0 0 100 100"><path d="M0,0 H100 V100 H0 Z" fill="black"/></svg>'); mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://w3.org" viewBox="0 0 100 100"><path d="M0,0 H100 V100 H0 Z" fill="black"/></svg>'); }
         .pieza[data-id-original="7"] { -webkit-mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://w3.org" viewBox="0 0 100 100"><path d="M0,0 H100 V70 Q85,70 85,85 Q85,100 70,100 H0 Z" fill="black"/></svg>'); mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://w3.org" viewBox="0 0 100 100"><path d="M0,0 H100 V70 Q85,70 85,85 Q85,100 70,100 H0 Z" fill="black"/></svg>'); }
         .pieza[data-id-original="8"] { -webkit-mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://w3.org" viewBox="0 0 100 100"><path d="M0,0 H100 V100 H0 Q15,100 15,85 Q15,70 0,70 Z" fill="black"/></svg>'); mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://w3.org" viewBox="0 0 100 100"><path d="M0,0 H100 V100 H0 Q15,100 15,85 Q15,70 0,70 Z" fill="black"/></svg>'); }
+
         .pieza:active { cursor: grabbing; z-index: 999; }
-        .celda-guia .pieza { position: absolute !important; top: 0 !important; left: 0 !important; width: 100% !important; height: 100% !important; box-shadow: none; }
-        button { background-color: #e74c3c; color: white; border: none; padding: 10px 24px; font-size: 15px; font-weight: bold; border-radius: 20px; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); position: fixed; bottom: 15px; z-index: 100; }
+        
+        /* Cuando la pieza encaja, se remueve la opacidad de la celda */
+        .celda-guia .pieza {
+            position: absolute !important;
+            top: 0 !important; left: 0 !important;
+            width: 100% !important; height: 100% !important;
+            box-shadow: none;
+        }
+        
+        .celda-guia.completada { opacity: 1 !important; }
+
+        button {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            font-size: 15px;
+            font-weight: bold;
+            border-radius: 20px;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            position: fixed;
+            bottom: 15px;
+            z-index: 100;
+        }
     </style>
 </head>
 <body>
@@ -69,96 +120,144 @@
         <h1>Rompecabezas Curvo</h1>
         <p>Arrastra las piezas de abajo y encájalas en su posición</p>
     </div>
+    
     <div id="tablero-destino"></div>
+
     <button onclick="iniciarJuego()">Mezclar de Nuevo</button>
+
     <script>
         const IMAGENES_JUEGOS = [
             "https://picsum.photos", 
             "https://picsum.photos", 
             "https://picsum.photos"
         ];
-        let piezaActiva = null; let despliegueX = 0; let despliegueY = 0;
+
+        let piezaActiva = null;
+        let despliegueX = 0; let despliegueY = 0;
+
         function iniciarJuego() {
             const tablero = document.getElementById("tablero-destino");
             document.querySelectorAll('body > .pieza').forEach(p => p.remove());
             tablero.innerHTML = ""; 
+
             for (let i = 0; i < 9; i++) {
                 const celda = document.createElement("div");
                 celda.classList.add("celda-guia");
                 celda.setAttribute("data-pos-correcta", i);
+                
                 celda.addEventListener('dragover', (e) => e.preventDefault());
                 celda.addEventListener('drop', (e) => {
                     e.preventDefault();
                     if (celda.children.length === 0 && piezaActiva) {
-                        celda.appendChild(piezaActiva); piezaActiva = null; verificarVictoria();
+                        celda.classList.add('completada');
+                        celda.appendChild(piezaActiva);
+                        piezaActiva = null;
+                        verificarVictoria();
                     }
                 });
                 tablero.appendChild(celda);
             }
+
             const imagenActual = IMAGENES_JUEGOS[Math.floor(Math.random() * IMAGENES_JUEGOS.length)];
             let lista = "0,1,2,3,4,5,6,7,8".split(",");
             lista.sort(() => Math.random() - 0.5); 
+
             lista.forEach((idStr, indice) => {
                 let idOriginal = parseInt(idStr);
                 const pieza = document.createElement("div");
                 pieza.classList.add("pieza");
                 pieza.setAttribute("draggable", "true");
                 pieza.setAttribute("data-id-original", idOriginal);
+                
                 pieza.style.backgroundImage = `url('${imagenActual}')`;
                 let xPorcentaje = (idOriginal % 3) * 50; 
                 let yPorcentaje = Math.floor(idOriginal / 3) * 50; 
                 pieza.style.backgroundPosition = `${xPorcentaje}% ${yPorcentaje}%`;
+
                 esparcirAbajo(pieza, indice);
+
                 pieza.addEventListener('dragstart', (e) => { piezaActiva = e.target; });
+
                 pieza.addEventListener('touchstart', (e) => {
                     if (pieza.parentElement.classList.contains('celda-guia')) return;
-                    piezaActiva = e.target; let toque = e.touches[0];
+                    piezaActiva = e.target;
+                    let toque = e.touches[0];
                     despliegueX = toque.clientX - piezaActiva.offsetLeft;
                     despliegueY = toque.clientY - piezaActiva.offsetTop;
                 }, { passive: true });
+
                 pieza.addEventListener('touchmove', (e) => {
                     if (!piezaActiva || piezaActiva.parentElement !== document.body) return;
-                    e.preventDefault(); let toque = e.touches[0];
+                    e.preventDefault(); 
+                    let toque = e.touches[0];
                     piezaActiva.style.left = (toque.clientX - despliegueX) + 'px';
                     piezaActiva.style.top = (toque.clientY - despliegueY) + 'px';
                 }, { passive: false });
+
                 pieza.addEventListener('touchend', (e) => {
-                    if (!piezaActiva) return; let toque = e.changedTouches[0];
-                    evaluarSoltar(toque.clientX, toque.clientY, piezaActiva); piezaActiva = null;
+                    if (!piezaActiva) return;
+                    let toque = e.changedTouches[0];
+                    evaluarSoltar(toque.clientX, toque.clientY, piezaActiva);
+                    piezaActiva = null;
                 });
+
                 document.body.appendChild(pieza);
             });
         }
+
         function esparcirAbajo(pieza, indice) {
-            let filas = Math.floor(indice / 3); let columnas = indice % 3;
+            let filas = Math.floor(indice / 3);
+            let columnas = indice % 3;
             let margenIzquierdo = 8 + (columnas * 29) + (Math.random() * 4 - 2);
             let margenSuperior = 55 + (filas * 12) + (Math.random() * 3 - 1);
-            pieza.style.left = margenIzquierdo + 'vw'; pieza.style.top = margenSuperior + 'vh';
+
+            pieza.style.left = margenIzquierdo + 'vw';
+            pieza.style.top = margenSuperior + 'vh';
         }
+
         function evaluarSoltar(clientX, clientY, piezaAEv) {
-            const celdas = document.querySelectorAll('.celda-guia'); let imantado = false;
+            const celdas = document.querySelectorAll('.celda-guia');
+            let imantado = false;
+
             celdas.forEach(celda => {
                 if (celda.children.length > 0) return;
                 const rect = celda.getBoundingClientRect();
+                
                 const distanciaX = Math.abs(clientX - (rect.left + rect.width / 2));
                 const distanciaY = Math.abs(clientY - (rect.top + rect.height / 2));
                 if (distanciaX < 45 && distanciaY < 45) {
-                    celda.appendChild(piezaAEv); imantado = true; verificarVictoria();
+                    celda.classList.add('completada');
+                    celda.appendChild(piezaAEv);
+                    imantado = true;
+                    verificarVictoria();
                 }
             });
-            if (!imantado) { let idOriginal = parseInt(piezaAEv.getAttribute('data-id-original')); esparcirAbajo(piezaAEv, idOriginal); }
+
+            if (!imantado) {
+                let idOriginal = parseInt(piezaAEv.getAttribute('data-id-original'));
+                esparcirAbajo(piezaAEv, idOriginal);
+            }
         }
+
         function verificarVictoria() {
-            const celdas = document.querySelectorAll('.celda-guia'); let ganar = true; let completadas = 0;
+            const celdas = document.querySelectorAll('.celda-guia');
+            let ganar = true; let completadas = 0;
+
             celdas.forEach(celda => {
                 const piezaDins = celda.querySelector('.pieza');
                 if (piezaDins) {
                     completadas++;
-                    if (celda.getAttribute('data-pos-correcta') !== piezaDins.getAttribute('data-id-original')) { ganar = false; }
+                    if (celda.getAttribute('data-pos-correcta') !== piezaDins.getAttribute('data-id-original')) {
+                        ganar = false;
+                    }
                 } else { ganar = false; }
             });
-            if (ganar && completadas === 9) { setTimeout(() => { alert("¡Espectacular! Completaste el rompecabezas real 🏆"); }, 200); }
+
+            if (ganar && completadas === 9) {
+                setTimeout(() => { alert("¡Espectacular! Completaste el rompecabezas real 🏆"); }, 200);
+            }
         }
+
         window.onload = iniciarJuego;
     </script>
 </body>
