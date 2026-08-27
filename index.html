@@ -1,774 +1,1010 @@
+```html
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-    <title>Rompecabezas Curvo</title>
+<title>Rompecabezas Curvo</title>
 
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+<style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
 
-        body {
-            font-family: 'Segoe UI', Arial, sans-serif;
-            text-align: center;
-            min-height: 100vh;
-            background-color: #1a252f;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-start;
-            padding: 10px;
-            overflow: hidden;
-            position: relative;
-        }
+body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    text-align: center;
+    min-height: 100vh;
+    background: #1a252f;
+    overflow: hidden;
+    color: white;
+}
 
-        .encabezado {
-            margin-top: 10px;
-            margin-bottom: 15px;
-            z-index: 10;
-        }
+.encabezado {
+    margin-top: 12px;
+    margin-bottom: 12px;
+    position: relative;
+    z-index: 10;
+}
 
-        h1 {
-            color: #ffffff;
-            font-size: clamp(1.2rem, 5vw, 1.8rem);
-        }
+h1 {
+    font-size: clamp(1.2rem, 5vw, 1.8rem);
+}
 
-        p {
-            color: #bdc3c7;
-            font-size: clamp(0.8rem, 3.5vw, 1rem);
-        }
+p {
+    color: #bdc3c7;
+    font-size: clamp(.8rem, 3.5vw, 1rem);
+}
 
-        #tablero-destino {
-            --tamano: min(85vw, 38vh, 300px);
+/* =========================================
+   TABLERO
+========================================= */
 
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            grid-template-rows: repeat(3, 1fr);
+#tablero-destino {
+    --tamano: min(82vw, 55vh, 330px);
 
-            width: var(--tamano);
-            height: var(--tamano);
+    width: var(--tamano);
+    height: var(--tamano);
 
-            border: 4px solid #ffffff;
-            background-color: #2c3e50;
-            border-radius: 12px;
+    margin: 0 auto;
 
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
 
-            margin-bottom: 20px;
+    position: relative;
 
-            position: relative;
-            z-index: 5;
+    background: #243746;
 
-            padding: 2px;
-        }
+    border: 3px solid white;
+    border-radius: 10px;
 
-        .celda-guia {
-            width: 100%;
-            height: 100%;
+    box-shadow:
+        0 10px 25px rgba(0,0,0,.5);
 
-            position: relative;
+    overflow: visible;
+}
 
-            border: 2px dashed rgba(255, 255, 255, 0.25);
+/* =========================================
+   GUÍAS PUNTEADAS
+========================================= */
 
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
+.celda-guia {
+    position: relative;
 
-        .celda-guia::after {
-            content: "";
+    border: 2px dashed rgba(255,255,255,.45);
 
-            position: absolute;
+    background:
+        rgba(255,255,255,.025);
 
-            width: 25%;
-            height: 25%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
-            border: 2px dashed rgba(255, 255, 255, 0.2);
-            border-radius: 50%;
+    transition: background .2s;
+}
 
-            background-color: #2c3e50;
-        }
+.celda-guia:hover {
+    background: rgba(255,255,255,.08);
+}
 
-        .pieza {
-            position: absolute;
+/* número pequeño de referencia */
 
-            width: min(24vw, 11vh, 90px);
-            height: min(24vw, 11vh, 90px);
+.celda-guia::before {
+    content: attr(data-pos-correcta);
+    position: absolute;
 
-            cursor: grab;
-            touch-action: none;
+    color: rgba(255,255,255,.18);
 
-            z-index: 50;
+    font-size: 13px;
+    font-weight: bold;
 
-            background-size: 300% 300%;
-            background-repeat: no-repeat;
+    pointer-events: none;
+}
 
-            border: 2px solid #ffffff;
+/* =========================================
+   PIEZAS
+========================================= */
 
-            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.4);
+.pieza {
+    position: absolute;
 
-            border-radius: 24px 8px 24px 8px;
+    width: min(26vw, 11.5vh, 110px);
+    height: min(26vw, 11.5vh, 110px);
 
-            user-select: none;
-        }
+    cursor: grab;
 
-        .pieza:nth-child(even) {
-            border-radius: 8px 24px 8px 24px;
-        }
+    touch-action: none;
+    user-select: none;
 
-        .pieza:active {
-            cursor: grabbing;
-            z-index: 999;
-            transform: scale(1.05);
-        }
+    z-index: 50;
 
-        .celda-guia .pieza {
-            position: absolute !important;
+    background-repeat: no-repeat;
+    background-size: 300% 300%;
 
-            top: 0 !important;
-            left: 0 !important;
+    /*
+       El clip-path genera la silueta
+       general de una pieza de rompecabezas.
+    */
 
-            width: 100% !important;
-            height: 100% !important;
+    filter:
+        drop-shadow(0 5px 5px rgba(0,0,0,.45));
 
-            box-shadow: none;
+    transition:
+        transform .15s,
+        filter .15s;
+}
 
-            border: 1px solid rgba(255, 255, 255, 0.4);
+.pieza:active {
+    cursor: grabbing;
 
-            transform: none !important;
-        }
+    transform: scale(1.06);
 
-        button {
-            background-color: #e74c3c;
+    z-index: 999;
+}
 
-            color: white;
+/* =========================================
+   FORMAS DE LAS PIEZAS
+========================================= */
 
-            border: none;
+/*
+    Cada pieza recibe una combinación
+    diferente de lados.
 
-            padding: 10px 24px;
+    0 = borde
+    1 = saliente
+    2 = entrante
+*/
 
-            font-size: 15px;
-            font-weight: bold;
+/* Esquinas */
 
-            border-radius: 20px;
+.pieza.esquina-superior-izquierda {
+    clip-path: polygon(
+        0 0,
+        100% 0,
+        100% 35%,
+        94% 35%,
+        90% 39%,
+        90% 48%,
+        94% 52%,
+        100% 52%,
+        100% 100%,
+        35% 100%,
+        35% 94%,
+        30% 90%,
+        20% 90%,
+        15% 94%,
+        15% 100%,
+        0 100%
+    );
+}
 
-            cursor: pointer;
+/* =========================================
+   BORDE SUPERIOR
+========================================= */
 
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+.pieza.borde-superior {
+    clip-path: polygon(
+        0 0,
+        35% 0,
+        35% 6%,
+        40% 10%,
+        50% 10%,
+        55% 6%,
+        55% 0,
+        100% 0,
 
-            position: fixed;
+        100% 35%,
+        94% 35%,
+        90% 40%,
+        90% 50%,
+        94% 55%,
+        100% 55%,
 
-            bottom: 15px;
+        100% 100%,
 
-            z-index: 100;
-        }
+        65% 100%,
+        65% 94%,
+        60% 90%,
+        50% 90%,
+        45% 94%,
+        45% 100%,
 
-        button:hover {
-            background-color: #ff5544;
-        }
-    </style>
+        0 100%,
+
+        0 55%,
+        6% 55%,
+        10% 50%,
+        10% 40%,
+        6% 35%,
+        0 35%
+    );
+}
+
+/* =========================================
+   PIEZA INTERIOR
+========================================= */
+
+.pieza.interior {
+    clip-path: polygon(
+        0 0,
+
+        35% 0,
+        35% 6%,
+        40% 10%,
+        50% 10%,
+        55% 6%,
+        55% 0,
+
+        100% 0,
+
+        100% 35%,
+        94% 35%,
+        90% 40%,
+        90% 50%,
+        94% 55%,
+        100% 55%,
+
+        100% 100%,
+
+        65% 100%,
+        65% 94%,
+        60% 90%,
+        50% 90%,
+        45% 94%,
+        45% 100%,
+
+        0 100%,
+
+        0 65%,
+        6% 65%,
+        10% 60%,
+        10% 50%,
+        6% 45%,
+        0 45%
+    );
+}
+
+/* =========================================
+   PIEZAS DENTRO DEL TABLERO
+========================================= */
+
+.celda-guia .pieza {
+    position: absolute;
+
+    left: 0 !important;
+    top: 0 !important;
+
+    width: 100% !important;
+    height: 100% !important;
+
+    z-index: 20;
+
+    filter: none;
+
+    transform: none !important;
+}
+
+/* =========================================
+   BOTÓN
+========================================= */
+
+button {
+    position: fixed;
+
+    bottom: 15px;
+    left: 50%;
+
+    transform: translateX(-50%);
+
+    padding: 11px 25px;
+
+    border: none;
+    border-radius: 25px;
+
+    background: #e74c3c;
+
+    color: white;
+
+    font-size: 15px;
+    font-weight: bold;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 4px 12px rgba(0,0,0,.4);
+
+    z-index: 1000;
+}
+
+button:hover {
+    background: #ff5544;
+}
+</style>
 </head>
 
 <body>
 
-    <div class="encabezado">
-        <h1>Rompecabezas Curvo</h1>
-        <p>Arrastra las piezas de abajo y encájalas en su posición</p>
-    </div>
+<div class="encabezado">
+    <h1>Rompecabezas 🧩</h1>
+    <p>Arrastrá las piezas y acomodalas en su lugar</p>
+</div>
 
-    <div id="tablero-destino"></div>
+<div id="tablero-destino"></div>
 
-    <button onclick="iniciarJuego()">
-        Mezclar de Nuevo
-    </button>
+<button onclick="iniciarJuego()">
+    🔀 Mezclar de Nuevo
+</button>
 
-    <script>
 
-        /*
-         * ==========================================
-         * CONFIGURACIÓN
-         * ==========================================
-         */
+<script>
 
-        let piezaActiva = null;
+/* =========================================
+   CONFIGURACIÓN
+========================================= */
 
-        let despliegueX = 0;
-        let despliegueY = 0;
+let piezaActiva = null;
 
+let offsetX = 0;
+let offsetY = 0;
 
-        /*
-         * ==========================================
-         * INICIAR JUEGO
-         * ==========================================
-         */
 
-        function iniciarJuego() {
+/*
+    Tus tres imágenes.
 
-            const tablero = document.getElementById("tablero-destino");
+    Cuando las subas a GitHub,
+    cambiá solamente estos nombres.
+*/
 
+const imagenes = [
 
-            // Eliminar piezas anteriores
-            document.querySelectorAll("body > .pieza").forEach(function(pieza) {
-                pieza.remove();
-            });
+    "imagenes/imagen1.jpg",
+    "imagenes/imagen2.jpg",
+    "imagenes/imagen3.jpg"
 
+];
 
-            // Vaciar tablero
-            tablero.innerHTML = "";
 
+/* =========================================
+   INICIAR JUEGO
+========================================= */
 
-            /*
-             * Crear las 9 celdas del tablero
-             */
+function iniciarJuego() {
 
-            for (let i = 0; i < 9; i++) {
+    const tablero =
+        document.getElementById("tablero-destino");
 
-                const celda = document.createElement("div");
+    /*
+        Limpiar tablero
+    */
 
-                celda.classList.add("celda-guia");
+    tablero.innerHTML = "";
 
-                celda.setAttribute(
-                    "data-pos-correcta",
-                    i
-                );
+    document
+        .querySelectorAll("body > .pieza")
+        .forEach(pieza => pieza.remove());
 
 
-                /*
-                 * Soltar con mouse
-                 */
+    /*
+        Elegir una de las 3 imágenes
+    */
 
-                celda.addEventListener("dragover", function(e) {
-                    e.preventDefault();
-                });
+    const imagenActual =
+        imagenes[
+            Math.floor(
+                Math.random() *
+                imagenes.length
+            )
+        ];
 
 
-                celda.addEventListener("drop", function(e) {
+    /*
+        Crear las 9 posiciones
+    */
 
-                    e.preventDefault();
+    for (let i = 0; i < 9; i++) {
 
-                    if (
-                        celda.children.length === 0 &&
-                        piezaActiva
-                    ) {
+        const celda =
+            document.createElement("div");
 
-                        celda.appendChild(piezaActiva);
+        celda.className =
+            "celda-guia";
 
-                        piezaActiva = null;
+        celda.dataset.posCorrecta = i + 1;
 
-                        verificarVictoria();
-                    }
+        tablero.appendChild(celda);
+    }
 
-                });
 
+    /*
+        Crear piezas
+    */
 
-                tablero.appendChild(celda);
-            }
+    let piezas = [
+        0,1,2,
+        3,4,5,
+        6,7,8
+    ];
 
 
-            /*
-             * ==========================================
-             * IMAGEN DEL ROMPECABEZAS
-             * ==========================================
-             *
-             * Picsum genera una imagen aleatoria.
-             * Usamos una semilla nueva cada vez que
-             * se inicia el juego.
-             */
+    /*
+        Mezclar
+    */
 
-            const semilla =
-                "rompecabezas-" +
-                Date.now();
+    piezas.sort(
+        () => Math.random() - .5
+    );
 
-            const imagenActual =
-                "https://picsum.photos/seed/" +
-                semilla +
-                "/900/900";
 
+    piezas.forEach(
+        (idOriginal, indice) => {
 
-            /*
-             * ==========================================
-             * CREAR LAS 9 PIEZAS
-             * ==========================================
-             */
-
-            let misPiezas = [
-                0, 1, 2,
-                3, 4, 5,
-                6, 7, 8
-            ];
-
-
-            /*
-             * Mezclar piezas
-             */
-
-            misPiezas.sort(function() {
-                return Math.random() - 0.5;
-            });
-
-
-            /*
-             * Crear cada pieza
-             */
-
-            misPiezas.forEach(function(idOriginal, indice) {
-
-                const pieza =
-                    document.createElement("div");
-
-
-                pieza.classList.add("pieza");
-
-
-                pieza.setAttribute(
-                    "draggable",
-                    "true"
-                );
-
-
-                pieza.setAttribute(
-                    "data-id-original",
-                    idOriginal
-                );
-
-
-                /*
-                 * Imagen
-                 */
-
-                pieza.style.backgroundImage =
-                    "url('" +
-                    imagenActual +
-                    "')";
-
-
-                /*
-                 * Posición de la parte de la imagen
-                 *
-                 * 0  = izquierda
-                 * 50 = centro
-                 * 100 = derecha
-                 */
-
-                const xPorcentaje =
-                    (idOriginal % 3) * 50;
-
-
-                const yPorcentaje =
-                    Math.floor(idOriginal / 3) * 50;
-
-
-                pieza.style.backgroundPosition =
-                    xPorcentaje +
-                    "% " +
-                    yPorcentaje +
-                    "%";
-
-
-                /*
-                 * Colocar pieza abajo
-                 */
-
-                esparcirAbajo(
-                    pieza,
-                    indice
-                );
-
-
-                /*
-                 * ==================================
-                 * DRAG CON MOUSE
-                 * ==================================
-                 */
-
-                pieza.addEventListener(
-                    "dragstart",
-                    function(e) {
-
-                        piezaActiva =
-                            e.currentTarget;
-
-                    }
-                );
-
-
-                /*
-                 * ==================================
-                 * TOUCH - CELULAR
-                 * ==================================
-                 */
-
-                pieza.addEventListener(
-                    "touchstart",
-                    function(e) {
-
-                        if (
-                            pieza.parentElement.classList.contains(
-                                "celda-guia"
-                            )
-                        ) {
-                            return;
-                        }
-
-
-                        piezaActiva =
-                            e.currentTarget;
-
-
-                        const toque =
-                            e.touches[0];
-
-
-                        const rect =
-                            piezaActiva.getBoundingClientRect();
-
-
-                        despliegueX =
-                            toque.clientX -
-                            rect.left;
-
-
-                        despliegueY =
-                            toque.clientY -
-                            rect.top;
-
-                    },
-                    {
-                        passive: true
-                    }
-                );
-
-
-                pieza.addEventListener(
-                    "touchmove",
-                    function(e) {
-
-                        if (
-                            !piezaActiva ||
-                            piezaActiva.parentElement !==
-                            document.body
-                        ) {
-                            return;
-                        }
-
-
-                        e.preventDefault();
-
-
-                        const toque =
-                            e.touches[0];
-
-
-                        piezaActiva.style.left =
-                            (
-                                toque.clientX -
-                                despliegueX
-                            ) +
-                            "px";
-
-
-                        piezaActiva.style.top =
-                            (
-                                toque.clientY -
-                                despliegueY
-                            ) +
-                            "px";
-
-                    },
-                    {
-                        passive: false
-                    }
-                );
-
-
-                pieza.addEventListener(
-                    "touchend",
-                    function(e) {
-
-                        if (!piezaActiva) {
-                            return;
-                        }
-
-
-                        const toque =
-                            e.changedTouches[0];
-
-
-                        evaluarSoltar(
-                            toque.clientX,
-                            toque.clientY,
-                            piezaActiva
-                        );
-
-
-                        piezaActiva = null;
-
-                    }
-                );
-
-
-                /*
-                 * Agregar pieza al body
-                 */
-
-                document.body.appendChild(pieza);
-
-            });
+            crearPieza(
+                idOriginal,
+                indice,
+                imagenActual
+            );
 
         }
+    );
+}
 
 
-        /*
-         * ==========================================
-         * COLOCAR PIEZAS ABAJO
-         * ==========================================
-         */
+/* =========================================
+   CREAR PIEZA
+========================================= */
 
-        function esparcirAbajo(
-            pieza,
-            indice
-        ) {
+function crearPieza(
+    idOriginal,
+    indice,
+    imagen
+) {
 
-            const filas =
-                Math.floor(indice / 3);
+    const pieza =
+        document.createElement("div");
 
+    pieza.classList.add("pieza");
 
-            const columnas =
-                indice % 3;
 
+    /*
+        Guardar posición correcta
+    */
 
-            const margenIzquierdo =
-                6 +
-                (columnas * 30);
+    pieza.dataset.idOriginal =
+        idOriginal;
 
 
-            const margenSuperior =
-                54 +
-                (filas * 13);
+    /*
+        Imagen
+    */
 
+    pieza.style.backgroundImage =
+        `url("${imagen}")`;
 
-            pieza.style.left =
-                margenIzquierdo +
-                "vw";
 
+    /*
+        Posición de la imagen
+    */
 
-            pieza.style.top =
-                margenSuperior +
-                "vh";
+    const columna =
+        idOriginal % 3;
 
-        }
+    const fila =
+        Math.floor(idOriginal / 3);
 
 
-        /*
-         * ==========================================
-         * EVALUAR DÓNDE SE SUELTA UNA PIEZA
-         * ==========================================
-         */
+    pieza.style.backgroundPosition =
+        `${columna * 50}% ${fila * 50}%`;
 
-        function evaluarSoltar(
-            clientX,
-            clientY,
-            piezaAEv
-        ) {
 
-            const celdas =
-                document.querySelectorAll(
-                    ".celda-guia"
-                );
+    /*
+        Forma de la pieza
+    */
 
+    asignarForma(
+        pieza,
+        idOriginal
+    );
 
-            let imantado = false;
 
+    /*
+        Posición inicial
+    */
 
-            celdas.forEach(function(celda) {
+    colocarAbajo(
+        pieza,
+        indice
+    );
 
-                /*
-                 * Si ya hay una pieza,
-                 * no se puede colocar otra.
-                 */
 
-                if (
-                    celda.children.length > 0
-                ) {
-                    return;
-                }
+    /*
+        Eventos
+    */
 
+    pieza.addEventListener(
+        "pointerdown",
+        comenzarArrastre
+    );
 
-                const rect =
-                    celda.getBoundingClientRect();
+    pieza.addEventListener(
+        "pointermove",
+        moverPieza
+    );
 
+    pieza.addEventListener(
+        "pointerup",
+        terminarArrastre
+    );
 
-                const centroX =
-                    rect.left +
-                    rect.width / 2;
+    pieza.addEventListener(
+        "pointercancel",
+        terminarArrastre
+    );
 
 
-                const centroY =
-                    rect.top +
-                    rect.height / 2;
+    document.body.appendChild(
+        pieza
+    );
+}
 
 
-                const distanciaX =
-                    Math.abs(
-                        clientX -
-                        centroX
-                    );
+/* =========================================
+   FORMAS
+========================================= */
 
+function asignarForma(
+    pieza,
+    id
+) {
 
-                const distanciaY =
-                    Math.abs(
-                        clientY -
-                        centroY
-                    );
+    const fila =
+        Math.floor(id / 3);
 
+    const columna =
+        id % 3;
 
-                /*
-                 * Área de imantado
-                 */
 
-                if (
-                    distanciaX <
-                    rect.width / 2 &&
-                    distanciaY <
-                    rect.height / 2
-                ) {
+    /*
+        Esquinas
+    */
 
-                    celda.appendChild(
-                        piezaAEv
-                    );
+    if (id === 0) {
 
+        pieza.classList.add(
+            "esquina-superior-izquierda"
+        );
 
-                    imantado = true;
+        return;
+    }
 
 
-                    verificarVictoria();
+    /*
+        Para las demás piezas usamos
+        diferentes formas.
+    */
 
-                }
+    if (fila === 0) {
 
-            });
+        pieza.classList.add(
+            "borde-superior"
+        );
 
+    } else {
 
-            /*
-             * Si no cayó en ninguna celda,
-             * devolver abajo.
-             */
+        pieza.classList.add(
+            "interior"
+        );
+    }
+}
 
-            if (!imantado) {
 
-                const idOriginal =
-                    parseInt(
-                        piezaAEv.getAttribute(
-                            "data-id-original"
-                        )
-                    );
+/* =========================================
+   COLOCAR ABAJO
+========================================= */
 
+function colocarAbajo(
+    pieza,
+    indice
+) {
 
-                esparcirAbajo(
-                    piezaAEv,
-                    idOriginal
-                );
+    const columna =
+        indice % 3;
 
-            }
+    const fila =
+        Math.floor(indice / 3);
 
-        }
 
+    /*
+        Distribución de piezas
+    */
 
-        /*
-         * ==========================================
-         * VERIFICAR VICTORIA
-         * ==========================================
-         */
+    const ancho =
+        window.innerWidth;
 
-        function verificarVictoria() {
 
-            const celdas =
-                document.querySelectorAll(
-                    ".celda-guia"
-                );
+    const x =
+        5 +
+        columna *
+        Math.min(
+            30,
+            90 / 3
+        );
 
 
-            let ganar = true;
+    const y =
+        Math.min(
+            55 + fila * 13,
+            82
+        );
 
-            let completadas = 0;
 
+    pieza.style.left =
+        x + "vw";
 
-            celdas.forEach(function(celda) {
+    pieza.style.top =
+        y + "vh";
+}
 
-                const piezaDentro =
-                    celda.querySelector(
-                        ".pieza"
-                    );
 
+/* =========================================
+   COMENZAR ARRASTRE
+========================================= */
 
-                if (piezaDentro) {
+function comenzarArrastre(e) {
 
-                    completadas++;
+    /*
+        Si está dentro del tablero,
+        también podemos moverla.
+    */
 
+    piezaActiva =
+        e.currentTarget;
 
-                    const posicionCorrecta =
-                        celda.getAttribute(
-                            "data-pos-correcta"
-                        );
 
+    piezaActiva.setPointerCapture(
+        e.pointerId
+    );
 
-                    const posicionPieza =
-                        piezaDentro.getAttribute(
-                            "data-id-original"
-                        );
 
+    const rect =
+        piezaActiva.getBoundingClientRect();
 
-                    if (
-                        posicionCorrecta !==
-                        posicionPieza
-                    ) {
 
-                        ganar = false;
+    offsetX =
+        e.clientX -
+        rect.left;
 
-                    }
+    offsetY =
+        e.clientY -
+        rect.top;
 
-                } else {
 
-                    ganar = false;
+    piezaActiva.style.zIndex =
+        999;
 
-                }
 
-            });
+    /*
+        Si estaba dentro de una celda,
+        la sacamos temporalmente.
+    */
+
+    if (
+        piezaActiva.parentElement.classList.contains(
+            "celda-guia"
+        )
+    ) {
+
+        document.body.appendChild(
+            piezaActiva
+        );
+
+    }
+
+
+    e.preventDefault();
+}
+
+
+/* =========================================
+   MOVER PIEZA
+========================================= */
+
+function moverPieza(e) {
+
+    if (!piezaActiva)
+        return;
+
+
+    piezaActiva.style.left =
+        (
+            e.clientX -
+            offsetX
+        ) + "px";
+
+
+    piezaActiva.style.top =
+        (
+            e.clientY -
+            offsetY
+        ) + "px";
+}
+
+
+/* =========================================
+   TERMINAR ARRASTRE
+========================================= */
+
+function terminarArrastre(e) {
+
+    if (!piezaActiva)
+        return;
+
+
+    const pieza =
+        piezaActiva;
+
+
+    piezaActiva = null;
+
+
+    /*
+        Buscar la celda sobre la que
+        soltamos la pieza.
+    */
+
+    const celdas =
+        document.querySelectorAll(
+            ".celda-guia"
+        );
+
+
+    let destino = null;
+
+
+    celdas.forEach(
+        celda => {
+
+            const rect =
+                celda.getBoundingClientRect();
 
 
             if (
-                ganar &&
-                completadas === 9
+                e.clientX >= rect.left &&
+                e.clientX <= rect.right &&
+                e.clientY >= rect.top &&
+                e.clientY <= rect.bottom
             ) {
 
-                setTimeout(function() {
-
-                    alert(
-                        "¡Espectacular! 🏆\n\n" +
-                        "Completaste el rompecabezas."
-                    );
-
-                }, 200);
+                destino = celda;
 
             }
 
         }
+    );
 
+
+    /*
+        Si no soltó sobre el tablero
+    */
+
+    if (!destino) {
+
+        colocarAbajo(
+            pieza,
+            parseInt(
+                pieza.dataset.idOriginal
+            )
+        );
+
+        return;
+    }
+
+
+    /*
+        =====================================
+        CELDA VACÍA
+        =====================================
+    */
+
+    if (
+        destino.children.length === 0
+    ) {
+
+        destino.appendChild(
+            pieza
+        );
+
+        pieza.style.zIndex = 20;
+
+        verificarVictoria();
+
+        return;
+    }
+
+
+    /*
+        =====================================
+        INTERCAMBIO DE PIEZAS
+        =====================================
+    */
+
+    const otraPieza =
+        destino.querySelector(
+            ".pieza"
+        );
+
+
+    /*
+        Guardamos la posición anterior
+        de la pieza que estamos moviendo.
+    */
+
+    const celdaAnterior =
+        encontrarCelda(pieza);
+
+
+    /*
+        Si venía de una celda,
+        intercambiamos.
+    */
+
+    if (celdaAnterior) {
 
         /*
-         * ==========================================
-         * INICIAR AUTOMÁTICAMENTE
-         * ==========================================
-         */
+            Sacamos ambas piezas.
+        */
 
-        window.onload =
-            iniciarJuego;
+        document.body.appendChild(
+            otraPieza
+        );
 
-    </script>
+        destino.appendChild(
+            pieza
+        );
+
+        /*
+            La otra pieza ocupa
+            la celda anterior.
+        */
+
+        celdaAnterior.appendChild(
+            otraPieza
+        );
+
+        pieza.style.zIndex = 20;
+
+        otraPieza.style.zIndex = 20;
+
+
+        verificarVictoria();
+
+    }
+
+    /*
+        Si la pieza venía de abajo,
+        simplemente vuelve abajo.
+    */
+
+    else {
+
+        colocarAbajo(
+            pieza,
+            parseInt(
+                pieza.dataset.idOriginal
+            )
+        );
+
+    }
+}
+
+
+/* =========================================
+   ENCONTRAR CELDA
+========================================= */
+
+function encontrarCelda(
+    pieza
+) {
+
+    const padre =
+        pieza.parentElement;
+
+
+    if (
+        padre &&
+        padre.classList.contains(
+            "celda-guia"
+        )
+    ) {
+
+        return padre;
+
+    }
+
+
+    return null;
+}
+
+
+/* =========================================
+   VERIFICAR VICTORIA
+========================================= */
+
+function verificarVictoria() {
+
+    const celdas =
+        document.querySelectorAll(
+            ".celda-guia"
+        );
+
+
+    let correcto = true;
+
+
+    celdas.forEach(
+        (celda, posicion) => {
+
+            const pieza =
+                celda.querySelector(
+                    ".pieza"
+                );
+
+
+            if (!pieza) {
+
+                correcto = false;
+
+                return;
+            }
+
+
+            const id =
+                parseInt(
+                    pieza.dataset.idOriginal
+                );
+
+
+            if (
+                id !== posicion
+            ) {
+
+                correcto = false;
+
+            }
+
+        }
+    );
+
+
+    if (correcto) {
+
+        setTimeout(() => {
+
+            alert(
+                "🏆 ¡ROMPECABEZAS COMPLETADO! 🧩\n\n" +
+                "¡Excelente trabajo!"
+            );
+
+        }, 250);
+
+    }
+}
+
+
+/* =========================================
+   INICIAR
+========================================= */
+
+window.addEventListener(
+    "load",
+    iniciarJuego
+);
+
+</script>
 
 </body>
 </html>
+```
