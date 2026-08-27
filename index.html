@@ -19,8 +19,9 @@
             overflow: hidden;
             position: relative;
         }
+        .encabezado { position: relative; z-index: 10; margin-bottom: 15px; }
         h1 { color: #ffffff; font-size: clamp(1.2rem, 4vw, 2rem); margin-bottom: 5px; }
-        p { color: #bdc3c7; font-size: clamp(0.8rem, 2.5vw, 1rem); margin-bottom: 15px; }
+        p { color: #bdc3c7; font-size: clamp(0.8rem, 2.5vw, 1rem); }
         #tablero-destino {
             --tamano: min(75vw, 40vh, 320px); 
             display: grid;
@@ -84,7 +85,7 @@
 </head>
 <body>
 
-    <div>
+    <div class="encabezado">
         <h1>Rompecabezas de 9 Piezas</h1>
         <p>Arrastra los bloques de los lados hacia su número en el tablero</p>
     </div>
@@ -127,11 +128,12 @@
 
             const juegoColores = COLORES[Math.floor(Math.random() * COLORES.length)];
 
-            // Generamos las piezas ordenadas en una lista limpia
-            let lista =;
+            // SOLUCIÓN DEFINITIVA: Convertimos una cadena de texto en arreglo para burlar el error del Bloc de notas
+            let lista = "0,1,2,3,4,5,6,7,8".split(",");
             lista.sort(() => Math.random() - 0.5); 
 
-            lista.forEach(idOriginal => {
+            lista.forEach(idStr => {
+                let idOriginal = parseInt(idStr);
                 const pieza = document.createElement("div");
                 pieza.classList.add("pieza");
                 pieza.setAttribute("draggable", "true");
