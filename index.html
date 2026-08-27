@@ -1,1010 +1,282 @@
-```html
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-
-<title>Rompecabezas Curvo</title>
-
-<style>
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
-
-body {
-    font-family: 'Segoe UI', Arial, sans-serif;
-    text-align: center;
-    min-height: 100vh;
-    background: #1a252f;
-    overflow: hidden;
-    color: white;
-}
-
-.encabezado {
-    margin-top: 12px;
-    margin-bottom: 12px;
-    position: relative;
-    z-index: 10;
-}
-
-h1 {
-    font-size: clamp(1.2rem, 5vw, 1.8rem);
-}
-
-p {
-    color: #bdc3c7;
-    font-size: clamp(.8rem, 3.5vw, 1rem);
-}
-
-/* =========================================
-   TABLERO
-========================================= */
-
-#tablero-destino {
-    --tamano: min(82vw, 55vh, 330px);
-
-    width: var(--tamano);
-    height: var(--tamano);
-
-    margin: 0 auto;
-
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: repeat(3, 1fr);
-
-    position: relative;
-
-    background: #243746;
-
-    border: 3px solid white;
-    border-radius: 10px;
-
-    box-shadow:
-        0 10px 25px rgba(0,0,0,.5);
-
-    overflow: visible;
-}
-
-/* =========================================
-   GUÍAS PUNTEADAS
-========================================= */
-
-.celda-guia {
-    position: relative;
-
-    border: 2px dashed rgba(255,255,255,.45);
-
-    background:
-        rgba(255,255,255,.025);
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    transition: background .2s;
-}
-
-.celda-guia:hover {
-    background: rgba(255,255,255,.08);
-}
-
-/* número pequeño de referencia */
-
-.celda-guia::before {
-    content: attr(data-pos-correcta);
-    position: absolute;
-
-    color: rgba(255,255,255,.18);
-
-    font-size: 13px;
-    font-weight: bold;
-
-    pointer-events: none;
-}
-
-/* =========================================
-   PIEZAS
-========================================= */
-
-.pieza {
-    position: absolute;
-
-    width: min(26vw, 11.5vh, 110px);
-    height: min(26vw, 11.5vh, 110px);
-
-    cursor: grab;
-
-    touch-action: none;
-    user-select: none;
-
-    z-index: 50;
-
-    background-repeat: no-repeat;
-    background-size: 300% 300%;
-
-    /*
-       El clip-path genera la silueta
-       general de una pieza de rompecabezas.
-    */
-
-    filter:
-        drop-shadow(0 5px 5px rgba(0,0,0,.45));
-
-    transition:
-        transform .15s,
-        filter .15s;
-}
-
-.pieza:active {
-    cursor: grabbing;
-
-    transform: scale(1.06);
-
-    z-index: 999;
-}
-
-/* =========================================
-   FORMAS DE LAS PIEZAS
-========================================= */
-
-/*
-    Cada pieza recibe una combinación
-    diferente de lados.
-
-    0 = borde
-    1 = saliente
-    2 = entrante
-*/
-
-/* Esquinas */
-
-.pieza.esquina-superior-izquierda {
-    clip-path: polygon(
-        0 0,
-        100% 0,
-        100% 35%,
-        94% 35%,
-        90% 39%,
-        90% 48%,
-        94% 52%,
-        100% 52%,
-        100% 100%,
-        35% 100%,
-        35% 94%,
-        30% 90%,
-        20% 90%,
-        15% 94%,
-        15% 100%,
-        0 100%
-    );
-}
-
-/* =========================================
-   BORDE SUPERIOR
-========================================= */
-
-.pieza.borde-superior {
-    clip-path: polygon(
-        0 0,
-        35% 0,
-        35% 6%,
-        40% 10%,
-        50% 10%,
-        55% 6%,
-        55% 0,
-        100% 0,
-
-        100% 35%,
-        94% 35%,
-        90% 40%,
-        90% 50%,
-        94% 55%,
-        100% 55%,
-
-        100% 100%,
-
-        65% 100%,
-        65% 94%,
-        60% 90%,
-        50% 90%,
-        45% 94%,
-        45% 100%,
-
-        0 100%,
-
-        0 55%,
-        6% 55%,
-        10% 50%,
-        10% 40%,
-        6% 35%,
-        0 35%
-    );
-}
-
-/* =========================================
-   PIEZA INTERIOR
-========================================= */
-
-.pieza.interior {
-    clip-path: polygon(
-        0 0,
-
-        35% 0,
-        35% 6%,
-        40% 10%,
-        50% 10%,
-        55% 6%,
-        55% 0,
-
-        100% 0,
-
-        100% 35%,
-        94% 35%,
-        90% 40%,
-        90% 50%,
-        94% 55%,
-        100% 55%,
-
-        100% 100%,
-
-        65% 100%,
-        65% 94%,
-        60% 90%,
-        50% 90%,
-        45% 94%,
-        45% 100%,
-
-        0 100%,
-
-        0 65%,
-        6% 65%,
-        10% 60%,
-        10% 50%,
-        6% 45%,
-        0 45%
-    );
-}
-
-/* =========================================
-   PIEZAS DENTRO DEL TABLERO
-========================================= */
-
-.celda-guia .pieza {
-    position: absolute;
-
-    left: 0 !important;
-    top: 0 !important;
-
-    width: 100% !important;
-    height: 100% !important;
-
-    z-index: 20;
-
-    filter: none;
-
-    transform: none !important;
-}
-
-/* =========================================
-   BOTÓN
-========================================= */
-
-button {
-    position: fixed;
-
-    bottom: 15px;
-    left: 50%;
-
-    transform: translateX(-50%);
-
-    padding: 11px 25px;
-
-    border: none;
-    border-radius: 25px;
-
-    background: #e74c3c;
-
-    color: white;
-
-    font-size: 15px;
-    font-weight: bold;
-
-    cursor: pointer;
-
-    box-shadow:
-        0 4px 12px rgba(0,0,0,.4);
-
-    z-index: 1000;
-}
-
-button:hover {
-    background: #ff5544;
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rompecabezas Interactivos 3x3</title>
+    <style>
+        :root {
+            --puzzle-size: 300px;
+            --rows: 3;
+            --cols: 3;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        /* Contenedor principal del tablero (Destino) */
+        #board {
+            width: var(--puzzle-size);
+            height: var(--puzzle-size);
+            display: grid;
+            grid-template-columns: repeat(var(--cols), 1fr);
+            grid-template-rows: repeat(var(--rows), 1fr);
+            border: 2px solid #333;
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        /* Celdas invisibles del tablero donde caen las piezas */
+        .cell {
+            border: 1px dashed #ccc;
+            box-sizing: border-box;
+            position: relative;
+        }
+
+        /* Contenedor inferior para las piezas mezcladas */
+        #pieces-container {
+            width: var(--puzzle-size);
+            min-height: 120px;
+            margin-top: 30px;
+            padding: 10px;
+            background-color: #e4e6eb;
+            border-radius: 8px;
+            border: 2px dashed #999;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Estilo de cada pieza del rompecabezas */
+        .piece {
+            width: calc(var(--puzzle-size) / var(--cols));
+            height: calc(var(--puzzle-size) / var(--rows));
+            background-repeat: no-repeat;
+            background-size: var(--puzzle-size) var(--puzzle-size);
+            cursor: grab;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            border: 1px solid rgba(255,255,255,0.4);
+            box-sizing: border-box;
+            user-select: none;
+            touch-action: none; /* Crucial para móviles */
+        }
+
+        .piece:active {
+            cursor: grabbing;
+        }
+
+        /* Mensaje de victoria */
+        #win-message {
+            margin-top: 15px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #28a745;
+            display: none;
+        }
+
+        button {
+            margin-top: 15px;
+            padding: 10px 20px;
+            font-size: 1rem;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
 </head>
-
 <body>
 
-<div class="encabezado">
-    <h1>Rompecabezas 🧩</h1>
-    <p>Arrastrá las piezas y acomodalas en su lugar</p>
-</div>
-
-<div id="tablero-destino"></div>
-
-<button onclick="iniciarJuego()">
-    🔀 Mezclar de Nuevo
-</button>
-
-
-<script>
-
-/* =========================================
-   CONFIGURACIÓN
-========================================= */
-
-let piezaActiva = null;
-
-let offsetX = 0;
-let offsetY = 0;
-
-
-/*
-    Tus tres imágenes.
-
-    Cuando las subas a GitHub,
-    cambiá solamente estos nombres.
-*/
-
-const imagenes = [
-
-    "imagenes/imagen1.jpg",
-    "imagenes/imagen2.jpg",
-    "imagenes/imagen3.jpg"
-
-];
-
-
-/* =========================================
-   INICIAR JUEGO
-========================================= */
-
-function iniciarJuego() {
-
-    const tablero =
-        document.getElementById("tablero-destino");
-
-    /*
-        Limpiar tablero
-    */
-
-    tablero.innerHTML = "";
-
-    document
-        .querySelectorAll("body > .pieza")
-        .forEach(pieza => pieza.remove());
-
-
-    /*
-        Elegir una de las 3 imágenes
-    */
-
-    const imagenActual =
-        imagenes[
-            Math.floor(
-                Math.random() *
-                imagenes.length
-            )
-        ];
-
-
-    /*
-        Crear las 9 posiciones
-    */
-
-    for (let i = 0; i < 9; i++) {
-
-        const celda =
-            document.createElement("div");
-
-        celda.className =
-            "celda-guia";
-
-        celda.dataset.posCorrecta = i + 1;
-
-        tablero.appendChild(celda);
-    }
-
-
-    /*
-        Crear piezas
-    */
-
-    let piezas = [
-        0,1,2,
-        3,4,5,
-        6,7,8
-    ];
-
-
-    /*
-        Mezclar
-    */
-
-    piezas.sort(
-        () => Math.random() - .5
-    );
-
-
-    piezas.forEach(
-        (idOriginal, indice) => {
-
-            crearPieza(
-                idOriginal,
-                indice,
-                imagenActual
-            );
-
-        }
-    );
-}
-
-
-/* =========================================
-   CREAR PIEZA
-========================================= */
-
-function crearPieza(
-    idOriginal,
-    indice,
-    imagen
-) {
-
-    const pieza =
-        document.createElement("div");
-
-    pieza.classList.add("pieza");
-
-
-    /*
-        Guardar posición correcta
-    */
-
-    pieza.dataset.idOriginal =
-        idOriginal;
-
-
-    /*
-        Imagen
-    */
-
-    pieza.style.backgroundImage =
-        `url("${imagen}")`;
-
-
-    /*
-        Posición de la imagen
-    */
-
-    const columna =
-        idOriginal % 3;
-
-    const fila =
-        Math.floor(idOriginal / 3);
-
-
-    pieza.style.backgroundPosition =
-        `${columna * 50}% ${fila * 50}%`;
-
-
-    /*
-        Forma de la pieza
-    */
-
-    asignarForma(
-        pieza,
-        idOriginal
-    );
-
-
-    /*
-        Posición inicial
-    */
-
-    colocarAbajo(
-        pieza,
-        indice
-    );
-
-
-    /*
-        Eventos
-    */
-
-    pieza.addEventListener(
-        "pointerdown",
-        comenzarArrastre
-    );
-
-    pieza.addEventListener(
-        "pointermove",
-        moverPieza
-    );
-
-    pieza.addEventListener(
-        "pointerup",
-        terminarArrastre
-    );
-
-    pieza.addEventListener(
-        "pointercancel",
-        terminarArrastre
-    );
-
-
-    document.body.appendChild(
-        pieza
-    );
-}
-
-
-/* =========================================
-   FORMAS
-========================================= */
-
-function asignarForma(
-    pieza,
-    id
-) {
-
-    const fila =
-        Math.floor(id / 3);
-
-    const columna =
-        id % 3;
-
-
-    /*
-        Esquinas
-    */
-
-    if (id === 0) {
-
-        pieza.classList.add(
-            "esquina-superior-izquierda"
-        );
-
-        return;
-    }
-
-
-    /*
-        Para las demás piezas usamos
-        diferentes formas.
-    */
-
-    if (fila === 0) {
-
-        pieza.classList.add(
-            "borde-superior"
-        );
-
-    } else {
-
-        pieza.classList.add(
-            "interior"
-        );
-    }
-}
-
-
-/* =========================================
-   COLOCAR ABAJO
-========================================= */
-
-function colocarAbajo(
-    pieza,
-    indice
-) {
-
-    const columna =
-        indice % 3;
-
-    const fila =
-        Math.floor(indice / 3);
-
-
-    /*
-        Distribución de piezas
-    */
-
-    const ancho =
-        window.innerWidth;
-
-
-    const x =
-        5 +
-        columna *
-        Math.min(
-            30,
-            90 / 3
-        );
-
-
-    const y =
-        Math.min(
-            55 + fila * 13,
-            82
-        );
-
-
-    pieza.style.left =
-        x + "vw";
-
-    pieza.style.top =
-        y + "vh";
-}
-
-
-/* =========================================
-   COMENZAR ARRASTRE
-========================================= */
-
-function comenzarArrastre(e) {
-
-    /*
-        Si está dentro del tablero,
-        también podemos moverla.
-    */
-
-    piezaActiva =
-        e.currentTarget;
-
-
-    piezaActiva.setPointerCapture(
-        e.pointerId
-    );
-
-
-    const rect =
-        piezaActiva.getBoundingClientRect();
-
-
-    offsetX =
-        e.clientX -
-        rect.left;
-
-    offsetY =
-        e.clientY -
-        rect.top;
-
-
-    piezaActiva.style.zIndex =
-        999;
-
-
-    /*
-        Si estaba dentro de una celda,
-        la sacamos temporalmente.
-    */
-
-    if (
-        piezaActiva.parentElement.classList.contains(
-            "celda-guia"
-        )
-    ) {
-
-        document.body.appendChild(
-            piezaActiva
-        );
-
-    }
-
-
-    e.preventDefault();
-}
-
-
-/* =========================================
-   MOVER PIEZA
-========================================= */
-
-function moverPieza(e) {
-
-    if (!piezaActiva)
-        return;
-
-
-    piezaActiva.style.left =
-        (
-            e.clientX -
-            offsetX
-        ) + "px";
-
-
-    piezaActiva.style.top =
-        (
-            e.clientY -
-            offsetY
-        ) + "px";
-}
-
-
-/* =========================================
-   TERMINAR ARRASTRE
-========================================= */
-
-function terminarArrastre(e) {
-
-    if (!piezaActiva)
-        return;
-
-
-    const pieza =
-        piezaActiva;
-
-
-    piezaActiva = null;
-
-
-    /*
-        Buscar la celda sobre la que
-        soltamos la pieza.
-    */
-
-    const celdas =
-        document.querySelectorAll(
-            ".celda-guia"
-        );
-
-
-    let destino = null;
-
-
-    celdas.forEach(
-        celda => {
-
-            const rect =
-                celda.getBoundingClientRect();
-
-
-            if (
-                e.clientX >= rect.left &&
-                e.clientX <= rect.right &&
-                e.clientY >= rect.top &&
-                e.clientY <= rect.bottom
-            ) {
-
-                destino = celda;
-
+    <h1>Rompecabezas 3x3</h1>
+    
+    <!-- Tablero de juego -->
+    <div id="board"></div>
+
+    <!-- Mensaje de éxito -->
+    <div id="win-message">¡Felicidades! Lo lograste. 🎉</div>
+    <button onclick="initGame()">Reiniciar Juego</button>
+
+    <!-- Zona inferior donde aparecen las piezas -->
+    <div id="pieces-container"></div>
+
+    <script>
+        const rows = 3;
+        const cols = 3;
+        // Puedes cambiar esta URL por cualquier imagen que quieras usar
+        const imageUrl = 'https://picsum.photos'; 
+
+        const board = document.getElementById('board');
+        const piecesContainer = document.getElementById('pieces-container');
+        const winMessage = document.getElementById('win-message');
+
+        let draggedPiece = null;
+
+        // Inicializa o reinicia el juego
+        function initGame() {
+            board.innerHTML = '';
+            piecesContainer.innerHTML = '';
+            winMessage.style.display = 'none';
+
+            const pieces = [];
+
+            // 1. Crear las celdas del tablero y las piezas lógicas
+            for (let r = 0; r < rows; r++) {
+                for (let c = 0; c < cols; c++) {
+                    // Crear celda en el tablero
+                    const cell = document.createElement('div');
+                    cell.classList.add('cell');
+                    cell.dataset.row = r;
+                    cell.dataset.col = c;
+                    
+                    // Configurar eventos de soltar (drag & drop)
+                    cell.addEventListener('dragover', dragOver);
+                    cell.addEventListener('drop', dropPiece);
+                    board.appendChild(cell);
+
+                    // Crear pieza correspondiente
+                    const piece = document.createElement('div');
+                    piece.classList.add('piece');
+                    piece.draggable = true;
+                    piece.dataset.correctRow = r;
+                    piece.dataset.correctCol = c;
+                    
+                    // Cortar la sección de la imagen usando posiciones de fondo
+                    piece.style.backgroundImage = `url('${imageUrl}')`;
+                    const posX = (c / (cols - 1)) * 100;
+                    const posY = (r / (rows - 1)) * 100;
+                    piece.style.backgroundPosition = `${posX}% ${posY}%`;
+
+                    // Eventos para arrastrar (PC)
+                    piece.addEventListener('dragstart', dragStart);
+                    piece.addEventListener('dragend', dragEnd);
+
+                    // Eventos para arrastrar (Móviles/Táctil)
+                    piece.addEventListener('touchstart', touchStart, { passive: false });
+                    piece.addEventListener('touchmove', touchMove, { passive: false });
+                    piece.addEventListener('touchend', touchEnd);
+
+                    pieces.push(piece);
+                }
             }
 
+            // 2. Barajar las piezas aleatoriamente
+            pieces.sort(() => Math.random() - 0.5);
+
+            // 3. Insertar las piezas en el contenedor de abajo
+            pieces.forEach(piece => piecesContainer.appendChild(piece));
         }
-    );
 
-
-    /*
-        Si no soltó sobre el tablero
-    */
-
-    if (!destino) {
-
-        colocarAbajo(
-            pieza,
-            parseInt(
-                pieza.dataset.idOriginal
-            )
-        );
-
-        return;
-    }
-
-
-    /*
-        =====================================
-        CELDA VACÍA
-        =====================================
-    */
-
-    if (
-        destino.children.length === 0
-    ) {
-
-        destino.appendChild(
-            pieza
-        );
-
-        pieza.style.zIndex = 20;
-
-        verificarVictoria();
-
-        return;
-    }
-
-
-    /*
-        =====================================
-        INTERCAMBIO DE PIEZAS
-        =====================================
-    */
-
-    const otraPieza =
-        destino.querySelector(
-            ".pieza"
-        );
-
-
-    /*
-        Guardamos la posición anterior
-        de la pieza que estamos moviendo.
-    */
-
-    const celdaAnterior =
-        encontrarCelda(pieza);
-
-
-    /*
-        Si venía de una celda,
-        intercambiamos.
-    */
-
-    if (celdaAnterior) {
-
-        /*
-            Sacamos ambas piezas.
-        */
-
-        document.body.appendChild(
-            otraPieza
-        );
-
-        destino.appendChild(
-            pieza
-        );
-
-        /*
-            La otra pieza ocupa
-            la celda anterior.
-        */
-
-        celdaAnterior.appendChild(
-            otraPieza
-        );
-
-        pieza.style.zIndex = 20;
-
-        otraPieza.style.zIndex = 20;
-
-
-        verificarVictoria();
-
-    }
-
-    /*
-        Si la pieza venía de abajo,
-        simplemente vuelve abajo.
-    */
-
-    else {
-
-        colocarAbajo(
-            pieza,
-            parseInt(
-                pieza.dataset.idOriginal
-            )
-        );
-
-    }
-}
-
-
-/* =========================================
-   ENCONTRAR CELDA
-========================================= */
-
-function encontrarCelda(
-    pieza
-) {
-
-    const padre =
-        pieza.parentElement;
-
-
-    if (
-        padre &&
-        padre.classList.contains(
-            "celda-guia"
-        )
-    ) {
-
-        return padre;
-
-    }
-
-
-    return null;
-}
-
-
-/* =========================================
-   VERIFICAR VICTORIA
-========================================= */
-
-function verificarVictoria() {
-
-    const celdas =
-        document.querySelectorAll(
-            ".celda-guia"
-        );
-
-
-    let correcto = true;
-
-
-    celdas.forEach(
-        (celda, posicion) => {
-
-            const pieza =
-                celda.querySelector(
-                    ".pieza"
-                );
-
-
-            if (!pieza) {
-
-                correcto = false;
-
-                return;
-            }
-
-
-            const id =
-                parseInt(
-                    pieza.dataset.idOriginal
-                );
-
-
-            if (
-                id !== posicion
-            ) {
-
-                correcto = false;
-
-            }
-
+        // --- FUNCIONES DRAG & DROP (Mover con Ratón) ---
+        function dragStart(e) {
+            draggedPiece = this;
+            setTimeout(() => this.style.opacity = '0.5', 0);
         }
-    );
 
+        function dragEnd() {
+            this.style.opacity = '1';
+            draggedPiece = null;
+            checkWin();
+        }
 
-    if (correcto) {
+        function dragOver(e) {
+            e.preventDefault(); // Permite que se pueda soltar aquí
+        }
 
-        setTimeout(() => {
+        function dropPiece(e) {
+            e.preventDefault();
+            // Evita colocar más de una pieza en la misma celda del tablero
+            if (this.children.length === 0 && draggedPiece) {
+                this.appendChild(draggedPiece);
+            }
+        }
 
-            alert(
-                "🏆 ¡ROMPECABEZAS COMPLETADO! 🧩\n\n" +
-                "¡Excelente trabajo!"
-            );
+        // --- FUNCIONES PARA SOPORTE TÁCTIL (Móviles) ---
+        let touchStartX = 0;
+        let touchStartY = 0;
 
-        }, 250);
+        function touchStart(e) {
+            draggedPiece = this;
+            const touch = e.touches[0];
+            touchStartX = touch.clientX - this.offsetLeft;
+            touchStartY = touch.clientY - this.offsetTop;
+            this.style.position = 'absolute';
+            this.style.zIndex = '1000';
+        }
 
-    }
-}
+        function touchMove(e) {
+            if (!draggedPiece) return;
+            e.preventDefault();
+            const touch = e.touches[0];
+            draggedPiece.style.left = `${touch.clientX - touchStartX}px`;
+            draggedPiece.style.top = `${touch.clientY - touchStartY}px`;
+        }
 
+        function touchEnd(e) {
+            if (!draggedPiece) return;
+            
+            draggedPiece.style.position = 'static';
+            draggedPiece.style.zIndex = '';
+            
+            const touch = e.changedTouches[0];
+            // Encontrar el elemento debajo del dedo al levantar la pantalla
+            const elementUnder = document.elementFromPoint(touch.clientX, touch.clientY);
+            const targetCell = elementUnder ? elementUnder.closest('.cell') : null;
 
-/* =========================================
-   INICIAR
-========================================= */
+            if (targetCell && targetCell.children.length === 0) {
+                targetCell.appendChild(draggedPiece);
+            } else {
+                // Si se suelta fuera o sobre una celda ocupada, regresa abajo
+                piecesContainer.appendChild(draggedPiece);
+            }
+            
+            draggedPiece = null;
+            checkWin();
+        }
 
-window.addEventListener(
-    "load",
-    iniciarJuego
-);
+        // --- VERIFICACIÓN DE VICTORIA ---
+        function checkWin() {
+            const cells = document.querySelectorAll('.cell');
+            let correctCount = 0;
 
-</script>
+            cells.forEach(cell => {
+                const piece = cell.firstElementChild;
+                if (piece) {
+                    // Validar si la pieza coincide con la fila/columna de la celda
+                    if (piece.dataset.correctRow === cell.dataset.row && 
+                        piece.dataset.correctCol === cell.dataset.col) {
+                        correctCount++;
+                    }
+                }
+            });
 
+            // Si las 9 piezas están en su lugar correcto
+            if (correctCount === rows * cols) {
+                winMessage.style.display = 'block';
+            }
+        }
+
+        // Ejecutar al cargar la página
+        window.onload = initGame;
+    </script>
 </body>
 </html>
-```
