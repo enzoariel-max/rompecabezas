@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Rompecabezas Compacto Real</title>
+    <title>Rompecabezas Curvo Real</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        
         body {
             font-family: 'Segoe UI', Arial, sans-serif;
             text-align: center;
@@ -20,17 +19,14 @@
             overflow: hidden;
             position: relative;
         }
-
         .encabezado { margin-top: 10px; margin-bottom: 15px; z-index: 10; }
         h1 { color: #ffffff; font-size: clamp(1.2rem, 5vw, 1.8rem); }
         p { color: #bdc3c7; font-size: clamp(0.8rem, 3.5vw, 1rem); }
-
         #tablero-destino {
-            --tamano: min(80vw, 38vh, 320px); 
+            --tamano: min(85vw, 38vh, 300px); 
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             grid-template-rows: repeat(3, 1fr);
-            gap: 3px;
             width: var(--tamano);
             height: var(--tamano);
             border: 4px solid #ffffff;
@@ -41,219 +37,128 @@
             position: relative;
             z-index: 5;
         }
-
         .celda-guia {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 22px;
-            font-weight: bold;
-            color: rgba(255, 255, 255, 0.2);
-            border: 1px dashed rgba(255, 255, 255, 0.1);
-            position: relative;
-            width: 100%;
-            height: 100%;
+            width: 100%; height: 100%; position: relative;
+            outline: 1px dashed rgba(255,255,255,0.15);
         }
-
         .pieza {
             position: absolute;
-            width: min(22vw, 10vh, 80px);
-            height: min(22vw, 10vh, 80px);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 20px;
-            font-weight: bold;
-            color: white;
-            cursor: grab;
-            touch-action: none;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.6);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-            z-index: 50;
-            
-            clip-path: polygon(
-                0% 20%, 35% 20%, 35% 0%, 65% 0%, 65% 20%, 100% 20%, 
-                100% 35%, 85% 35%, 85% 65%, 100% 65%, 100% 100%, 
-                65% 100%, 65% 80%, 35% 80%, 35% 100%, 0% 100%, 
-                0% 65%, 15% 65%, 15% 35%, 0% 35%
-            );
+            width: min(26vw, 12vh, 100px);
+            height: min(26vw, 12vh, 100px);
+            cursor: grab; touch-action: none; z-index: 50;
+            background-size: 300% 300%;
+            -webkit-mask-size: 100% 100%; mask-size: 100% 100%;
+            -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
         }
-
-        .pieza:active {
-            cursor: grabbing;
-            z-index: 999;
-        }
-
-        .celda-guia .pieza {
-            position: static !important;
-            width: 100% !important;
-            height: 100% !important;
-            box-shadow: none;
-            border-radius: 4px;
-        }
-
-        button {
-            background-color: #e74c3c;
-            color: white;
-            border: none;
-            padding: 10px 24px;
-            font-size: 15px;
-            font-weight: bold;
-            border-radius: 20px;
-            cursor: pointer;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-            position: fixed;
-            bottom: 15px;
-            z-index: 100;
-        }
+        .pieza[data-id-original="0"] { -webkit-mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://w3.org" viewBox="0 0 100 100"><path d="M0,0 H100 Q85,0 85,15 Q85,30 100,30 V100 H0 Z" fill="black"/></svg>'); mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://w3.org" viewBox="0 0 100 100"><path d="M0,0 H100 Q85,0 85,15 Q85,30 100,30 V100 H0 Z" fill="black"/></svg>'); }
+        .pieza[data-id-original="1"] { -webkit-mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://w3.org" viewBox="0 0 100 100"><path d="M0,0 H100 V100 H0 Q15,100 15,85 Q15,70 0,70 Z" fill="black"/></svg>'); mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://w3.org" viewBox="0 0 100 100"><path d="M0,0 H100 V100 H0 Q15,100 15,85 Q15,70 0,70 Z" fill="black"/></svg>'); }
+        .pieza[data-id-original="2"] { -webkit-mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://w3.org" viewBox="0 0 100 100"><path d="M0,0 H100 V70 Q85,70 85,85 Q85,100 70,100 H0 Z" fill="black"/></svg>'); mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://w3.org" viewBox="0 0 100 100"><path d="M0,0 H100 V70 Q85,70 85,85 Q85,100 70,100 H0 Z" fill="black"/></svg>'); }
+        .pieza[data-id-original="3"] { -webkit-mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://w3.org" viewBox="0 0 100 100"><path d="M0,0 H100 V100 H0 Q30,100 30,85 Q30,70 0,70 Z" fill="black"/></svg>'); mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://w3.org" viewBox="0 0 100 100"><path d="M0,0 H100 V100 H0 Q30,100 30,85 Q30,70 0,70 Z" fill="black"/></svg>'); }
+        .pieza[data-id-original="4"] { -webkit-mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://w3.org" viewBox="0 0 100 100"><path d="M0,0 H100 V100 H0 Z" fill="black"/></svg>'); mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://w3.org" viewBox="0 0 100 100"><path d="M0,0 H100 V100 H0 Z" fill="black"/></svg>'); }
+        .pieza[data-id-original="5"] { -webkit-mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://w3.org" viewBox="0 0 100 100"><path d="M0,0 H100 Q85,0 85,15 Q85,30 100,30 V100 H0 Z" fill="black"/></svg>'); mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://w3.org" viewBox="0 0 100 100"><path d="M0,0 H100 Q85,0 85,15 Q85,30 100,30 V100 H0 Z" fill="black"/></svg>'); }
+        .pieza[data-id-original="6"] { -webkit-mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://w3.org" viewBox="0 0 100 100"><path d="M0,0 H100 V100 H0 Z" fill="black"/></svg>'); mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://w3.org" viewBox="0 0 100 100"><path d="M0,0 H100 V100 H0 Z" fill="black"/></svg>'); }
+        .pieza[data-id-original="7"] { -webkit-mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://w3.org" viewBox="0 0 100 100"><path d="M0,0 H100 V70 Q85,70 85,85 Q85,100 70,100 H0 Z" fill="black"/></svg>'); mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://w3.org" viewBox="0 0 100 100"><path d="M0,0 H100 V70 Q85,70 85,85 Q85,100 70,100 H0 Z" fill="black"/></svg>'); }
+        .pieza[data-id-original="8"] { -webkit-mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://w3.org" viewBox="0 0 100 100"><path d="M0,0 H100 V100 H0 Q15,100 15,85 Q15,70 0,70 Z" fill="black"/></svg>'); mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://w3.org" viewBox="0 0 100 100"><path d="M0,0 H100 V100 H0 Q15,100 15,85 Q15,70 0,70 Z" fill="black"/></svg>'); }
+        .pieza:active { cursor: grabbing; z-index: 999; }
+        .celda-guia .pieza { position: absolute !important; top: 0 !important; left: 0 !important; width: 100% !important; height: 100% !important; box-shadow: none; }
+        button { background-color: #e74c3c; color: white; border: none; padding: 10px 24px; font-size: 15px; font-weight: bold; border-radius: 20px; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); position: fixed; bottom: 15px; z-index: 100; }
     </style>
 </head>
 <body>
-
     <div class="encabezado">
-        <h1>Rompecabezas Real</h1>
-        <p>Arrastra las piezas de abajo y acércalas a su número</p>
+        <h1>Rompecabezas Curvo</h1>
+        <p>Arrastra las piezas de abajo y encájalas en su posición</p>
     </div>
-    
     <div id="tablero-destino"></div>
-
     <button onclick="iniciarJuego()">Mezclar de Nuevo</button>
-
     <script>
-        const COLORES = [
-            ["#2ecc71", "#27ae60"], 
-            ["#3498db", "#2980b9"], 
-            ["#9b59b6", "#8e44ad"]  
+        const IMAGENES_JUEGOS = [
+            "https://picsum.photos", 
+            "https://picsum.photos", 
+            "https://picsum.photos"
         ];
-
-        let piezaActiva = null;
-        let despliegueX = 0;
-        let despliegueY = 0;
-
+        let piezaActiva = null; let despliegueX = 0; let despliegueY = 0;
         function iniciarJuego() {
             const tablero = document.getElementById("tablero-destino");
-            
             document.querySelectorAll('body > .pieza').forEach(p => p.remove());
             tablero.innerHTML = ""; 
-
             for (let i = 0; i < 9; i++) {
                 const celda = document.createElement("div");
                 celda.classList.add("celda-guia");
-                celda.innerText = i + 1; 
                 celda.setAttribute("data-pos-correcta", i);
-                
                 celda.addEventListener('dragover', (e) => e.preventDefault());
                 celda.addEventListener('drop', (e) => {
                     e.preventDefault();
                     if (celda.children.length === 0 && piezaActiva) {
-                        celda.appendChild(piezaActiva);
-                        piezaActiva = null;
-                        verificarVictoria();
+                        celda.appendChild(piezaActiva); piezaActiva = null; verificarVictoria();
                     }
                 });
-
                 tablero.appendChild(celda);
             }
-
-            const juegoColores = COLORES[Math.floor(Math.random() * COLORES.length)];
+            const imagenActual = IMAGENES_JUEGOS[Math.floor(Math.random() * IMAGENES_JUEGOS.length)];
             let lista = "0,1,2,3,4,5,6,7,8".split(",");
             lista.sort(() => Math.random() - 0.5); 
-
             lista.forEach((idStr, indice) => {
                 let idOriginal = parseInt(idStr);
                 const pieza = document.createElement("div");
                 pieza.classList.add("pieza");
                 pieza.setAttribute("draggable", "true");
                 pieza.setAttribute("data-id-original", idOriginal);
-                pieza.innerText = idOriginal + 1;
-                pieza.style.backgroundColor = (idOriginal % 2 === 0) ? juegoColores[0] : juegoColores[1];
-
+                pieza.style.backgroundImage = `url('${imagenActual}')`;
+                let xPorcentaje = (idOriginal % 3) * 50; 
+                let yPorcentaje = Math.floor(idOriginal / 3) * 50; 
+                pieza.style.backgroundPosition = `${xPorcentaje}% ${yPorcentaje}%`;
                 esparcirAbajo(pieza, indice);
-
                 pieza.addEventListener('dragstart', (e) => { piezaActiva = e.target; });
-
                 pieza.addEventListener('touchstart', (e) => {
                     if (pieza.parentElement.classList.contains('celda-guia')) return;
-                    piezaActiva = e.target;
-                    let toque = e.touches[0];
+                    piezaActiva = e.target; let toque = e.touches[0];
                     despliegueX = toque.clientX - piezaActiva.offsetLeft;
                     despliegueY = toque.clientY - piezaActiva.offsetTop;
                 }, { passive: true });
-
                 pieza.addEventListener('touchmove', (e) => {
                     if (!piezaActiva || piezaActiva.parentElement !== document.body) return;
-                    e.preventDefault(); 
-                    let toque = e.touches[0];
+                    e.preventDefault(); let toque = e.touches[0];
                     piezaActiva.style.left = (toque.clientX - despliegueX) + 'px';
                     piezaActiva.style.top = (toque.clientY - despliegueY) + 'px';
                 }, { passive: false });
-
                 pieza.addEventListener('touchend', (e) => {
-                    if (!piezaActiva) return;
-                    let toque = e.changedTouches[0];
-                    evaluarSoltar(toque.clientX, toque.clientY, piezaActiva);
-                    piezaActiva = null;
+                    if (!piezaActiva) return; let toque = e.changedTouches[0];
+                    evaluarSoltar(toque.clientX, toque.clientY, piezaActiva); piezaActiva = null;
                 });
-
                 document.body.appendChild(pieza);
             });
         }
-
         function esparcirAbajo(pieza, indice) {
-            let filas = Math.floor(indice / 3);
-            let columnas = indice % 3;
-
-            let margenIzquierdo = 10 + (columnas * 28) + (Math.random() * 6 - 3);
-            let margenSuperior = 54 + (filas * 11) + (Math.random() * 4 - 2);
-
-            pieza.style.left = margenIzquierdo + 'vw';
-            pieza.style.top = margenSuperior + 'vh';
+            let filas = Math.floor(indice / 3); let columnas = indice % 3;
+            let margenIzquierdo = 8 + (columnas * 29) + (Math.random() * 4 - 2);
+            let margenSuperior = 55 + (filas * 12) + (Math.random() * 3 - 1);
+            pieza.style.left = margenIzquierdo + 'vw'; pieza.style.top = margenSuperior + 'vh';
         }
-
         function evaluarSoltar(clientX, clientY, piezaAEv) {
-            const celdas = document.querySelectorAll('.celda-guia');
-            let imantado = false;
-
+            const celdas = document.querySelectorAll('.celda-guia'); let imantado = false;
             celdas.forEach(celda => {
                 if (celda.children.length > 0) return;
-
                 const rect = celda.getBoundingClientRect();
-                
                 const distanciaX = Math.abs(clientX - (rect.left + rect.width / 2));
                 const distanciaY = Math.abs(clientY - (rect.top + rect.height / 2));
-
                 if (distanciaX < 45 && distanciaY < 45) {
-                    celda.appendChild(piezaAEv);
-                    imantado = true;
-                    verificarVictoria();
+                    celda.appendChild(piezaAEv); imantado = true; verificarVictoria();
                 }
             });
-
-            if (!imantado) {
-                let idOriginal = parseInt(piezaAEv.getAttribute('data-id-original'));
-                esparcirAbajo(piezaAEv, idOriginal);
-            }
+            if (!imantado) { let idOriginal = parseInt(piezaAEv.getAttribute('data-id-original')); esparcirAbajo(piezaAEv, idOriginal); }
         }
-
         function verificarVictoria() {
-            const celdas = document.querySelectorAll('.celda-guia');
-            let ganar = true; let completadas = 0;
-
+            const celdas = document.querySelectorAll('.celda-guia'); let ganar = true; let completadas = 0;
             celdas.forEach(celda => {
                 const piezaDins = celda.querySelector('.pieza');
                 if (piezaDins) {
                     completadas++;
-                    if (celda.getAttribute('data-pos-correcta') !== piezaDins.getAttribute('data-id-original')) {
-                        ganar = false;
-                    }
+                    if (celda.getAttribute('data-pos-correcta') !== piezaDins.getAttribute('data-id-original')) { ganar = false; }
                 } else { ganar = false; }
             });
-
-            if (ganar && completadas === 9) {
-                setTimeout(() => { alert("¡Excelente! Has resuelto el rompecabezas con éxito 🏆"); }, 200);
-            }
+            if (ganar && completadas === 9) { setTimeout(() => { alert("¡Espectacular! Completaste el rompecabezas real 🏆"); }, 200); }
         }
-
         window.onload = iniciarJuego;
     </script>
 </body>
