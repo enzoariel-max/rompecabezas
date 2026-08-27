@@ -1,1067 +1,1764 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Rompecabezas 3x3</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#0a0a0a">
+<title>Rompecabezas El Rey</title>
 
-  <style>
-    :root {
-      --background: #080b16;
-      --panel: #11182b;
-      --panel-light: #19233c;
-      --text: #f4f7ff;
-      --muted: #9ba7c2;
-      --accent: #6ee7c8;
-      --accent-strong: #35caa5;
-      --border: rgba(255, 255, 255, 0.12);
-    }
+<style>
+*{
+  box-sizing:border-box;
+  -webkit-tap-highlight-color:transparent;
+}
 
-    * {
-      box-sizing: border-box;
-    }
+html,body{
+  margin:0;
+  min-height:100%;
+  background:#0a0a0a;
+  color:#fff;
+  font-family:Inter,Segoe UI,Roboto,Arial,sans-serif;
+}
 
-    html,
-    body {
-      margin: 0;
-      min-height: 100%;
-      font-family: Arial, Helvetica, sans-serif;
-      background:
-        radial-gradient(circle at 50% -10%, #202c52 0%, transparent 42%),
-        var(--background);
-      color: var(--text);
-    }
+body{
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  overflow:hidden;
+}
 
-    body {
-      min-height: 100vh;
-      min-height: 100dvh;
-      overflow-x: hidden;
-    }
+.app{
+  width:100%;
+  max-width:520px;
+  min-height:100vh;
+  padding:18px 12px 24px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+}
 
-    body.dragging-piece {
-      overflow: hidden;
-    }
+.header{
+  text-align:center;
+  margin-bottom:14px;
+  user-select:none;
+}
 
-    button {
-      font: inherit;
-    }
+.kicker{
+  display:block;
+  color:#c99a2e;
+  font-size:10px;
+  font-weight:800;
+  letter-spacing:4px;
+  text-transform:uppercase;
+  margin-bottom:5px;
+}
 
-    .app {
-      width: min(100%, 560px);
-      margin: 0 auto;
-      padding: 24px 14px 42px;
-    }
+h1{
+  margin:0;
+  font-family:Georgia,"Times New Roman",serif;
+  font-size:clamp(30px,8vw,43px);
+  line-height:1;
+  color:#f5d36b;
+  letter-spacing:-1px;
+  text-shadow:
+    0 0 5px rgba(255,205,75,.8),
+    0 0 20px rgba(255,175,0,.35),
+    0 5px 18px #000;
+}
 
-    .header {
-      text-align: center;
-      margin-bottom: 18px;
-    }
+.header-line{
+  width:130px;
+  height:1px;
+  margin:10px auto 7px;
+  background:linear-gradient(90deg,transparent,#e6b84c,transparent);
+  box-shadow:0 0 9px rgba(230,184,76,.8);
+}
 
-    .eyebrow {
-      margin: 0 0 8px;
-      color: var(--accent);
-      font-size: 0.75rem;
-      font-weight: bold;
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
-    }
+.subtitle{
+  margin:0;
+  color:#777;
+  font-size:10px;
+  letter-spacing:1.5px;
+  text-transform:uppercase;
+}
 
-    h1 {
-      margin: 0;
-      font-size: clamp(1.8rem, 7vw, 2.8rem);
-      line-height: 1;
-    }
+.card{
+  width:100%;
+  padding:11px;
+  border-radius:24px;
+  border:1px solid rgba(230,184,76,.22);
+  background:linear-gradient(145deg,#171717,#0d0d0d);
+  box-shadow:
+    0 25px 70px rgba(0,0,0,.7),
+    inset 0 1px 0 rgba(255,255,255,.06),
+    0 0 35px rgba(230,184,76,.05);
+}
 
-    .subtitle {
-      max-width: 400px;
-      margin: 12px auto 0;
-      color: var(--muted);
-      font-size: 0.95rem;
-      line-height: 1.45;
-    }
+.info{
+  display:flex;
+  justify-content:space-between;
+  padding:2px 5px 10px;
+  color:#777;
+  font-size:10px;
+  letter-spacing:1.3px;
+  text-transform:uppercase;
+}
 
-    .status-line {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      width: min(100%, 430px);
-      margin: 0 auto 13px;
-      color: var(--muted);
-      font-size: 0.88rem;
-    }
+.info strong{
+  color:#e8c65c;
+}
 
-    .counter {
-      min-width: 48px;
-      padding: 5px 9px;
-      border: 1px solid rgba(110, 231, 200, 0.25);
-      border-radius: 999px;
-      color: var(--accent);
-      text-align: center;
-      font-weight: bold;
-    }
+.arena{
+  position:relative;
+  width:100%;
+  height:min(144vw,650px);
+  min-height:525px;
+  overflow:hidden;
+  border-radius:18px;
+  background:
+    radial-gradient(circle at 50% 0%,rgba(255,193,7,.07),transparent 38%),
+    #070707;
+  border:1px solid rgba(255,255,255,.035);
+  touch-action:none;
+  user-select:none;
+}
 
-    .board {
-      position: relative;
-      width: min(91vw, 430px);
-      aspect-ratio: 1 / 1;
-      margin: 0 auto;
-      border-radius: 22px;
-      background: #10172a;
-      box-shadow:
-        0 0 0 2px rgba(255, 255, 255, 0.12),
-        0 18px 45px rgba(0, 0, 0, 0.38);
-      isolation: isolate;
-      overflow: visible;
-    }
+.board{
+  position:absolute;
+  top:14px;
+  left:50%;
+  width:min(88vw,390px);
+  aspect-ratio:1;
+  transform:translateX(-50%);
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  grid-template-rows:repeat(3,1fr);
+  gap:2px;
+  padding:2px;
+  border-radius:14px;
+  background:#030303;
+  box-shadow:
+    0 0 0 1px rgba(230,184,76,.3),
+    0 0 28px rgba(230,184,76,.12),
+    inset 0 0 25px #000;
+  z-index:1;
+}
 
-    .board::before {
-      content: "";
-      position: absolute;
-      z-index: 0;
-      inset: 0;
-      border-radius: inherit;
-      background-image: var(--puzzle-image);
-      background-position: center;
-      background-size: 100% 100%;
-      opacity: 0.16;
-      pointer-events: none;
-    }
+.cell{
+  position:relative;
+  border-radius:4px;
+  background:rgba(255,255,255,.018);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.025);
+}
 
-    .board::after {
-      content: "";
-      position: absolute;
-      z-index: 0;
-      inset: 0;
-      border-radius: inherit;
-      background:
-        linear-gradient(
-          to right,
-          transparent 33.15%,
-          rgba(255, 255, 255, 0.1) 33.25%,
-          transparent 33.35%,
-          transparent 66.48%,
-          rgba(255, 255, 255, 0.1) 66.58%,
-          transparent 66.68%
-        ),
-        linear-gradient(
-          to bottom,
-          transparent 33.15%,
-          rgba(255, 255, 255, 0.1) 33.25%,
-          transparent 33.35%,
-          transparent 66.48%,
-          rgba(255, 255, 255, 0.1) 66.58%,
-          transparent 66.68%
-        );
-      pointer-events: none;
-    }
+.cell::after{
+  content:attr(data-number);
+  position:absolute;
+  inset:0;
+  display:grid;
+  place-items:center;
+  color:rgba(230,184,76,.08);
+  font-size:20px;
+  font-weight:900;
+  pointer-events:none;
+}
 
-    .slot {
-      position: absolute;
-      z-index: 1;
-      border: 1px dashed rgba(255, 255, 255, 0.14);
-      border-radius: 8px;
-      pointer-events: none;
-    }
+.tray-label{
+  position:absolute;
+  top:calc(min(88vw,390px) + 35px);
+  left:0;
+  right:0;
+  text-align:center;
+  color:#505050;
+  font-size:9px;
+  letter-spacing:2px;
+  text-transform:uppercase;
+  pointer-events:none;
+}
 
-    .hint {
-      margin: 13px 0 16px;
-      color: var(--muted);
-      font-size: 0.84rem;
-      text-align: center;
-    }
+.tray-line{
+  position:absolute;
+  top:calc(min(88vw,390px) + 57px);
+  left:8%;
+  right:8%;
+  height:1px;
+  background:linear-gradient(90deg,transparent,rgba(230,184,76,.2),transparent);
+}
 
-    .tray-panel {
-      width: min(100%, 500px);
-      margin: 0 auto;
-      padding: 13px 10px 10px;
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      background:
-        linear-gradient(145deg, rgba(255, 255, 255, 0.05), transparent 45%),
-        var(--panel);
-      box-shadow: 0 15px 38px rgba(0, 0, 0, 0.22);
-    }
+/* PIEZAS */
 
-    .tray-title {
-      margin-bottom: 2px;
-      color: var(--muted);
-      font-size: 0.76rem;
-      font-weight: bold;
-      letter-spacing: 0.1em;
-      text-align: center;
-      text-transform: uppercase;
-    }
+.piece{
+  --size:min(29vw,128px);
 
-    .tray {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: center;
-      align-content: center;
-      gap: 8px;
-      min-height: 245px;
-      padding: 15px 8px 18px;
-      touch-action: pan-y;
-    }
+  position:absolute;
+  width:var(--size);
+  height:var(--size);
+  border:0;
+  outline:0;
+  padding:0;
+  cursor:grab;
+  touch-action:none;
 
-    .piece {
-      position: relative;
-      flex: 0 0 auto;
-      display: block;
-      padding: 0;
-      margin: 0;
-      border: 0;
-      background: transparent;
-      cursor: grab;
-      user-select: none;
-      -webkit-user-select: none;
-      -webkit-user-drag: none;
-      touch-action: none;
-      filter: drop-shadow(0 7px 7px rgba(0, 0, 0, 0.34));
-      transition: filter 0.15s ease, transform 0.15s ease;
-      z-index: 5;
-    }
+  background-repeat:no-repeat;
+  background-size:300% 300%;
 
-    .piece:hover {
-      filter: drop-shadow(0 9px 10px rgba(0, 0, 0, 0.48));
-      transform: translateY(-2px);
-    }
+  box-shadow:
+    0 7px 15px rgba(0,0,0,.7),
+    0 0 0 1px rgba(255,255,255,.1);
 
-    .piece:active {
-      cursor: grabbing;
-    }
+  transition:
+    left .2s ease,
+    top .2s ease,
+    transform .2s ease,
+    filter .2s ease;
 
-    .piece.dragging {
-      position: fixed !important;
-      z-index: 1000;
-      margin: 0 !important;
-      cursor: grabbing;
-      filter:
-        drop-shadow(0 19px 17px rgba(0, 0, 0, 0.48))
-        drop-shadow(0 0 8px rgba(110, 231, 200, 0.25));
-      transform: rotate(1.5deg) scale(1.025);
-      transition: none;
-    }
+  z-index:10;
+}
 
-    .piece.placed {
-      z-index: 3;
-      cursor: default;
-      pointer-events: none;
-      filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.27));
-      transition: none;
-    }
+.piece::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,.17),
+    inset 0 0 12px rgba(0,0,0,.2);
+  pointer-events:none;
+}
 
-    .piece.returning {
-      animation: returnBump 0.24s ease;
-    }
+/*
+  Las piezas tienen formas de rompecabezas.
+  Se usa clip-path con path() para generar pestañas
+  entrantes/salientes.
+*/
 
-    .piece svg {
-      display: block;
-      width: 100%;
-      height: 100%;
-      overflow: visible;
-      pointer-events: none;
-    }
+.p0{
+  clip-path:path("M0 0H37C37 7 44 10 50 10S63 7 63 0H100V37C93 37 90 44 90 50S93 63 100 63V100H63C63 93 56 90 50 90S37 93 37 100H0V63C7 63 10 56 10 50S7 37 0 37Z");
+}
 
-    @keyframes returnBump {
-      0% {
-        transform: scale(0.94);
-      }
-      65% {
-        transform: scale(1.04);
-      }
-      100% {
-        transform: scale(1);
-      }
-    }
+.p1{
+  clip-path:path("M0 0H37C37 -7 44 -10 50 -10S63 -7 63 0H100V37C107 37 110 44 110 50S107 63 100 63V100H63C63 93 56 90 50 90S37 93 37 100H0V63C7 63 10 56 10 50S7 37 0 37Z");
+}
 
-    .win-panel {
-      margin: 16px auto 0;
-      padding: 15px 16px;
-      border: 1px solid rgba(110, 231, 200, 0.38);
-      border-radius: 16px;
-      background: rgba(41, 155, 126, 0.14);
-      color: var(--accent);
-      font-weight: bold;
-      text-align: center;
-      animation: appear 0.35s ease;
-    }
+.p2{
+  clip-path:path("M0 0H37C37 7 44 10 50 10S63 7 63 0H100V37C107 37 110 44 110 50S107 63 100 63V100H63C63 107 56 110 50 110S37 107 37 100H0V63C7 63 10 56 10 50S7 37 0 37Z");
+}
 
-    .win-panel[hidden] {
-      display: none;
-    }
+.p3{
+  clip-path:path("M0 0H37C37 7 44 10 50 10S63 7 63 0H100V37C93 37 90 44 90 50S93 63 100 63V100H63C63 107 56 110 50 110S37 107 37 100H0V63C-7 63 -10 56 -10 50S-7 37 0 37Z");
+}
 
-    @keyframes appear {
-      from {
-        opacity: 0;
-        transform: translateY(8px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
+.p4{
+  clip-path:path("M0 0H37C37 -7 44 -10 50 -10S63 -7 63 0H100V37C107 37 110 44 110 50S107 63 100 63V100H63C63 107 56 110 50 110S37 107 37 100H0V63C-7 63 -10 56 -10 50S-7 37 0 37Z");
+}
 
-    .shuffle-button {
-      display: block;
-      width: min(100%, 300px);
-      margin: 18px auto 0;
-      padding: 13px 18px;
-      border: 1px solid rgba(110, 231, 200, 0.4);
-      border-radius: 13px;
-      background: linear-gradient(135deg, var(--accent), var(--accent-strong));
-      color: #06251f;
-      cursor: pointer;
-      font-weight: bold;
-      box-shadow: 0 8px 20px rgba(53, 202, 165, 0.18);
-      transition: transform 0.15s ease, filter 0.15s ease;
-    }
+.p5{
+  clip-path:path("M0 0H37C37 7 44 10 50 10S63 7 63 0H100V37C93 37 90 44 90 50S93 63 100 63V100H63C63 93 56 90 50 90S37 93 37 100H0V63C-7 63 -10 56 -10 50S-7 37 0 37Z");
+}
 
-    .shuffle-button:hover {
-      filter: brightness(1.08);
-      transform: translateY(-1px);
-    }
+.p6{
+  clip-path:path("M0 0H37C37 -7 44 -10 50 -10S63 -7 63 0H100V37C93 37 90 44 90 50S93 63 100 63V100H63C63 93 56 90 50 90S37 93 37 100H0V63C7 63 10 56 10 50S7 37 0 37Z");
+}
 
-    .shuffle-button:active {
-      transform: translateY(1px) scale(0.99);
-    }
+.p7{
+  clip-path:path("M0 0H37C37 -7 44 -10 50 -10S63 -7 63 0H100V37C107 37 110 44 110 50S107 63 100 63V100H63C63 93 56 90 50 90S37 93 37 100H0V63C7 63 10 56 10 50S7 37 0 37Z");
+}
 
-    @media (max-width: 380px) {
-      .app {
-        padding-top: 18px;
-      }
+.p8{
+  clip-path:path("M0 0H37C37 7 44 10 50 10S63 7 63 0H100V37C107 37 110 44 110 50S107 63 100 63V100H63C63 93 56 90 50 90S37 93 37 100H0V63C-7 63 -10 56 -10 50S-7 37 0 37Z");
+}
 
-      .subtitle {
-        font-size: 0.87rem;
-      }
+.piece.dragging{
+  cursor:grabbing;
+  transition:none;
+  z-index:999;
+  filter:brightness(1.15);
+  box-shadow:
+    0 18px 35px rgba(0,0,0,.85),
+    0 0 25px rgba(255,196,52,.3),
+    0 0 0 1px rgba(245,204,93,.55);
+}
 
-      .tray {
-        min-height: 225px;
-        gap: 6px;
-        padding-inline: 4px;
-      }
+.controls{
+  display:flex;
+  justify-content:center;
+  margin-top:12px;
+}
 
-      .tray-panel {
-        padding-inline: 7px;
-      }
-    }
-  </style>
+.reset{
+  border:1px solid rgba(230,184,76,.4);
+  border-radius:999px;
+  padding:11px 23px;
+  color:#f2d477;
+  background:linear-gradient(135deg,#181818,#0d0d0d);
+  font-size:12px;
+  font-weight:800;
+  letter-spacing:.6px;
+  box-shadow:
+    0 0 15px rgba(230,184,76,.08),
+    inset 0 1px 0 rgba(255,255,255,.06);
+}
+
+.reset:active{
+  transform:scale(.96);
+}
+
+/* VICTORIA */
+
+.overlay{
+  position:fixed;
+  inset:0;
+  z-index:5000;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  background:rgba(0,0,0,.84);
+  backdrop-filter:blur(9px);
+}
+
+.overlay.show{
+  display:flex;
+  animation:fade .3s ease;
+}
+
+.modal{
+  width:min(100%,380px);
+  padding:30px 22px 24px;
+  text-align:center;
+  border-radius:28px;
+  border:1px solid rgba(246,205,90,.5);
+  background:
+    radial-gradient(circle at 50% 0%,rgba(255,207,72,.17),transparent 48%),
+    linear-gradient(145deg,#181818,#090909);
+  box-shadow:
+    0 30px 80px rgba(0,0,0,.9),
+    0 0 55px rgba(255,193,7,.15),
+    inset 0 1px 0 rgba(255,255,255,.08);
+  animation:pop .45s cubic-bezier(.17,.89,.32,1.25);
+}
+
+.crown{
+  font-size:43px;
+  filter:drop-shadow(0 0 13px rgba(255,197,54,.75));
+}
+
+.modal h2{
+  margin:8px 0 6px;
+  color:#f6d36a;
+  font-family:Georgia,"Times New Roman",serif;
+  font-size:30px;
+}
+
+.modal p{
+  margin:0 0 18px;
+  color:#aaa;
+  font-size:13px;
+}
+
+.code-box{
+  margin-bottom:18px;
+  padding:14px 10px;
+  border:1px solid rgba(230,184,76,.35);
+  border-radius:15px;
+  background:rgba(0,0,0,.45);
+}
+
+.code-label{
+  display:block;
+  margin-bottom:4px;
+  color:#777;
+  font-size:9px;
+  letter-spacing:2px;
+  text-transform:uppercase;
+}
+
+.code{
+  color:#ffe28a;
+  font-size:30px;
+  font-weight:900;
+  letter-spacing:4px;
+  text-shadow:0 0 14px rgba(255,202,61,.4);
+}
+
+.claim{
+  width:100%;
+  border:0;
+  border-radius:15px;
+  padding:15px;
+  color:#16120a;
+  background:linear-gradient(135deg,#f8d86b,#bd8b25);
+  font-size:14px;
+  font-weight:900;
+  letter-spacing:1px;
+  box-shadow:
+    0 8px 25px rgba(230,184,76,.25),
+    inset 0 1px 0 rgba(255,255,255,.55);
+}
+
+.claim:active{
+  transform:scale(.98);
+}
+
+.again{
+  margin-top:12px;
+  border:0;
+  background:transparent;
+  color:#777;
+  font-size:11px;
+}
+
+@keyframes fade{
+  from{opacity:0}
+  to{opacity:1}
+}
+
+@keyframes pop{
+  from{
+    opacity:0;
+    transform:scale(.82) translateY(20px);
+  }
+  to{
+    opacity:1;
+    transform:scale(1) translateY(0);
+  }
+}
+
+@media(max-width:360px){
+  .app{
+    padding-left:8px;
+    padding-right:8px;
+  }
+
+  .arena{
+    min-height:500px;
+  }
+}
+
+@media(min-width:521px){
+  .arena{
+    height:650px;
+  }
+}
+</style>
 </head>
 
 <body>
-  <main class="app">
-    <header class="header">
-      <p class="eyebrow">Juego táctil</p>
-      <h1>Rompecabezas 3x3</h1>
-      <p class="subtitle">
-        Arrastra cada pieza desde la bandeja inferior hasta su lugar correspondiente.
-      </p>
-    </header>
 
-    <div class="status-line" aria-live="polite">
-      <span id="status">Mezcla las piezas para comenzar.</span>
-      <span class="counter" id="counter">0/9</span>
+<main class="app">
+
+  <header class="header">
+    <span class="kicker">Desafío VIP</span>
+    <h1>Rompecabezas El Rey</h1>
+    <div class="header-line"></div>
+    <p class="subtitle">Completa la imagen y gana tu código</p>
+  </header>
+
+  <section class="card">
+
+    <div class="info">
+      <span>Rompecabezas</span>
+      <strong>3 × 3 · 9 piezas</strong>
     </div>
 
-    <section aria-label="Área del rompecabezas">
-      <div
-        id="board"
-        class="board"
-        aria-label="Tablero del rompecabezas"
-      ></div>
+    <div id="arena" class="arena">
 
-      <p class="hint">Las piezas incorrectas vuelven automáticamente a la bandeja.</p>
-
-      <div class="tray-panel">
-        <div class="tray-title">Piezas disponibles</div>
-        <div id="tray" class="tray" aria-label="Bandeja de piezas"></div>
+      <div id="board" class="board">
+        <div class="cell" data-index="0" data-number="1"></div>
+        <div class="cell" data-index="1" data-number="2"></div>
+        <div class="cell" data-index="2" data-number="3"></div>
+        <div class="cell" data-index="3" data-number="4"></div>
+        <div class="cell" data-index="4" data-number="5"></div>
+        <div class="cell" data-index="5" data-number="6"></div>
+        <div class="cell" data-index="6" data-number="7"></div>
+        <div class="cell" data-index="7" data-number="8"></div>
+        <div class="cell" data-index="8" data-number="9"></div>
       </div>
 
-      <div id="winPanel" class="win-panel" hidden>
-        🎉 ¡Excelente! Has completado el rompecabezas.
+      <div class="tray-label">
+        Arrastra las piezas al tablero
       </div>
 
-      <button id="shuffleButton" class="shuffle-button" type="button">
-        Volver a mezclar y reiniciar
+      <div class="tray-line"></div>
+
+    </div>
+
+    <div class="controls">
+      <button id="resetBtn" class="reset" type="button">
+        ↻ Reiniciar rompecabezas
       </button>
-    </section>
-  </main>
+    </div>
 
-  <script>
-    const SIZE = 3;
-    const TOTAL_PIECES = SIZE * SIZE;
+  </section>
 
-    const board = document.getElementById("board");
-    const tray = document.getElementById("tray");
-    const status = document.getElementById("status");
-    const counter = document.getElementById("counter");
-    const winPanel = document.getElementById("winPanel");
-    const shuffleButton = document.getElementById("shuffleButton");
+</main>
 
-    /*
-      Imagen integrada en formato SVG.
-      Puedes sustituirla por una imagen propia usando, por ejemplo:
-      const puzzleImage = "https://tu-sitio.com/imagen.jpg";
-    */
-    const imageSvg = `
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 900">
-        <defs>
-          <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="#07152f"/>
-            <stop offset="55%" stop-color="#236b91"/>
-            <stop offset="100%" stop-color="#f0a566"/>
-          </linearGradient>
+<!-- VENTANA DE VICTORIA -->
 
-          <linearGradient id="water" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="#256b91"/>
-            <stop offset="100%" stop-color="#08172e"/>
-          </linearGradient>
+<div id="overlay" class="overlay" role="dialog" aria-modal="true">
 
-          <radialGradient id="sun">
-            <stop offset="0%" stop-color="#fffbd0"/>
-            <stop offset="45%" stop-color="#ffd878"/>
-            <stop offset="100%" stop-color="#ff9d5c"/>
-          </radialGradient>
+  <div class="modal">
 
-          <linearGradient id="mountainBack" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stop-color="#7298b0"/>
-            <stop offset="100%" stop-color="#345273"/>
-          </linearGradient>
+    <div class="crown">♛</div>
 
-          <linearGradient id="mountainFront" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stop-color="#213a5b"/>
-            <stop offset="100%" stop-color="#081527"/>
-          </linearGradient>
+    <h2>¡Felicitaciones!</h2>
 
-          <filter id="glow">
-            <feGaussianBlur stdDeviation="18"/>
-          </filter>
-        </defs>
+    <p>
+      Completaste correctamente el Rompecabezas El Rey.
+    </p>
 
-        <rect width="900" height="900" fill="url(#sky)"/>
+    <div class="code-box">
+      <span class="code-label">Código ganador</span>
+      <div id="code" class="code">0001</div>
+    </div>
 
-        <circle cx="675" cy="220" r="118" fill="#ffd890" opacity="0.28" filter="url(#glow)"/>
-        <circle cx="675" cy="220" r="76" fill="url(#sun)"/>
+    <button id="claimBtn" class="claim" type="button">
+      Cobrar
+    </button>
 
-        <g fill="#fff5d6" opacity="0.75">
-          <circle cx="120" cy="130" r="3"/>
-          <circle cx="210" cy="250" r="4"/>
-          <circle cx="330" cy="105" r="3"/>
-          <circle cx="465" cy="190" r="3"/>
-          <circle cx="790" cy="95" r="3"/>
-          <circle cx="835" cy="310" r="4"/>
-        </g>
+    <button id="againBtn" class="again" type="button">
+      Jugar nuevamente
+    </button>
 
-        <path
-          d="M0 500 L150 350 L220 420 L355 235 L505 415 L625 300 L900 510 L900 900 L0 900 Z"
-          fill="url(#mountainBack)"
-        />
+  </div>
 
-        <path
-          d="M0 620 L150 440 L270 555 L410 350 L555 535 L700 410 L900 595 L900 900 L0 900 Z"
-          fill="url(#mountainFront)"
-        />
+</div>
 
-        <path
-          d="M410 350 L365 412 L410 390 L445 420 L490 410 Z"
-          fill="#d9edf0"
-          opacity="0.82"
-        />
+<script>
+/*
+  El JavaScript está en el BLOQUE 2.
+*/
+</script>
 
-        <path
-          d="M0 585
-             C145 555 238 600 360 570
-             C505 535 650 585 900 548
-             L900 900 L0 900 Z"
-          fill="url(#water)"
-        />
-
-        <g opacity="0.27" fill="#ffd889">
-          <path d="M620 590 L760 590 L795 620 L600 620 Z"/>
-          <path d="M650 650 L735 650 L770 670 L625 670 Z"/>
-          <path d="M675 705 L725 705 L750 720 L650 720 Z"/>
-        </g>
-
-        <g fill="#071326">
-          <path d="M75 760 L115 585 L155 760 Z"/>
-          <path d="M120 790 L170 555 L220 790 Z"/>
-          <path d="M755 805 L805 570 L855 805 Z"/>
-          <path d="M700 820 L748 625 L796 820 Z"/>
-        </g>
-
-        <g fill="#10253e">
-          <path d="M0 805 L45 635 L90 805 Z"/>
-          <path d="M830 850 L875 650 L920 850 Z"/>
-        </g>
-
-        <path
-          d="M0 815 C160 780 280 835 450 800 C620 765 770 820 900 790 L900 900 L0 900 Z"
-          fill="#050c19"
-          opacity="0.72"
-        />
-      </svg>
-    `;
-
-    const puzzleImage =
-      "data:image/svg+xml;charset=utf-8," + encodeURIComponent(imageSvg.trim());
-
-    board.style.setProperty("--puzzle-image", `url("${puzzleImage}")`);
-
-    /*
-      Cada valor -1 o 1 define si una pestaña es entrante o saliente.
-      Las piezas vecinas reciben valores opuestos para que encajen.
-    */
-    const connectors = createConnectors();
-
-    const pieces = [];
-    let placedCount = 0;
-    let activeDrag = null;
-
-    let geometry = {
-      cellWidth: 0,
-      cellHeight: 0,
-      tab: 0,
-      fullWidth: 0,
-      fullHeight: 0,
-      trayScale: 0.7
-    };
-
-    createBoardSlots();
-    createPieces();
-    updateGeometry();
-    resetGame();
-
-    shuffleButton.addEventListener("click", resetGame);
-
-    window.addEventListener("resize", () => {
-      requestAnimationFrame(updateGeometry);
-    });
-
-    window.addEventListener(
-      "pointermove",
-      moveDrag,
-      { passive: false }
-    );
-
-    window.addEventListener(
-      "pointerup",
-      endDrag,
-      { passive: false }
-    );
-
-    window.addEventListener(
-      "pointercancel",
-      cancelDrag,
-      { passive: false }
-    );
-
-    function createConnectors() {
-      const horizontal = Array.from(
-        { length: SIZE },
-        () => Array(SIZE - 1).fill(0)
-      );
-
-      const vertical = Array.from(
-        { length: SIZE - 1 },
-        () => Array(SIZE).fill(0)
-      );
-
-      for (let row = 0; row < SIZE; row++) {
-        for (let col = 0; col < SIZE - 1; col++) {
-          horizontal[row][col] = Math.random() < 0.5 ? -1 : 1;
-        }
-      }
-
-      for (let row = 0; row < SIZE - 1; row++) {
-        for (let col = 0; col < SIZE; col++) {
-          vertical[row][col] = Math.random() < 0.5 ? -1 : 1;
-        }
-      }
-
-      return { horizontal, vertical };
-    }
-
-    function createBoardSlots() {
-      for (let row = 0; row < SIZE; row++) {
-        for (let col = 0; col < SIZE; col++) {
-          const slot = document.createElement("div");
-
-          slot.className = "slot";
-          slot.style.left = `${(col * 100) / SIZE}%`;
-          slot.style.top = `${(row * 100) / SIZE}%`;
-          slot.style.width = `${100 / SIZE}%`;
-          slot.style.height = `${100 / SIZE}%`;
-
-          board.appendChild(slot);
-        }
-      }
-    }
-
-    function createPieces() {
-      for (let row = 0; row < SIZE; row++) {
-        for (let col = 0; col < SIZE; col++) {
-          const index = row * SIZE + col;
-          const piece = document.createElement("div");
-
-          piece.className = "piece";
-          piece.dataset.index = index;
-          piece.dataset.row = row;
-          piece.dataset.col = col;
-          piece.setAttribute(
-            "aria-label",
-            `Pieza ${index + 1} del rompecabezas`
-          );
-
-          piece.addEventListener("pointerdown", startDrag);
-          pieces.push(piece);
-          tray.appendChild(piece);
-        }
-      }
-    }
-
-    function updateGeometry() {
-      const boardSize = board.clientWidth;
-
-      if (!boardSize) {
-        return;
-      }
-
-      geometry.cellWidth = boardSize / SIZE;
-      geometry.cellHeight = boardSize / SIZE;
-      geometry.tab = Math.max(7, geometry.cellWidth * 0.17);
-      geometry.fullWidth = geometry.cellWidth + geometry.tab * 2;
-      geometry.fullHeight = geometry.cellHeight + geometry.tab * 2;
-
-      const trayContentWidth = Math.max(180, tray.clientWidth - 16);
-      const gap = 8;
-
-      const calculatedScale =
-        (trayContentWidth - gap * (SIZE - 1)) /
-        (SIZE * geometry.fullWidth);
-
-      geometry.trayScale = Math.max(
-        0.52,
-        Math.min(0.78, calculatedScale)
-      );
-
-      for (const piece of pieces) {
-        renderPiece(piece);
-
-        if (activeDrag && activeDrag.piece === piece) {
-          piece.style.width = `${geometry.fullWidth}px`;
-          piece.style.height = `${geometry.fullHeight}px`;
-          continue;
-        }
-
-        if (piece.classList.contains("placed")) {
-          const row = Number(piece.dataset.row);
-          const col = Number(piece.dataset.col);
-
-          piece.style.position = "absolute";
-          piece.style.width = `${geometry.fullWidth}px`;
-          piece.style.height = `${geometry.fullHeight}px`;
-          piece.style.left = `${col * geometry.cellWidth - geometry.tab}px`;
-          piece.style.top = `${row * geometry.cellHeight - geometry.tab}px`;
-        } else {
-          piece.style.position = "";
-          piece.style.left = "";
-          piece.style.top = "";
-          piece.style.width = `${geometry.fullWidth * geometry.trayScale}px`;
-          piece.style.height = `${geometry.fullHeight * geometry.trayScale}px`;
-        }
-      }
-    }
-
-    function renderPiece(piece) {
-      const index = Number(piece.dataset.index);
-      const row = Number(piece.dataset.row);
-      const col = Number(piece.dataset.col);
-
-      const width = geometry.cellWidth;
-      const height = geometry.cellHeight;
-      const tab = geometry.tab;
-
-      const path = getPiecePath(row, col, width, height, tab);
-      const clipId = `piece-clip-${index}`;
-
-      piece.innerHTML = `
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          xmlns:xlink="http://www.w3.org/1999/xlink"
-          viewBox="${-tab} ${-tab} ${width + tab * 2} ${height + tab * 2}"
-          preserveAspectRatio="none"
-          aria-hidden="true"
-        >
-          <defs>
-            <clipPath id="${clipId}" clipPathUnits="userSpaceOnUse">
-              <path d="${path}"></path>
-            </clipPath>
-          </defs>
-
-          <image
-            href="${puzzleImage}"
-            xlink:href="${puzzleImage}"
-            x="${-col * width}"
-            y="${-row * height}"
-            width="${SIZE * width}"
-            height="${SIZE * height}"
-            preserveAspectRatio="none"
-            clip-path="url(#${clipId})"
-          ></image>
-
-          <path
-            d="${path}"
-            fill="none"
-            stroke="rgba(255,255,255,0.78)"
-            stroke-width="1.7"
-            stroke-linejoin="round"
-            vector-effect="non-scaling-stroke"
-          ></path>
-        </svg>
-      `;
-    }
-
-    function getPiecePath(row, col, width, height, tab) {
-      const topValue =
-        row === 0 ? 0 : -connectors.vertical[row - 1][col];
-
-      const rightValue =
-        col === SIZE - 1 ? 0 : connectors.horizontal[row][col];
-
-      const bottomValue =
-        row === SIZE - 1 ? 0 : connectors.vertical[row][col];
-
-      const leftValue =
-        col === 0 ? 0 : -connectors.horizontal[row][col - 1];
-
-      const topOffset = -topValue * tab;
-      const rightOffset = rightValue * tab;
-      const bottomOffset = bottomValue * tab;
-      const leftOffset = -leftValue * tab;
-
-      return [
-        "M 0 0",
-        horizontalEdge(0, 0, width, topOffset),
-        verticalEdge(width, 0, height, rightOffset),
-        horizontalEdge(width, height, 0, bottomOffset),
-        verticalEdge(0, height, 0, leftOffset),
-        "Z"
-      ].join(" ");
-    }
-
-    function horizontalEdge(x1, y, x2, offset) {
-      const length = Math.abs(x2 - x1);
-
-      if (length < 0.01) {
-        return "";
-      }
-
-      if (Math.abs(offset) < 0.1) {
-        return `L ${x2} ${y}`;
-      }
-
-      const direction = x2 >= x1 ? 1 : -1;
-      const at = (percentage) =>
-        x1 + direction * length * percentage;
-
-      return [
-        `L ${at(0.31)} ${y}`,
-        `C ${at(0.34)} ${y},
-           ${at(0.36)} ${y + offset * 0.72},
-           ${at(0.39)} ${y + offset * 0.94}`,
-        `C ${at(0.42)} ${y + offset * 1.08},
-           ${at(0.47)} ${y + offset},
-           ${at(0.50)} ${y + offset}`,
-        `C ${at(0.53)} ${y + offset},
-           ${at(0.58)} ${y + offset * 1.08},
-           ${at(0.61)} ${y + offset * 0.94}`,
-        `C ${at(0.64)} ${y + offset * 0.72},
-           ${at(0.66)} ${y},
-           ${at(0.69)} ${y}`,
-        `L ${x2} ${y}`
-      ].join(" ");
-    }
-
-    function verticalEdge(x, y1, y2, offset) {
-      const length = Math.abs(y2 - y1);
-
-      if (length < 0.01) {
-        return "";
-      }
-
-      if (Math.abs(offset) < 0.1) {
-        return `L ${x} ${y2}`;
-      }
-
-      const direction = y2 >= y1 ? 1 : -1;
-      const at = (percentage) =>
-        y1 + direction * length * percentage;
-
-      return [
-        `L ${x} ${at(0.31)}`,
-        `C ${x} ${at(0.34)},
-           ${x + offset * 0.72} ${at(0.36)},
-           ${x + offset * 0.94} ${at(0.39)}`,
-        `C ${x + offset * 1.08} ${at(0.42)},
-           ${x + offset} ${at(0.47)},
-           ${x + offset} ${at(0.50)}`,
-        `C ${x + offset} ${at(0.53)},
-           ${x + offset * 1.08} ${at(0.58)},
-           ${x + offset * 0.94} ${at(0.61)}`,
-        `C ${x + offset * 0.72} ${at(0.64)},
-           ${x} ${at(0.66)},
-           ${x} ${at(0.69)}`,
-        `L ${x} ${y2}`
-      ].join(" ");
-    }
-
-    function startDrag(event) {
-      const piece = event.currentTarget;
-
-      if (
-        piece.classList.contains("placed") ||
-        activeDrag ||
-        (event.pointerType === "mouse" && event.button !== 0)
-      ) {
-        return;
-      }
-
-      event.preventDefault();
-
-      const rect = piece.getBoundingClientRect();
-
-      activeDrag = {
-        piece,
-        pointerId: event.pointerId,
-        grabRatioX: (event.clientX - rect.left) / rect.width,
-        grabRatioY: (event.clientY - rect.top) / rect.height
-      };
-
-      piece.classList.add("dragging");
-      piece.style.position = "fixed";
-      piece.style.width = `${geometry.fullWidth}px`;
-      piece.style.height = `${geometry.fullHeight}px`;
-      piece.style.left = `${
-        event.clientX -
-        activeDrag.grabRatioX * geometry.fullWidth
-      }px`;
-      piece.style.top = `${
-        event.clientY -
-        activeDrag.grabRatioY * geometry.fullHeight
-      }px`;
-
-      document.body.classList.add("dragging-piece");
-
-      try {
-        piece.setPointerCapture(event.pointerId);
-      } catch (error) {
-        // Algunos navegadores móviles no soportan pointer capture.
-      }
-    }
-
-    function moveDrag(event) {
-      if (!activeDrag || event.pointerId !== activeDrag.pointerId) {
-        return;
-      }
-
-      event.preventDefault();
-
-      const { piece, grabRatioX, grabRatioY } = activeDrag;
-
-      piece.style.left = `${
-        event.clientX - grabRatioX * geometry.fullWidth
-      }px`;
-
-      piece.style.top = `${
-        event.clientY - grabRatioY * geometry.fullHeight
-      }px`;
-    }
-
-    function endDrag(event) {
-      finishDrag(event, false);
-    }
-
-    function cancelDrag(event) {
-      finishDrag(event, true);
-    }
-
-    function finishDrag(event, wasCancelled) {
-      if (
-        !activeDrag ||
-        event.pointerId !== activeDrag.pointerId
-      ) {
-        return;
-      }
-
-      event.preventDefault();
-
-      const drag = activeDrag;
-      const piece = drag.piece;
-
-      if (!wasCancelled && Number.isFinite(event.clientX)) {
-        piece.style.left = `${
-          event.clientX - drag.grabRatioX * geometry.fullWidth
-        }px`;
-
-        piece.style.top = `${
-          event.clientY - drag.grabRatioY * geometry.fullHeight
-        }px`;
-      }
-
-      activeDrag = null;
-      document.body.classList.remove("dragging-piece");
-
-      try {
-        piece.releasePointerCapture(drag.pointerId);
-      } catch (error) {
-        // No pasa nada si el navegador ya liberó el pointer.
-      }
-
-      if (wasCancelled) {
-        returnPieceToTray(piece);
-        return;
-      }
-
-      const pieceRect = piece.getBoundingClientRect();
-      const centerX = pieceRect.left + pieceRect.width / 2;
-      const centerY = pieceRect.top + pieceRect.height / 2;
-
-      const boardRect = board.getBoundingClientRect();
-      const localX = centerX - boardRect.left;
-      const localY = centerY - boardRect.top;
-
-      const isInsideBoard =
-        localX >= 0 &&
-        localX < boardRect.width &&
-        localY >= 0 &&
-        localY < boardRect.height;
-
-      if (!isInsideBoard) {
-        returnPieceToTray(piece);
-        return;
-      }
-
-      const cellWidth = boardRect.width / SIZE;
-      const cellHeight = boardRect.height / SIZE;
-
-      const targetCol = Math.floor(localX / cellWidth);
-      const targetRow = Math.floor(localY / cellHeight);
-
-      const correctRow = Number(piece.dataset.row);
-      const correctCol = Number(piece.dataset.col);
-
-      if (
-        targetRow === correctRow &&
-        targetCol === correctCol
-      ) {
-        placePiece(piece, targetRow, targetCol);
-      } else {
-        returnPieceToTray(piece);
-      }
-    }
-
-    function placePiece(piece, row, col) {
-      board.appendChild(piece);
-
-      piece.classList.remove("dragging", "returning");
-      piece.classList.add("placed");
-
-      piece.style.position = "absolute";
-      piece.style.width = `${geometry.fullWidth}px`;
-      piece.style.height = `${geometry.fullHeight}px`;
-      piece.style.left = `${col * geometry.cellWidth - geometry.tab}px`;
-      piece.style.top = `${row * geometry.cellHeight - geometry.tab}px`;
-
-      placedCount++;
-      updateStatus();
-
-      if (placedCount === TOTAL_PIECES) {
-        winPanel.hidden = false;
-        status.textContent = "¡Rompecabezas completado!";
-      }
-    }
-
-    function returnPieceToTray(piece) {
-      piece.classList.remove("dragging", "placed");
-      piece.style.position = "";
-      piece.style.left = "";
-      piece.style.top = "";
-      piece.style.zIndex = "";
-      piece.style.width = "";
-      piece.style.height = "";
-
-      if (piece.parentElement !== tray) {
-        tray.appendChild(piece);
-      }
-
-      piece.classList.add("returning");
-
-      setTimeout(() => {
-        piece.classList.remove("returning");
-      }, 260);
-
-      updateGeometry();
-    }
-
-    function resetGame() {
-      if (activeDrag) {
-        document.body.classList.remove("dragging-piece");
-        activeDrag = null;
-      }
-
-      placedCount = 0;
-      winPanel.hidden = true;
-
-      const shuffledPieces = shuffleUntilDifferent([...pieces]);
-
-      for (const piece of pieces) {
-        piece.classList.remove("placed", "dragging", "returning");
-        piece.style.position = "";
-        piece.style.left = "";
-        piece.style.top = "";
-        piece.style.zIndex = "";
-        piece.style.width = "";
-        piece.style.height = "";
-      }
-
-      for (const piece of shuffledPieces) {
-        tray.appendChild(piece);
-      }
-
-      updateStatus();
-      updateGeometry();
-    }
-
-    function shuffleUntilDifferent(list) {
-      let shuffled = [...list];
-
-      do {
-        for (let i = shuffled.length - 1; i > 0; i--) {
-          const randomIndex = Math.floor(Math.random() * (i + 1));
-          [shuffled[i], shuffled[randomIndex]] = [
-            shuffled[randomIndex],
-            shuffled[i]
-          ];
-        }
-      } while (
-        shuffled.every((piece, index) => piece === pieces[index])
-      );
-
-      return shuffled;
-    }
-
-    function updateStatus() {
-      counter.textContent = `${placedCount}/${TOTAL_PIECES}`;
-
-      if (placedCount === 0) {
-        status.textContent = "Arrastra las piezas al tablero.";
-      } else if (placedCount < TOTAL_PIECES) {
-        status.textContent = "¡Muy bien! Continúa colocando piezas.";
-      } else {
-        status.textContent = "¡Rompecabezas completado!";
-      }
-    }
-  </script>
 </body>
 </html>
+"use strict";
+
+/* ==========================================================
+   ROMPECABEZAS EL REY — JAVASCRIPT
+   ========================================================== */
+
+/*
+  IMÁGENES:
+  Guardá imagen1.jpg, imagen2.jpg e imagen3.jpg
+  en la misma carpeta que este archivo HTML.
+*/
+const IMAGES = [
+  "imagen1.jpg",
+  "imagen2.jpg",
+  "imagen3.jpg"
+];
+
+/*
+  CONTADOR GLOBAL
+
+  Se utiliza CounterAPI, que actualmente ofrece una API pública
+  gratuita sin cuenta, clave ni autenticación.
+
+  Endpoint:
+  https://counterapi.com/api/{namespace}/{action}/{key}
+
+  La operación normal incrementa el contador y devuelve
+  inmediatamente el nuevo valor.
+
+  IMPORTANTE:
+  No usamos la antigua API v1 de counterapi.dev porque fue
+  retirada el 7 de agosto de 2026.
+*/
+const COUNTER_NAMESPACE = "rompecabezas-el-rey";
+const COUNTER_ACTION = "victoria";
+const COUNTER_KEY = "rompecabezas_rey_counter";
+
+const COUNTER_URL =
+  "https://counterapi.com/api/" +
+  encodeURIComponent(COUNTER_NAMESPACE) +
+  "/" +
+  encodeURIComponent(COUNTER_ACTION) +
+  "/" +
+  encodeURIComponent(COUNTER_KEY);
+
+/*
+  WhatsApp:
+  Argentina +54
+  Buenos Aires 11
+  Número 2405-0658
+*/
+const WHATSAPP_NUMBER = "5491124050658";
+
+/* ==========================================================
+   ELEMENTOS
+   ========================================================== */
+
+const arena = document.getElementById("arena");
+const board = document.getElementById("board");
+
+const resetBtn = document.getElementById("resetBtn");
+const againBtn = document.getElementById("againBtn");
+
+const overlay = document.getElementById("overlay");
+const codeElement = document.getElementById("code");
+const claimBtn = document.getElementById("claimBtn");
+
+const cells = [
+  ...document.querySelectorAll(".cell")
+];
+
+/* ==========================================================
+   ESTADO
+   ========================================================== */
+
+let pieces = [];
+
+let currentImage = "";
+
+let draggedPiece = null;
+
+let dragOffsetX = 0;
+let dragOffsetY = 0;
+
+let startX = 0;
+let startY = 0;
+
+let moved = false;
+
+let gameWon = false;
+
+/*
+  positions[pieza] = casilla
+
+  null  -> pieza está abajo
+  0..8  -> pieza está dentro de una casilla
+
+  Una pieza puede estar en una casilla INCORRECTA.
+  Eso es intencional.
+*/
+const positions = new Array(9).fill(null);
+
+/* ==========================================================
+   UTILIDADES
+   ========================================================== */
+
+function random(min, max) {
+  return Math.random() * (max - min) + min;
+}
+
+function randomInt(min, max) {
+  return Math.floor(
+    Math.random() * (max - min + 1)
+  );
+}
+
+function shuffle(array) {
+  const copy = [...array];
+
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(
+      Math.random() * (i + 1)
+    );
+
+    [copy[i], copy[j]] =
+      [copy[j], copy[i]];
+  }
+
+  return copy;
+}
+
+function clamp(value, min, max) {
+  return Math.max(
+    min,
+    Math.min(max, value)
+  );
+}
+
+/* ==========================================================
+   ELEGIR IMAGEN
+   ========================================================== */
+
+function chooseImage() {
+  /*
+    Evita repetir inmediatamente la misma imagen cuando
+    existen varias opciones.
+  */
+  if (IMAGES.length === 1) {
+    return IMAGES[0];
+  }
+
+  let image;
+
+  do {
+    image =
+      IMAGES[
+        randomInt(0, IMAGES.length - 1)
+      ];
+  } while (
+    image === currentImage
+  );
+
+  return image;
+}
+
+/* ==========================================================
+   CREAR PIEZAS
+   ========================================================== */
+
+function createPieces() {
+
+  /*
+    Elimina las piezas anteriores.
+  */
+  for (const piece of pieces) {
+    piece.remove();
+  }
+
+  pieces = [];
+
+  positions.fill(null);
+
+  for (let index = 0; index < 9; index++) {
+
+    const piece =
+      document.createElement("div");
+
+    piece.className =
+      `piece p${index}`;
+
+    piece.dataset.index =
+      String(index);
+
+    piece.setAttribute(
+      "role",
+      "button"
+    );
+
+    piece.setAttribute(
+      "aria-label",
+      `Pieza ${index + 1}`
+    );
+
+    /*
+      Cada pieza utiliza la misma imagen,
+      pero muestra una región diferente.
+    */
+
+    const row =
+      Math.floor(index / 3);
+
+    const column =
+      index % 3;
+
+    /*
+      Para background-size:300% 300%:
+        columna 0 = 0%
+        columna 1 = 50%
+        columna 2 = 100%
+
+        fila 0 = 0%
+        fila 1 = 50%
+        fila 2 = 100%
+    */
+
+    const backgroundX =
+      column * 50;
+
+    const backgroundY =
+      row * 50;
+
+    piece.style.backgroundImage =
+      `url("${currentImage}")`;
+
+    piece.style.backgroundPosition =
+      `${backgroundX}% ${backgroundY}%`;
+
+    /*
+      TOUCH EVENTS NATIVOS
+    */
+
+    piece.addEventListener(
+      "touchstart",
+      handleTouchStart,
+      { passive: false }
+    );
+
+    piece.addEventListener(
+      "touchmove",
+      handleTouchMove,
+      { passive: false }
+    );
+
+    piece.addEventListener(
+      "touchend",
+      handleTouchEnd,
+      { passive: false }
+    );
+
+    /*
+      Eventos de mouse para poder probar
+      el juego desde una computadora.
+    */
+
+    piece.addEventListener(
+      "mousedown",
+      handleMouseDown
+    );
+
+    arena.appendChild(piece);
+
+    pieces.push(piece);
+  }
+}
+
+/* ==========================================================
+   DIMENSIONES
+   ========================================================== */
+
+function getPieceSize() {
+
+  const boardRect =
+    board.getBoundingClientRect();
+
+  return boardRect.width / 3;
+}
+
+/* ==========================================================
+   DISPERSIÓN
+   ========================================================== */
+
+function scatterPieces() {
+
+  const arenaRect =
+    arena.getBoundingClientRect();
+
+  const boardRect =
+    board.getBoundingClientRect();
+
+  const pieceSize =
+    getPieceSize();
+
+  /*
+    La bandeja empieza debajo del tablero.
+  */
+
+  const trayStart =
+    boardRect.bottom -
+    arenaRect.top +
+    60;
+
+  const trayHeight =
+    arenaRect.height -
+    trayStart;
+
+  /*
+    Distribuimos las 9 piezas en distintas zonas
+    y luego añadimos desplazamientos aleatorios.
+  */
+
+  const order =
+    shuffle(pieces);
+
+  order.forEach(
+    (piece, visualIndex) => {
+
+      const column =
+        visualIndex % 3;
+
+      const row =
+        Math.floor(visualIndex / 3);
+
+      const columnWidth =
+        arenaRect.width / 3;
+
+      let left =
+        column * columnWidth +
+        random(
+          -pieceSize * .25,
+          pieceSize * .45
+        );
+
+      let top =
+        trayStart +
+        row *
+        Math.max(
+          1,
+          trayHeight / 3
+        ) +
+        random(
+          -pieceSize * .35,
+          pieceSize * .35
+        );
+
+      /*
+        Límites de seguridad.
+      */
+
+      left = clamp(
+        left,
+        2,
+        arenaRect.width -
+        pieceSize -
+        2
+      );
+
+      top = clamp(
+        top,
+        trayStart,
+        Math.max(
+          trayStart,
+          arenaRect.height -
+          pieceSize -
+          3
+        )
+      );
+
+      const rotation =
+        random(-15, 15);
+
+      piece.style.left =
+        `${left}px`;
+
+      piece.style.top =
+        `${top}px`;
+
+      piece.style.transform =
+        `rotate(${rotation}deg)`;
+
+      positions[
+        Number(piece.dataset.index)
+      ] = null;
+    }
+  );
+}
+
+/* ==========================================================
+   POSICIÓN DE UNA CASILLA
+   ========================================================== */
+
+function getCellPosition(cellIndex) {
+
+  const arenaRect =
+    arena.getBoundingClientRect();
+
+  const cellRect =
+    cells[cellIndex]
+      .getBoundingClientRect();
+
+  const pieceSize =
+    getPieceSize();
+
+  return {
+    left:
+      cellRect.left -
+      arenaRect.left +
+      (cellRect.width -
+        pieceSize) / 2,
+
+    top:
+      cellRect.top -
+      arenaRect.top +
+      (cellRect.height -
+        pieceSize) / 2
+  };
+}
+
+/* ==========================================================
+   COLOCAR PIEZA EN CASILLA
+   ========================================================== */
+
+function placeInCell(
+  piece,
+  cellIndex
+) {
+
+  const position =
+    getCellPosition(
+      cellIndex
+    );
+
+  piece.style.left =
+    `${position.left}px`;
+
+  piece.style.top =
+    `${position.top}px`;
+
+  piece.style.transform =
+    "rotate(0deg)";
+
+  positions[
+    Number(piece.dataset.index)
+  ] = cellIndex;
+}
+
+/* ==========================================================
+   DEVOLVER PIEZA A LA ZONA INFERIOR
+   ========================================================== */
+
+function returnToTray(
+  piece,
+  left,
+  top
+) {
+
+  const arenaRect =
+    arena.getBoundingClientRect();
+
+  const boardRect =
+    board.getBoundingClientRect();
+
+  const pieceSize =
+    getPieceSize();
+
+  const minimumTop =
+    boardRect.bottom -
+    arenaRect.top +
+    55;
+
+  const maximumTop =
+    arenaRect.height -
+    pieceSize -
+    3;
+
+  /*
+    Si no recibimos una posición válida,
+    generamos una posición aleatoria.
+  */
+
+  if (
+    typeof left !== "number" ||
+    typeof top !== "number"
+  ) {
+
+    left = random(
+      4,
+      arenaRect.width -
+      pieceSize -
+      4
+    );
+
+    top = random(
+      minimumTop,
+      Math.max(
+        minimumTop,
+        maximumTop
+      )
+    );
+  }
+
+  left = clamp(
+    left,
+    3,
+    arenaRect.width -
+    pieceSize -
+    3
+  );
+
+  top = clamp(
+    top,
+    minimumTop,
+    Math.max(
+      minimumTop,
+      maximumTop
+    )
+  );
+
+  piece.style.left =
+    `${left}px`;
+
+  piece.style.top =
+    `${top}px`;
+
+  piece.style.transform =
+    `rotate(${random(-14,14)}deg)`;
+
+  positions[
+    Number(piece.dataset.index)
+  ] = null;
+}
+
+/* ==========================================================
+   DETECTAR CASILLA DE DESTINO
+   ========================================================== */
+
+function getDropCell(piece) {
+
+  const pieceRect =
+    piece.getBoundingClientRect();
+
+  const centerX =
+    pieceRect.left +
+    pieceRect.width / 2;
+
+  const centerY =
+    pieceRect.top +
+    pieceRect.height / 2;
+
+  for (
+    let index = 0;
+    index < cells.length;
+    index++
+  ) {
+
+    const rect =
+      cells[index]
+        .getBoundingClientRect();
+
+    /*
+      El centro de la pieza debe caer dentro
+      de una casilla.
+    */
+
+    if (
+      centerX >= rect.left &&
+      centerX <= rect.right &&
+      centerY >= rect.top &&
+      centerY <= rect.bottom
+    ) {
+      return index;
+    }
+  }
+
+  return null;
+}
+
+/* ==========================================================
+   TOUCHSTART
+   ========================================================== */
+
+function handleTouchStart(event) {
+
+  if (gameWon) return;
+
+  event.preventDefault();
+
+  const touch =
+    event.touches[0];
+
+  beginDrag(
+    event.currentTarget,
+    touch.clientX,
+    touch.clientY
+  );
+}
+
+/* ==========================================================
+   TOUCHMOVE
+   ========================================================== */
+
+function handleTouchMove(event) {
+
+  if (
+    !draggedPiece ||
+    gameWon
+  ) {
+    return;
+  }
+
+  event.preventDefault();
+
+  const touch =
+    event.touches[0];
+
+  movePiece(
+    touch.clientX,
+    touch.clientY
+  );
+}
+
+/* ==========================================================
+   TOUCHEND
+   ========================================================== */
+
+function handleTouchEnd(event) {
+
+  if (
+    !draggedPiece ||
+    gameWon
+  ) {
+    return;
+  }
+
+  event.preventDefault();
+
+  finishDrag();
+}
+
+/* ==========================================================
+   MOUSE
+   ========================================================== */
+
+function handleMouseDown(event) {
+
+  if (gameWon) return;
+
+  event.preventDefault();
+
+  beginDrag(
+    event.currentTarget,
+    event.clientX,
+    event.clientY
+  );
+
+  window.addEventListener(
+    "mousemove",
+    handleMouseMove
+  );
+
+  window.addEventListener(
+    "mouseup",
+    handleMouseUp,
+    { once:true }
+  );
+}
+
+function handleMouseMove(event) {
+
+  if (!draggedPiece) {
+    return;
+  }
+
+  movePiece(
+    event.clientX,
+    event.clientY
+  );
+}
+
+function handleMouseUp() {
+
+  if (!draggedPiece) {
+    return;
+  }
+
+  finishDrag();
+
+  window.removeEventListener(
+    "mousemove",
+    handleMouseMove
+  );
+}
+
+/* ==========================================================
+   COMENZAR ARRASTRE
+   ========================================================== */
+
+function beginDrag(
+  piece,
+  clientX,
+  clientY
+) {
+
+  draggedPiece = piece;
+
+  moved = false;
+
+  startX = clientX;
+  startY = clientY;
+
+  const rect =
+    piece.getBoundingClientRect();
+
+  /*
+    Conservamos exactamente dónde tocó
+    el usuario dentro de la pieza.
+  */
+
+  dragOffsetX =
+    clientX - rect.left;
+
+  dragOffsetY =
+    clientY - rect.top;
+
+  piece.classList.add(
+    "dragging"
+  );
+
+  piece.style.zIndex =
+    "999";
+
+  /*
+    Si la pieza estaba en una casilla,
+    ahora queda libre.
+  */
+
+  positions[
+    Number(piece.dataset.index)
+  ] = null;
+}
+
+/* ==========================================================
+   MOVER PIEZA
+   ========================================================== */
+
+function movePiece(
+  clientX,
+  clientY
+) {
+
+  if (!draggedPiece) {
+    return;
+  }
+
+  if (
+    Math.abs(clientX - startX) > 3 ||
+    Math.abs(clientY - startY) > 3
+  ) {
+    moved = true;
+  }
+
+  const arenaRect =
+    arena.getBoundingClientRect();
+
+  const pieceSize =
+    getPieceSize();
+
+  let left =
+    clientX -
+    arenaRect.left -
+    dragOffsetX;
+
+  let top =
+    clientY -
+    arenaRect.top -
+    dragOffsetY;
+
+  /*
+    Permitimos atravesar libremente el tablero.
+  */
+
+  left = clamp(
+    left,
+    -pieceSize * .35,
+    arenaRect.width -
+    pieceSize * .65
+  );
+
+  top = clamp(
+    top,
+    0,
+    arenaRect.height -
+    pieceSize * .65
+  );
+
+  draggedPiece.style.left =
+    `${left}px`;
+
+  draggedPiece.style.top =
+    `${top}px`;
+
+  draggedPiece.style.transform =
+    "rotate(0deg)";
+}
+
+/* ==========================================================
+   TERMINAR ARRASTRE
+   ========================================================== */
+
+function finishDrag() {
+
+  if (!draggedPiece) {
+    return;
+  }
+
+  const piece =
+    draggedPiece;
+
+  piece.classList.remove(
+    "dragging"
+  );
+
+  piece.style.zIndex =
+    "10";
+
+  /*
+    Si solamente tocó la pieza sin moverla,
+    no modificamos su posición.
+  */
+
+  if (!moved) {
+
+    const pieceIndex =
+      Number(piece.dataset.index);
+
+    const oldCell =
+      positions[pieceIndex];
+
+    if (oldCell !== null) {
+      placeInCell(
+        piece,
+        oldCell
+      );
+    }
+
+    draggedPiece = null;
+
+    return;
+  }
+
+  const dropCell =
+    getDropCell(piece);
+
+  if (dropCell !== null) {
+
+    /*
+      REGLA FUNDAMENTAL:
+
+      NO comprobamos si dropCell === piece.index.
+
+      Por lo tanto, una pieza puede caer en una casilla
+      equivocada y QUEDA AHÍ.
+
+      El jugador podrá volver a tomarla desde esa casilla
+      y moverla a otra.
+    */
+
+    placeInCell(
+      piece,
+      dropCell
+    );
+
+  } else {
+
+    /*
+      Si no cayó sobre el tablero,
+      vuelve a la zona inferior.
+    */
+
+    const arenaRect =
+      arena.getBoundingClientRect();
+
+    const rect =
+      piece.getBoundingClientRect();
+
+    returnToTray(
+      piece,
+      rect.left -
+      arenaRect.left,
+
+      rect.top -
+      arenaRect.top
+    );
+  }
+
+  draggedPiece = null;
+
+  checkVictory();
+}
+
+/* ==========================================================
+   COMPROBAR VICTORIA
+   ========================================================== */
+
+function checkVictory() {
+
+  /*
+    Victoria únicamente cuando:
+
+    pieza 0 -> casilla 0
+    pieza 1 -> casilla 1
+    ...
+    pieza 8 -> casilla 8
+
+    Además, ninguna puede estar abajo.
+  */
+
+  const complete =
+    positions.every(
+      (cellIndex, pieceIndex) =>
+        cellIndex === pieceIndex
+    );
+
+  if (!complete) {
+    return;
+  }
+
+  gameWon = true;
+
+  /*
+    Esperamos un instante para que la última pieza
+    termine su animación.
+  */
+
+  setTimeout(
+    registerGlobalWin,
+    300
+  );
+}
+
+/* ==========================================================
+   CONTADOR GLOBAL EN LA NUBE
+   ========================================================== */
+
+/*
+  CounterAPI devuelve el valor incrementado
+  directamente en la respuesta.
+
+  Esto es mejor que hacer:
+
+    GET
+    +1
+    SET
+
+  porque dos celulares podrían leer el mismo número
+  simultáneamente.
+
+  La operación de incremento del endpoint se ejecuta
+  como una operación de contador y devuelve el nuevo valor.
+*/
+
+async function registerGlobalWin() {
+
+  try {
+
+    const response =
+      await fetch(
+        COUNTER_URL,
+        {
+          method:"GET",
+          cache:"no-store"
+        }
+      );
+
+    if (!response.ok) {
+      throw new Error(
+        `HTTP ${response.status}`
+      );
+    }
+
+    const data =
+      await response.json();
+
+    /*
+      CounterAPI devuelve:
+      {
+        value: número,
+        ...
+      }
+    */
+
+    if (
+      !data ||
+      typeof data.value !== "number"
+    ) {
+      throw new Error(
+        "Respuesta inválida del contador"
+      );
+    }
+
+    const code =
+      formatCode(data.value);
+
+    showVictory(code);
+
+  } catch (error) {
+
+    console.error(
+      "Error del contador global:",
+      error
+    );
+
+    /*
+      FALLBACK:
+
+      Si el servicio está temporalmente caído,
+      no dejamos al usuario sin pantalla de victoria.
+
+      Este código es LOCAL y NO debe interpretarse
+      como un número global confirmado.
+    */
+
+    const fallbackCode =
+      getLocalFallback();
+
+    showVictory(
+      fallbackCode,
+      true
+    );
+  }
+}
+
+/* ==========================================================
+   FORMATO DEL CÓDIGO
+   ========================================================== */
+
+function formatCode(value) {
+
+  /*
+    1     => 0001
+    14    => 0014
+    125   => 0125
+    9999  => 9999
+    10000 => 10000
+  */
+
+  return String(value)
+    .padStart(4,"0");
+}
+
+/* ==========================================================
+   FALLBACK
+   ========================================================== */
+
+function getLocalFallback() {
+
+  const storageKey =
+    "rompecabezas_rey_local_fallback";
+
+  let value =
+    Number(
+      localStorage.getItem(
+        storageKey
+      ) || "0"
+    );
+
+  value++;
+
+  localStorage.setItem(
+    storageKey,
+    String(value)
+  );
+
+  return formatCode(value);
+}
+
+/* ==========================================================
+   MOSTRAR VICTORIA
+   ========================================================== */
+
+function showVictory(
+  code,
+  isFallback = false
+) {
+
+  codeElement.textContent =
+    code;
+
+  codeElement.dataset.code =
+    code;
+
+  codeElement.dataset.fallback =
+    isFallback
+      ? "true"
+      : "false";
+
+  overlay.classList.add(
+    "show"
+  );
+}
+
+/* ==========================================================
+   COBRAR POR WHATSAPP
+   ========================================================== */
+
+claimBtn.addEventListener(
+  "click",
+  () => {
+
+    const code =
+      codeElement.dataset.code ||
+      codeElement.textContent.trim();
+
+    /*
+      TEXTO EXACTO SOLICITADO:
+
+      "felicitaciones por finalizar el rompecabezas.
+      Mi código es: [Número del contador]"
+    */
+
+    const message =
+      `felicitaciones por finalizar el rompecabezas. Mi código es: ${code}`;
+
+    const url =
+      `https://wa.me/${WHATSAPP_NUMBER}?text=` +
+      encodeURIComponent(message);
+
+    window.location.href = url;
+  }
+);
+
+/* ==========================================================
+   REINICIAR
+   ========================================================== */
+
+function restartGame() {
+
+  gameWon = false;
+
+  draggedPiece = null;
+
+  overlay.classList.remove(
+    "show"
+  );
+
+  /*
+    Nueva imagen aleatoria.
+  */
+
+  currentImage =
+    chooseImage();
+
+  createPieces();
+
+  /*
+    Esperamos un frame para tener las dimensiones
+    correctas del tablero.
+  */
+
+  requestAnimationFrame(
+    () => {
+      scatterPieces();
+    }
+  );
+}
+
+resetBtn.addEventListener(
+  "click",
+  restartGame
+);
+
+againBtn.addEventListener(
+  "click",
+  restartGame
+);
+
+/* ==========================================================
+   RESPONSIVE / ROTACIÓN DEL TELÉFONO
+   ========================================================== */
+
+window.addEventListener(
+  "resize",
+  () => {
+
+    /*
+      Las piezas que estén dentro del tablero se
+      vuelven a alinear con su casilla.
+
+      Las piezas de la bandeja mantienen su posición.
+    */
+
+    pieces.forEach(
+      piece => {
+
+        const pieceIndex =
+          Number(
+            piece.dataset.index
+          );
+
+        const cellIndex =
+          positions[pieceIndex];
+
+        if (
+          cellIndex !== null
+        ) {
+          placeInCell(
+            piece,
+            cellIndex
+          );
+        }
+      }
+    );
+  },
+  { passive:true }
+);
+
+/* ==========================================================
+   INICIALIZACIÓN
+   ========================================================== */
+
+restartGame();
+        
