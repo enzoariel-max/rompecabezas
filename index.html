@@ -1,3 +1,7 @@
+<!-- ================================================================= -->
+<!-- BLOQUE 1: ESTRUCTURA HTML Y ESTILOS CSS UNIFICADOS                -->
+<!-- Pega este bloque completo en tu archivo index.html                -->
+<!-- ================================================================= -->
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -12,12 +16,12 @@
 
   <style>
     /* ========================================================= */
-    /* VARIABLES Y ESTILOS GLOBALES - BOLD TYPOGRAPHY            */
+    /* RESET & ESTILOS BASE (NATIVO MÓVIL SIN ARMAZÓN ARTIFICIAL) */
     /* ========================================================= */
     :root {
       --bg: #0a0a0a;
       --gold: #d4af37;
-      --gold-glow: rgba(212, 175, 55, 0.65);
+      --gold-glow: rgba(212, 175, 55, 0.7);
       --ink: #ffffff;
     }
 
@@ -35,108 +39,79 @@
       min-height: 100vh;
       background-color: var(--bg);
       color: var(--ink);
-      font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: 'Montserrat', sans-serif;
       overflow-x: hidden;
       touch-action: pan-x pan-y;
     }
 
     body {
       display: flex;
+      flex-direction: column;
       align-items: center;
-      justify-content: center;
-      padding: 12px 8px;
-      background: radial-gradient(circle at 50% 15%, #1c180a 0%, #0a0a0a 75%);
+      justify-content: flex-start;
+      padding: 16px 12px 28px 12px;
+      background: radial-gradient(circle at 50% 15%, #1d180a 0%, #0a0a0a 75%);
     }
 
-    /* CONTENEDOR TIPO DISPOSITIVO MÓVIL (MOBILE-FIRST) */
-    .device-container {
+    /* CONTENEDOR RESPONSIVO LIMPIO */
+    .game-wrapper {
       width: 100%;
-      max-width: 390px;
-      min-height: 700px;
-      background: #000000;
-      border: 4px solid #1a1a1a;
-      border-radius: 42px;
-      position: relative;
+      max-width: 360px;
       display: flex;
       flex-direction: column;
-      box-shadow: 0 0 80px rgba(0, 0, 0, 0.8), 0 0 25px rgba(212, 175, 55, 0.1);
-      overflow: hidden;
-      padding-bottom: 20px;
-    }
-
-    /* BARRA DE ESTADO SUPERIOR */
-    .status-bar {
-      height: 32px;
-      padding: 6px 24px 0 24px;
-      display: flex;
-      justify-content: space-between;
       align-items: center;
-      font-size: 11px;
-      font-weight: 700;
-      color: #666;
-      letter-spacing: 1px;
+      position: relative;
     }
 
-    .status-bar .right-icons {
-      display: flex;
-      gap: 6px;
-      font-size: 10px;
-      color: #777;
-    }
-
-    /* ENCABEZADO Y TÍTULO BOLD TYPOGRAPHY */
-    .title-header {
-      padding: 10px 16px 8px 16px;
+    /* ENCABEZADO Y TÍTULO PREMIUM */
+    .header {
+      margin-bottom: 12px;
       text-align: center;
+      width: 100%;
     }
 
-    .title-text {
+    .badge-top {
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--gold);
+      text-shadow: 0 0 10px var(--gold-glow);
+      margin-bottom: 3px;
+    }
+
+    .title {
       font-family: 'Cinzel', serif;
-      font-size: 23px;
+      font-size: 24px;
       font-weight: 900;
-      letter-spacing: 0.22em;
+      letter-spacing: 3.5px;
       text-transform: uppercase;
       color: #ffffff;
       text-shadow: 0 0 15px var(--gold-glow), 0 0 30px var(--gold-glow);
       line-height: 1.15;
-      margin-bottom: 4px;
     }
 
-    .edition-tag {
-      font-size: 10px;
-      font-weight: 800;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--gold);
-      opacity: 0.85;
-    }
-
-    /* TABLERO 3X3 (330px X 330px) */
+    /* TABLERO 3x3 (330px X 330px) */
     .board-container {
-      display: flex;
-      justify-content: center;
-      padding: 4px 8px;
-    }
-
-    .board-frame {
-      position: relative;
       width: 330px;
       height: 330px;
-      padding: 1px;
-      background: linear-gradient(to bottom, rgba(212, 175, 55, 0.35), rgba(212, 175, 55, 0.1));
+      position: relative;
+      background: #0d0d0d;
+      border: 2px solid rgba(212, 175, 55, 0.4);
       border-radius: 8px;
-      box-shadow: 0 0 20px rgba(212, 175, 55, 0.15);
+      box-shadow: 0 0 25px rgba(212, 175, 55, 0.2), inset 0 0 20px rgba(0, 0, 0, 0.95);
+      margin-bottom: 14px;
     }
 
     #board {
-      width: 330px;
-      height: 330px;
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid rgba(255, 255, 255, 0.1);
       display: grid;
       grid-template-columns: repeat(3, 110px);
       grid-template-rows: repeat(3, 110px);
-      position: relative;
+      width: 330px;
+      height: 330px;
+      position: absolute;
+      top: 0;
+      left: 0;
       border-radius: 6px;
       overflow: hidden;
     }
@@ -145,7 +120,7 @@
       width: 110px;
       height: 110px;
       position: relative;
-      border: 0.5px solid rgba(255, 255, 255, 0.08);
+      border: 1px dashed rgba(212, 175, 55, 0.2);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -153,34 +128,36 @@
     }
 
     .slot.hovered {
-      background-color: rgba(212, 175, 55, 0.22);
+      background-color: rgba(212, 175, 55, 0.25);
       border-color: var(--gold);
     }
 
-    .slot-number {
-      font-family: 'Cinzel', serif;
-      font-size: 15px;
-      font-weight: 900;
-      color: rgba(255, 255, 255, 0.12);
+    /* SILUETA GUÍA TRASLÚCIDA DENTRO DE CADA CASILLA */
+    .slot-silhouette {
+      width: 110px;
+      height: 110px;
+      position: absolute;
+      background-color: rgba(212, 175, 55, 0.08);
+      border: 1px solid rgba(212, 175, 55, 0.25);
       pointer-events: none;
+      opacity: 0.85;
     }
 
-    /* ARENA DE PIEZAS DISPERSAS INFERIOR (#arena) */
-    .arena-container {
-      flex: 1;
+    /* CONTENEDOR DE DISPERSIÓN INFERIOR (#arena) */
+    .arena-section {
       width: 100%;
-      padding: 12px 16px 0 16px;
-      position: relative;
+      max-width: 340px;
+      margin-bottom: 14px;
     }
 
-    .arena-title {
+    .arena-label {
       text-align: center;
       font-size: 10px;
       font-weight: 800;
       text-transform: uppercase;
-      letter-spacing: 0.25em;
+      letter-spacing: 2px;
       color: var(--gold);
-      opacity: 0.75;
+      opacity: 0.8;
       margin-bottom: 6px;
     }
 
@@ -189,10 +166,10 @@
       height: 220px;
       position: relative;
       overflow: visible;
-      background: linear-gradient(to top, rgba(212, 175, 55, 0.06), transparent);
-      border: 1px solid rgba(212, 175, 55, 0.2);
+      background: linear-gradient(to top, rgba(212, 175, 55, 0.06), rgba(0,0,0,0.4));
+      border: 1px solid rgba(212, 175, 55, 0.25);
       border-radius: 12px;
-      box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.75);
+      box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.8);
     }
 
     /* PIEZAS DEL ROMPECABEZAS (110px X 110px) */
@@ -223,7 +200,10 @@
       pointer-events: none;
     }
 
-    /* MOLDE TRADICIONAL DE PESTAÑAS (ACOPLABLES EN 3x3) */
+    /* ========================================================= */
+    /* MOLDES MATRICIALES EXACTOS DE ENCAJE (CLIP-PATH 3x3)      */
+    /* Relación simétrica perfecta entre piezas adyacentes       */
+    /* ========================================================= */
     .p0 { clip-path: polygon(0 0, 100% 0, 100% 35%, 85% 50%, 100% 65%, 100% 100%, 65% 100%, 50% 115%, 35% 100%, 0 100%); }
     .p1 { clip-path: polygon(0 0, 100% 0, 100% 35%, 115% 50%, 100% 65%, 100% 100%, 65% 100%, 50% 85%, 35% 100%, 0 100%, 0 65%, -15% 50%, 0 35%); }
     .p2 { clip-path: polygon(0 0, 100% 0, 100% 100%, 65% 100%, 50% 115%, 35% 100%, 0 100%, 0 65%, 15% 50%, 0 35%); }
@@ -234,11 +214,11 @@
     .p7 { clip-path: polygon(0 0, 35% 0, 50% 15%, 65% 0, 100% 0, 100% 35%, 115% 50%, 100% 65%, 100% 100%, 0 100%, 0 65%, -15% 50%, 0 35%); }
     .p8 { clip-path: polygon(0 0, 35% 0, 50% -15%, 65% 0, 100% 0, 100% 100%, 0 100%, 0 65%, 15% 50%, 0 35%); }
 
-    /* BOTONES Y CONTROLES */
+    /* BOTONES */
     .controls {
-      padding: 10px 24px 0 24px;
+      width: 100%;
+      max-width: 340px;
       display: flex;
-      gap: 12px;
       justify-content: center;
     }
 
@@ -246,22 +226,22 @@
       background: transparent;
       border: 1px solid var(--gold);
       color: var(--gold);
-      padding: 12px 24px;
+      padding: 12px 28px;
       border-radius: 999px;
-      font-size: 12px;
-      font-weight: 700;
+      font-family: 'Cinzel', serif;
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: 2px;
       text-transform: uppercase;
-      letter-spacing: 1.5px;
       cursor: pointer;
-      transition: all 0.25s ease;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
+      transition: all 0.2s ease;
       width: 100%;
+      text-align: center;
     }
 
     .btn:active {
       transform: scale(0.96);
+      background: rgba(212, 175, 55, 0.15);
     }
 
     .btn-whatsapp {
@@ -269,13 +249,13 @@
       color: #ffffff;
       border: 1px solid #48e68b;
       box-shadow: 0 4px 20px rgba(37, 211, 102, 0.4);
-      font-weight: 800;
+      font-weight: 900;
     }
 
     /* MODAL FLOTANTE DE VICTORIA */
     #modal-victoria {
       display: none;
-      position: absolute;
+      position: fixed;
       inset: 0;
       background: rgba(0, 0, 0, 0.88);
       backdrop-filter: blur(8px);
@@ -293,11 +273,11 @@
       background: #111111;
       border: 2px solid var(--gold);
       border-radius: 28px;
-      padding: 28px 20px;
+      padding: 28px 22px;
       width: 100%;
-      max-width: 300px;
+      max-width: 310px;
       text-align: center;
-      box-shadow: 0 0 50px rgba(0, 0, 0, 0.9), 0 0 20px rgba(212, 175, 55, 0.35);
+      box-shadow: 0 0 50px rgba(0, 0, 0, 0.9), 0 0 20px var(--gold-glow);
       animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
 
@@ -317,15 +297,15 @@
       align-items: center;
       justify-content: center;
       font-size: 24px;
-      box-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
+      box-shadow: 0 0 15px var(--gold-glow);
     }
 
     .victory-title {
       font-family: 'Cinzel', serif;
-      font-size: 20px;
+      font-size: 22px;
       font-weight: 900;
       color: #ffffff;
-      letter-spacing: 0.2em;
+      letter-spacing: 3px;
       text-shadow: 0 0 15px var(--gold-glow);
       margin-bottom: 2px;
     }
@@ -333,7 +313,7 @@
     .victory-subtitle {
       font-size: 10px;
       font-weight: 800;
-      letter-spacing: 0.2em;
+      letter-spacing: 2px;
       text-transform: uppercase;
       color: #888888;
       margin-bottom: 14px;
@@ -349,9 +329,9 @@
 
     .code-text {
       font-family: 'Courier New', Courier, monospace;
-      font-size: 26px;
+      font-size: 22px;
       font-weight: 900;
-      letter-spacing: 0.25em;
+      letter-spacing: 3px;
       color: var(--gold);
       text-shadow: 0 0 12px var(--gold-glow);
     }
@@ -365,51 +345,40 @@
 </head>
 <body>
 
-  <div class="device-container">
-    <!-- BARRA DE ESTADO -->
-    <div class="status-bar">
-      <span>9:41</span>
-      <div class="right-icons">
-        <span>5G</span>
-        <span>100%</span>
-      </div>
-    </div>
-
-    <!-- TÍTULO BOLD TYPOGRAPHY -->
-    <header class="title-header">
-      <h1 class="title-text">ROMPECABEZAS<br>EL REY</h1>
-      <div id="edition-indicator" class="edition-tag">Edición 1 de 3</div>
+  <div class="game-wrapper">
+    <!-- ENCABEZADO -->
+    <header class="header">
+      <div class="badge-top">Completa y gana</div>
+      <h1 class="title">Rompecabezas El Rey</h1>
     </header>
 
-    <!-- TABLERO SUPERIOR 3x3 -->
+    <!-- TABLERO SUPERIOR CON SILUETAS CURVAS DE GUÍA -->
     <div class="board-container">
-      <div class="board-frame">
-        <div id="board">
-          <div class="slot" data-index="0"><span class="slot-number">1</span></div>
-          <div class="slot" data-index="1"><span class="slot-number">2</span></div>
-          <div class="slot" data-index="2"><span class="slot-number">3</span></div>
-          <div class="slot" data-index="3"><span class="slot-number">4</span></div>
-          <div class="slot" data-index="4"><span class="slot-number">5</span></div>
-          <div class="slot" data-index="5"><span class="slot-number">6</span></div>
-          <div class="slot" data-index="6"><span class="slot-number">7</span></div>
-          <div class="slot" data-index="7"><span class="slot-number">8</span></div>
-          <div class="slot" data-index="8"><span class="slot-number">9</span></div>
-        </div>
+      <div id="board">
+        <div class="slot" data-index="0"><div class="slot-silhouette p0"></div></div>
+        <div class="slot" data-index="1"><div class="slot-silhouette p1"></div></div>
+        <div class="slot" data-index="2"><div class="slot-silhouette p2"></div></div>
+        <div class="slot" data-index="3"><div class="slot-silhouette p3"></div></div>
+        <div class="slot" data-index="4"><div class="slot-silhouette p4"></div></div>
+        <div class="slot" data-index="5"><div class="slot-silhouette p5"></div></div>
+        <div class="slot" data-index="6"><div class="slot-silhouette p6"></div></div>
+        <div class="slot" data-index="7"><div class="slot-silhouette p7"></div></div>
+        <div class="slot" data-index="8"><div class="slot-silhouette p8"></div></div>
       </div>
     </div>
 
-    <!-- ARENA DE DISPERSIÓN INFERIOR -->
-    <div class="arena-container">
-      <div class="arena-title">Arena de Piezas</div>
+    <!-- ARENA DE PIEZAS DISPERSAS INFERIOR -->
+    <div class="arena-section">
+      <div class="arena-label">Arena de Piezas</div>
       <div id="arena"></div>
     </div>
 
-    <!-- CONTROLES -->
+    <!-- BOTÓN DE REINICIO -->
     <div class="controls">
       <button id="btn-reset" class="btn" type="button">Reiniciar</button>
     </div>
 
-    <!-- CARTEL FLOTANTE DE VICTORIA -->
+    <!-- MODAL FLOTANTE DE VICTORIA -->
     <div id="modal-victoria">
       <div class="victory-card">
         <div class="victory-crown">👑</div>
@@ -426,7 +395,6 @@
     </div>
   </div>
 
-  <!-- PEGA EL BLOQUE 2 JUSTO AQUÍ DEBAJO -->
 </body>
 </html>
 <script>
@@ -436,7 +404,7 @@
   // =================================================================
 
   document.addEventListener('DOMContentLoaded', () => {
-    // 1. CONFIGURACIÓN Y PARÁMETROS MATRICIALES
+    // 1. CONFIGURACIÓN Y CONSTANTES
     const IMAGES = ['imagen1.jpeg', 'imagen2.jpeg', 'imagen3.jpeg'];
     const FIREBASE_DB_URL = "https://firebaseio.com";
     const GRID_SIZE = 3;
@@ -447,21 +415,19 @@
     const boardEl = document.getElementById('board');
     const arenaEl = document.getElementById('arena');
     const slots = Array.from(document.querySelectorAll('.slot'));
-    const editionIndicator = document.getElementById('edition-indicator');
     const btnReset = document.getElementById('btn-reset');
     const modalVictoria = document.getElementById('modal-victoria');
     const codigoGanadorEl = document.getElementById('codigo-ganador');
     const btnCobrar = document.getElementById('btn-cobrar');
     const btnModalReiniciar = document.getElementById('btn-modal-reiniciar');
 
-    // 3. ESTADO GLOBAL DEL JUEGO
+    // 3. ESTADO GLOBAL
     let currentImage = '';
-    let currentImageIndex = 0;
-    let gridState = new Array(9).fill(null); // Casillas del tablero: almacena elemento o null
+    let gridState = new Array(9).fill(null); // Casillas del tablero
     let isGameFinished = false;
     let ganadorCodigoActual = '0001';
 
-    // 4. CONTROL DE EVENTOS TÁCTILES Y ARRASTRE
+    // 4. CONTROL DE ARRASTRE TÁCTIL Y MOUSE
     let draggedPiece = null;
     let touchStartX = 0;
     let touchStartY = 0;
@@ -472,14 +438,13 @@
     // INICIALIZACIÓN
     initGame();
 
-    // BOTONES
     btnReset.addEventListener('click', () => initGame());
     btnModalReiniciar.addEventListener('click', () => {
       modalVictoria.classList.remove('active');
       initGame();
     });
 
-    // REDIRECCIÓN DIRECTA A WHATSAPP
+    // REDIRECCIÓN A WHATSAPP
     btnCobrar.addEventListener('click', () => {
       const textoMensaje = `felicitaciones por finalizar el rompecabezas. Mi código es: ${ganadorCodigoActual}`;
       const urlWa = `https://wa.me/?text=${encodeURIComponent(textoMensaje)}`;
@@ -487,7 +452,7 @@
     });
 
     // =========================================================
-    // CARGA ALEATORIA Y DISPERSIÓN MATRICIAL ASIMÉTRICA
+    // CARGA ALEATORIA Y DISPERSIÓN MATRICIAL EXACTA
     // =========================================================
     function initGame() {
       isGameFinished = false;
@@ -496,13 +461,10 @@
       arenaEl.innerHTML = '';
 
       // Selección aleatoria de una de las 3 imágenes
-      currentImageIndex = Math.floor(Math.random() * IMAGES.length);
-      currentImage = IMAGES[currentImageIndex];
-      if (editionIndicator) {
-        editionIndicator.textContent = `Edición ${currentImageIndex + 1} de 3`;
-      }
+      const randomIndex = Math.floor(Math.random() * IMAGES.length);
+      currentImage = IMAGES[randomIndex];
 
-      // Instanciar las 9 piezas con fondo fijo y coordenadas absolutas
+      // Instanciar las 9 piezas con recorte y fondo fijo
       for (let i = 0; i < 9; i++) {
         const piece = document.createElement('div');
         piece.classList.add('piece', `p${i}`);
@@ -519,11 +481,11 @@
         piece.style.backgroundSize = `${TOTAL_SIZE}px ${TOTAL_SIZE}px`;
         piece.style.backgroundPosition = `${bgX}px ${bgY}px`;
 
-        // Posicionamiento aleatorio controlado en la arena (sin desbordar)
+        // Posicionamiento aleatorio dentro de la arena sin desbordar
         const arenaRect = arenaEl.getBoundingClientRect();
         const maxArenaW = arenaRect.width > 0 ? arenaRect.width : 340;
-        const maxLeft = Math.max(0, maxArenaW - PIECE_SIZE - 8);
-        const maxTop = Math.max(0, 220 - PIECE_SIZE - 8);
+        const maxLeft = Math.max(0, maxArenaW - PIECE_SIZE - 6);
+        const maxTop = Math.max(0, 220 - PIECE_SIZE - 6);
 
         const randomLeft = Math.floor(Math.random() * (maxLeft + 1));
         const randomTop = Math.floor(Math.random() * (maxTop + 1));
@@ -534,7 +496,7 @@
         piece.style.top = `${randomTop}px`;
         piece.style.transform = `rotate(${randomRotation}deg)`;
 
-        // Asignar controladores táctiles nativos
+        // Asignar controladores táctiles
         bindPieceEvents(piece);
 
         arenaEl.appendChild(piece);
@@ -552,7 +514,7 @@
         startDrag(el, touch.clientX, touch.clientY);
       }, { passive: false });
 
-      // MOUSE FALLBACK (Para pruebas en navegador de escritorio)
+      // MOUSE FALLBACK (Para escritorio)
       el.addEventListener('mousedown', (e) => {
         if (isGameFinished) return;
         startDrag(el, e.clientX, e.clientY);
@@ -575,7 +537,7 @@
     // TOUCH MOVE Y TOUCH END GLOBALES
     window.addEventListener('touchmove', (e) => {
       if (!draggedPiece) return;
-      if (e.cancelable) e.preventDefault(); // Evita scroll vertical de pantalla
+      if (e.cancelable) e.preventDefault(); // Evita scroll vertical en móviles
       const touch = e.touches[0];
       handleMove(touch.clientX, touch.clientY);
     }, { passive: false });
@@ -595,14 +557,14 @@
       pieceInitialLeft = rect.left;
       pieceInitialTop = rect.top;
 
-      // Si estaba alojada en una casilla del tablero, liberarla
+      // Si estaba en una casilla del tablero, liberarla
       const currentSlot = parseInt(el.dataset.currentSlot, 10);
       if (currentSlot !== -1) {
         gridState[currentSlot] = null;
         el.dataset.currentSlot = -1;
       }
 
-      // Mover temporalmente al body para evitar recortes de overflow
+      // Mover temporalmente al body para libre arrastre
       document.body.appendChild(el);
       el.style.left = `${pieceInitialLeft}px`;
       el.style.top = `${pieceInitialTop}px`;
@@ -631,13 +593,13 @@
       const targetSlotIndex = findTargetSlot(clientX, clientY);
 
       if (targetSlotIndex !== -1) {
-        // REGLA: Si la casilla ya está ocupada por otra pieza, enviar la anterior a la arena
+        // REGLA: Si la casilla está ocupada, devolver la pieza anterior a la arena
         if (gridState[targetSlotIndex] !== null && gridState[targetSlotIndex] !== el) {
           const occupiedPiece = gridState[targetSlotIndex];
           returnPieceToArena(occupiedPiece);
         }
 
-        // Alojar fijamente la pieza en la casilla (correcta o incorrecta)
+        // Alojar la pieza fijamente en la casilla seleccionada (incluso si es incorrecta)
         snapPieceToSlot(el, targetSlotIndex);
       } else {
         // Soltada fuera del tablero: regresar y asentar en la arena
@@ -647,12 +609,12 @@
       clearSlotHover();
       draggedPiece = null;
 
-      // Validar si el juego se completó
+      // Validar si se completó el rompecabezas
       checkVictory();
     }
 
     // =========================================================
-    // DETECCIÓN DE COLISIONES Y ALOJAMIENTO EN CUADRÍCULA
+    // DETECCIÓN DE CASILLAS Y ALOJAMIENTO EN TABLERO
     // =========================================================
     function checkSlotHover(clientX, clientY) {
       clearSlotHover();
@@ -739,7 +701,7 @@
     }
 
     // =========================================================
-    // VALIDACIÓN DE GRILLA Y CONEXIÓN DIRECTA CON FIREBASE
+    // VALIDACIÓN DE GRILLA Y CONTEO INCREMENTAL GLOBAL FIREBASE
     // =========================================================
     function checkVictory() {
       for (let i = 0; i < 9; i++) {
@@ -760,7 +722,7 @@
         const dbBase = FIREBASE_DB_URL.replace(/\/+$/, '');
         const endpoint = `${dbBase}/ganadores.json`;
 
-        // 1. POST histórico para asentar la victoria en la nube
+        // 1. POST obligatorio para asentar nuevo registro histórico único
         const nuevoRegistro = {
           timestamp: Date.now(),
           fecha: new Date().toISOString(),
@@ -774,24 +736,24 @@
           body: JSON.stringify(nuevoRegistro)
         });
 
-        // 2. GET limpio sin caché para contar registros reales
-        const respuesta = await fetch(`${endpoint}?nocache=${Date.now()}`);
+        // 2. GET forzando la anulación de caché (?v=Timestamp)
+        const respuesta = await fetch(`${endpoint}?v=${Date.now()}`);
         const datos = await respuesta.json();
 
-        let cantidadGanadores = 1;
+        let totalGanadores = 1;
         if (datos && typeof datos === 'object') {
-          cantidadGanadores = Object.keys(datos).length;
+          totalGanadores = Object.keys(datos).length;
         }
 
-        // Formato a 4 dígitos con ceros a la izquierda (ej: 0001, 0012)
-        ganadorCodigoActual = String(cantidadGanadores).padStart(4, '0');
+        // Formateo estricto a 4 dígitos con ceros a la izquierda (ej: "0001", "0012")
+        ganadorCodigoActual = String(totalGanadores).padStart(4, '0');
       } catch (error) {
-        console.warn("Firebase offline o de prueba, generando código local:", error);
-        const codigoLocal = Math.floor(Math.random() * 900) + 1;
-        ganadorCodigoActual = String(codigoLocal).padStart(4, '0');
+        console.warn("Error o modo offline en Firebase, generando código alternativo:", error);
+        const fallback = Math.floor(Math.random() * 900) + 1;
+        ganadorCodigoActual = String(fallback).padStart(4, '0');
       }
 
-      // Mostrar el cartel flotante de victoria
+      // Mostrar código en cartel flotante
       codigoGanadorEl.textContent = `CÓDIGO: ${ganadorCodigoActual}`;
       modalVictoria.classList.add('active');
     }
