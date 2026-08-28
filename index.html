@@ -445,10 +445,12 @@
         modalVictoria.classList.remove('active');
         initGame();
       });
+        btnCobrar.addEventListener('click', () => {
+        const textoMensaje = `¡Hola! He completado el Rompecabezas Rey 👑. Mi código ganador es: ${ganadorCodigoActual}`;
+        const numeroLimpio = NUMERO_WHATSAPP.replace(/\D/g, '');
 
-      btnCobrar.addEventListener('click', () => {
-        const textoMensaje = `felicitaciones por finalizar el rompecabezas. Mi código es: ${ganadorCodigoActual}`;
-        const urlWa = `https://wa.me/?text=${encodeURIComponent(textoMensaje)}`;
+        // Redirige directo a tu chat con el mensaje y código de canje
+        const urlWa = `https://wa.me/${numeroLimpio}?text=${encodeURIComponent(textoMensaje)}`;
         window.location.href = urlWa;
       });
 
