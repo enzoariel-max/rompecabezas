@@ -1,6 +1,6 @@
 <!-- ================================================================= -->
-<!-- BLOQUE 1: ESTRUCTURA HTML, ESTILOS Y TABLERO GRABADO EN ORO       -->
-<!-- Pega este bloque en tu index.html                                 -->
+<!-- BLOQUE 1: ESTRUCTURA HTML Y ESTILOS CSS UNIFICADOS                -->
+<!-- Pega este bloque completo en tu archivo index.html                -->
 <!-- ================================================================= -->
 <!DOCTYPE html>
 <html lang="es">
@@ -91,7 +91,7 @@
     }
 
     /* ========================================================= */
-    /* TABLERO 3x3 UNIFICADO (SIN PARTES OSCURAS NI HUECOS)      */
+    /* TABLERO 3x3 UNIFICADO                                     */
     /* ========================================================= */
     .board-container {
       width: 330px;
@@ -105,7 +105,7 @@
       overflow: hidden;
     }
 
-    /* LÍNEAS DE GUÍA GRABADAS EN EL TABLERO (UNIFICADO) */
+    /* LÍNEAS DE GUÍA CURVAS EN EL FONDO DEL TABLERO */
     .board-grid-svg {
       position: absolute;
       top: 0;
@@ -114,7 +114,7 @@
       height: 330px;
       pointer-events: none;
       z-index: 1;
-      opacity: 0.5;
+      opacity: 0.65;
     }
 
     #board {
@@ -133,6 +133,7 @@
       width: 110px;
       height: 110px;
       position: relative;
+      overflow: visible;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -143,7 +144,7 @@
       background-color: rgba(212, 175, 55, 0.2);
     }
 
-    /* CONTENEDOR DE PIEZAS DISPERSAS (#arena) */
+    /* ARENA DE PIEZAS INFERIOR */
     .arena-section {
       width: 100%;
       max-width: 340px;
@@ -163,7 +164,7 @@
 
     #arena {
       width: 100%;
-      height: 220px;
+      height: 230px;
       position: relative;
       overflow: visible;
       background: linear-gradient(to top, rgba(212, 175, 55, 0.06), rgba(0,0,0,0.4));
@@ -172,29 +173,28 @@
       box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.8);
     }
 
-    /* PIEZAS REALES: OPACIDAD 100% Y NITIDEZ TOTAL */
-    .piece {
-      width: 110px;
-      height: 110px;
+    /* PIEZAS REALES CON MOLDES CURVOS ORGÁNICOS */
+    .piece-canvas {
+      width: 154px;
+      height: 154px;
       position: absolute;
-      background-repeat: no-repeat;
       cursor: grab;
       touch-action: none;
-      filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.9));
+      filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.85));
       transition: transform 0.15s ease, filter 0.15s ease;
       opacity: 1 !important;
       z-index: 10;
+      pointer-events: auto;
     }
 
-    .piece.placed {
+    .piece-canvas.placed {
       cursor: pointer;
-      filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.6));
+      filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5));
       transition: none;
-      opacity: 1 !important;
       z-index: 10;
     }
 
-    .piece.dragging {
+    .piece-canvas.dragging {
       cursor: grabbing;
       z-index: 9999 !important;
       transform: scale(1.06) rotate(0deg) !important;
@@ -204,21 +204,7 @@
       opacity: 1 !important;
     }
 
-    /* ========================================================= */
-    /* MOLDES DE ENCAJE CONTINUOS (CLIP-PATH)                   */
-    /* Cada pieza encaja perfectamente con su vecina sin huecos */
-    /* ========================================================= */
-    .p0 { clip-path: polygon(0% 0%, 100% 0%, 100% 36%, 86% 50%, 100% 64%, 100% 100%, 64% 100%, 50% 114%, 36% 100%, 0% 100%); }
-    .p1 { clip-path: polygon(0% 0%, 100% 0%, 100% 36%, 114% 50%, 100% 64%, 100% 100%, 64% 100%, 50% 86%, 36% 100%, 0% 100%, 0% 64%, -14% 50%, 0% 36%); }
-    .p2 { clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 64% 100%, 50% 114%, 36% 100%, 0% 100%, 0% 64%, 14% 50%, 0% 36%); }
-    .p3 { clip-path: polygon(0% 0%, 36% 0%, 50% 14%, 64% 0%, 100% 0%, 100% 36%, 114% 50%, 100% 64%, 100% 100%, 64% 100%, 50% 86%, 36% 100%, 0% 100%); }
-    .p4 { clip-path: polygon(0% 0%, 36% 0%, 50% -14%, 64% 0%, 100% 0%, 100% 36%, 86% 50%, 100% 64%, 100% 100%, 64% 100%, 50% 114%, 36% 100%, 0% 100%, 0% 64%, 14% 50%, 0% 36%); }
-    .p5 { clip-path: polygon(0% 0%, 36% 0%, 50% 14%, 64% 0%, 100% 0%, 100% 100%, 64% 100%, 50% 86%, 36% 100%, 0% 100%, 0% 64%, -14% 50%, 0% 36%); }
-    .p6 { clip-path: polygon(0% 0%, 36% 0%, 50% -14%, 64% 0%, 100% 0%, 100% 36%, 86% 50%, 100% 64%, 100% 100%, 0% 100%); }
-    .p7 { clip-path: polygon(0% 0%, 36% 0%, 50% 14%, 64% 0%, 100% 0%, 100% 36%, 114% 50%, 100% 64%, 100% 100%, 0% 100%, 0% 64%, -14% 50%, 0% 36%); }
-    .p8 { clip-path: polygon(0% 0%, 36% 0%, 50% -14%, 64% 0%, 100% 0%, 100% 100%, 0% 100%, 0% 64%, 14% 50%, 0% 36%); }
-
-    /* CONTROLES Y BOTONES */
+    /* BOTONES */
     .controls {
       width: 100%;
       max-width: 340px;
@@ -256,7 +242,7 @@
       font-weight: 900;
     }
 
-    /* MODAL FLOTANTE DE VICTORIA */
+    /* MODAL DE VICTORIA */
     #modal-victoria {
       display: none;
       position: fixed;
@@ -350,23 +336,11 @@
       <h1 class="title">Rompecabezas El Rey</h1>
     </header>
 
-    <!-- TABLERO 3x3 UNIFICADO CON LÍNEAS DE CORTE GRABADAS -->
+    <!-- TABLERO 3x3 UNIFICADO CON LÍNEAS CURVAS DE GUÍA -->
     <div class="board-container">
-      <svg class="board-grid-svg" viewBox="0 0 330 330">
-        <!-- Línea Vertical 1 (x=110) con curvas de pestañas -->
-        <path d="M 110,0 L 110,38 C 110,38 95,38 95,55 C 95,72 110,72 110,72 L 110,148 C 110,148 125,148 125,165 C 125,182 110,182 110,182 L 110,258 C 110,258 95,258 95,275 C 95,292 110,292 110,292 L 110,330" fill="none" stroke="rgba(212, 175, 55, 0.4)" stroke-width="1.5" stroke-dasharray="4 2" />
-        
-        <!-- Línea Vertical 2 (x=220) con curvas de pestañas -->
-        <path d="M 220,0 L 220,38 C 220,38 205,38 205,55 C 205,72 220,72 220,72 L 220,148 C 220,148 235,148 235,165 C 235,182 220,182 220,182 L 220,258 C 220,258 205,258 205,275 C 205,292 220,292 220,292 L 220,330" fill="none" stroke="rgba(212, 175, 55, 0.4)" stroke-width="1.5" stroke-dasharray="4 2" />
+      <svg id="board-svg" class="board-grid-svg" viewBox="0 0 330 330"></svg>
 
-        <!-- Línea Horizontal 1 (y=110) con curvas de pestañas -->
-        <path d="M 0,110 L 38,110 C 38,110 38,95 55,95 C 72,95 72,110 72,110 L 148,110 C 148,110 148,125 165,125 C 182,125 182,110 182,110 L 258,110 C 258,110 258,95 275,95 C 292,95 292,110 292,110 L 330,110" fill="none" stroke="rgba(212, 175, 55, 0.4)" stroke-width="1.5" stroke-dasharray="4 2" />
-
-        <!-- Línea Horizontal 2 (y=220) con curvas de pestañas -->
-        <path d="M 0,220 L 38,220 C 38,220 38,205 55,205 C 72,205 72,220 72,220 L 148,220 C 148,220 148,235 165,235 C 182,235 182,220 182,220 L 258,220 C 258,220 258,205 275,205 C 292,205 292,220 292,220 L 330,220" fill="none" stroke="rgba(212, 175, 55, 0.4)" stroke-width="1.5" stroke-dasharray="4 2" />
-      </svg>
-
-      <!-- CASILLAS PARA ACOMODAR LAS PIEZAS -->
+      <!-- CASILLAS PARA LAS PIEZAS -->
       <div id="board">
         <div class="slot" data-index="0"></div>
         <div class="slot" data-index="1"></div>
@@ -391,7 +365,7 @@
       <button id="btn-reset" class="btn" type="button">Reiniciar</button>
     </div>
 
-    <!-- MODAL DE VICTORIA -->
+    <!-- MODAL FLOTANTE DE VICTORIA -->
     <div id="modal-victoria">
       <div class="victory-card">
         <div class="victory-crown">👑</div>
@@ -408,8 +382,8 @@
     </div>
   </div>
   <!-- ================================================================= -->
-<!-- BLOQUE 2: LÓGICA COMPLETA DE JAVASCRIPT NATIVO (Vanilla JS)       -->
-<!-- Pega este bloque completo justo antes de cerrar </body> en index  -->
+<!-- BLOQUE 2: LÓGICA JAVASCRIPT CON CURVAS BÉZIER Y ENCAJE PERFECTO   -->
+<!-- Pega este bloque justo antes de </body>                          -->
 <!-- ================================================================= -->
   <script>
     document.addEventListener('DOMContentLoaded', () => {
@@ -418,8 +392,11 @@
       const GRID_SIZE = 3;
       const PIECE_SIZE = 110;
       const TOTAL_SIZE = 330;
+      const PADDING = 22; // Margen para pestañas salientes
+      const CANVAS_SIZE = PIECE_SIZE + (PADDING * 2); // 154px
 
       const boardEl = document.getElementById('board');
+      const boardSvg = document.getElementById('board-svg');
       const arenaEl = document.getElementById('arena');
       const slots = Array.from(document.querySelectorAll('.slot'));
       const btnReset = document.getElementById('btn-reset');
@@ -440,6 +417,21 @@
       let pieceInitialTop = 0;
       let currentSlotHovered = null;
 
+      // Matriz de pestañas: [Top, Right, Bottom, Left]
+      // 1 = Pestaña saliente (Tab), -1 = Hueco entrante (Hole), 0 = Borde recto
+      const PIECE_EDGES = [
+        [0, 1, 1, 0],   // Pieza 0 (0,0)
+        [0, 1, -1, -1], // Pieza 1 (0,1)
+        [0, 0, 1, -1],  // Pieza 2 (0,2)
+        [-1, 1, -1, 0], // Pieza 3 (1,0)
+        [1, -1, 1, -1], // Pieza 4 (1,1)
+        [-1, 0, -1, 1], // Pieza 5 (1,2)
+        [1, 1, 0, 0],   // Pieza 6 (2,0)
+        [-1, 1, 0, -1], // Pieza 7 (2,1)
+        [1, 0, 0, -1]   // Pieza 8 (2,2)
+      ];
+
+      renderBoardGuideLines();
       initGame();
 
       btnReset.addEventListener('click', () => initGame());
@@ -454,46 +446,171 @@
         window.location.href = urlWa;
       });
 
+      // Trazo de una arista curva de rompecabezas clásica
+      function drawPuzzleEdge(ctxOrPath, x1, y1, x2, y2, tabType, isSvg = false) {
+        if (tabType === 0) {
+          if (isSvg) return `L ${x2} ${y2} `;
+          ctxOrPath.lineTo(x2, y2);
+          return '';
+        }
+
+        const dx = x2 - x1;
+        const dy = y2 - y1;
+        const len = Math.hypot(dx, dy);
+        const ux = dx / len;
+        const uy = dy / len;
+        const nx = -uy * tabType;
+        const ny = ux * tabType;
+
+        const p = (u, n) => {
+          const px = x1 + (ux * u * len) + (nx * n * len);
+          const py = y1 + (uy * u * len) + (ny * n * len);
+          return { x: px, y: py };
+        };
+
+        const p0 = p(0.38, 0);
+        const cp1 = p(0.36, 0.04);
+        const cp2 = p(0.32, 0.16);
+        const cp3 = p(0.50, 0.18);
+        const cp4 = p(0.68, 0.16);
+        const cp5 = p(0.64, 0.04);
+        const p1 = p(0.62, 0);
+
+        if (isSvg) {
+          return `L ${p0.x.toFixed(2)} ${p0.y.toFixed(2)} ` +
+                 `C ${cp1.x.toFixed(2)} ${cp1.y.toFixed(2)}, ${cp2.x.toFixed(2)} ${cp2.y.toFixed(2)}, ${cp3.x.toFixed(2)} ${cp3.y.toFixed(2)} ` +
+                 `C ${cp4.x.toFixed(2)} ${cp4.y.toFixed(2)}, ${cp5.x.toFixed(2)} ${cp5.y.toFixed(2)}, ${p1.x.toFixed(2)} ${p1.y.toFixed(2)} ` +
+                 `L ${x2.toFixed(2)} ${y2.toFixed(2)} `;
+        } else {
+          ctxOrPath.lineTo(p0.x, p0.y);
+          ctxOrPath.bezierCurveTo(cp1.x, cp1.y, cp2.x, cp2.y, cp3.x, cp3.y);
+          ctxOrPath.bezierCurveTo(cp4.x, cp4.y, cp5.x, cp5.y, p1.x, p1.y);
+          ctxOrPath.lineTo(x2, y2);
+        }
+      }
+
+      function renderBoardGuideLines() {
+        let v1 = `M 110 0 ` +
+                 drawPuzzleEdge(null, 110, 0, 110, 110, 1, true) +
+                 drawPuzzleEdge(null, 110, 110, 110, 220, 1, true) +
+                 drawPuzzleEdge(null, 110, 220, 110, 330, 1, true);
+
+        let v2 = `M 220 0 ` +
+                 drawPuzzleEdge(null, 220, 0, 220, 110, 1, true) +
+                 drawPuzzleEdge(null, 220, 110, 220, 220, -1, true) +
+                 drawPuzzleEdge(null, 220, 220, 220, 330, 1, true);
+
+        let h1 = `M 0 110 ` +
+                 drawPuzzleEdge(null, 0, 110, 110, 110, -1, true) +
+                 drawPuzzleEdge(null, 110, 110, 220, 110, 1, true) +
+                 drawPuzzleEdge(null, 220, 110, 330, 110, -1, true);
+
+        let h2 = `M 0 220 ` +
+                 drawPuzzleEdge(null, 0, 220, 110, 220, 1, true) +
+                 drawPuzzleEdge(null, 110, 220, 220, 220, -1, true) +
+                 drawPuzzleEdge(null, 220, 220, 330, 220, 1, true);
+
+        boardSvg.innerHTML = `
+          <path d="${v1}" fill="none" stroke="rgba(212, 175, 55, 0.45)" stroke-width="1.5" stroke-dasharray="4 2" />
+          <path d="${v2}" fill="none" stroke="rgba(212, 175, 55, 0.45)" stroke-width="1.5" stroke-dasharray="4 2" />
+          <path d="${h1}" fill="none" stroke="rgba(212, 175, 55, 0.45)" stroke-width="1.5" stroke-dasharray="4 2" />
+          <path d="${h2}" fill="none" stroke="rgba(212, 175, 55, 0.45)" stroke-width="1.5" stroke-dasharray="4 2" />
+        `;
+      }
+
       function initGame() {
         isGameFinished = false;
         modalVictoria.classList.remove('active');
         gridState.fill(null);
         arenaEl.innerHTML = '';
+        slots.forEach(s => s.innerHTML = '');
 
         const randomIndex = Math.floor(Math.random() * IMAGES.length);
         currentImage = IMAGES[randomIndex];
 
-        for (let i = 0; i < 9; i++) {
-          const piece = document.createElement('div');
-          piece.classList.add('piece', `p${i}`);
-          piece.dataset.pieceIndex = i;
-          piece.dataset.currentSlot = -1;
+        const img = new Image();
+        img.crossOrigin = "anonymous";
+        img.onload = () => {
+          buildPuzzlePieces(img);
+        };
+        img.src = currentImage;
+      }
 
+      function buildPuzzlePieces(img) {
+        for (let i = 0; i < 9; i++) {
           const col = i % GRID_SIZE;
           const row = Math.floor(i / GRID_SIZE);
-          const bgX = -(col * PIECE_SIZE);
-          const bgY = -(row * PIECE_SIZE);
+          const edges = PIECE_EDGES[i];
 
-          piece.style.backgroundImage = `url('${currentImage}')`;
-          piece.style.backgroundSize = `${TOTAL_SIZE}px ${TOTAL_SIZE}px`;
-          piece.style.backgroundPosition = `${bgX}px ${bgY}px`;
+          const canvas = document.createElement('canvas');
+          canvas.width = CANVAS_SIZE;
+          canvas.height = CANVAS_SIZE;
+          canvas.classList.add('piece-canvas');
+          canvas.dataset.pieceIndex = i;
+          canvas.dataset.currentSlot = -1;
 
+          const ctx = canvas.getContext('2d');
+
+          const x0 = PADDING;
+          const y0 = PADDING;
+          const x1 = PADDING + PIECE_SIZE;
+          const y1 = PADDING + PIECE_SIZE;
+
+          // Contorno curvo
+          ctx.beginPath();
+          ctx.moveTo(x0, y0);
+          drawPuzzleEdge(ctx, x0, y0, x1, y0, -edges[0]); // Top
+          drawPuzzleEdge(ctx, x1, y0, x1, y1, -edges[1]); // Right
+          drawPuzzleEdge(ctx, x1, y1, x0, y1, -edges[2]); // Bottom
+          drawPuzzleEdge(ctx, x0, y1, x0, y0, -edges[3]); // Left
+          ctx.closePath();
+
+          ctx.save();
+          ctx.clip();
+
+          // Renderizado con textura continua
+          const srcX = (col * PIECE_SIZE) - PADDING;
+          const srcY = (row * PIECE_SIZE) - PADDING;
+          const scaleX = img.naturalWidth / TOTAL_SIZE;
+          const scaleY = img.naturalHeight / TOTAL_SIZE;
+
+          ctx.drawImage(
+            img,
+            srcX * scaleX,
+            srcY * scaleY,
+            CANVAS_SIZE * scaleX,
+            CANVAS_SIZE * scaleY,
+            0,
+            0,
+            CANVAS_SIZE,
+            CANVAS_SIZE
+          );
+          ctx.restore();
+
+          // Bisel dorado sutil
+          ctx.save();
+          ctx.lineWidth = 1;
+          ctx.strokeStyle = "rgba(212, 175, 55, 0.4)";
+          ctx.stroke();
+          ctx.restore();
+
+          // Arena
           const arenaRect = arenaEl.getBoundingClientRect();
           const maxArenaW = arenaRect.width > 0 ? arenaRect.width : 340;
-          const maxLeft = Math.max(0, maxArenaW - PIECE_SIZE - 6);
-          const maxTop = Math.max(0, 220 - PIECE_SIZE - 6);
+          const maxLeft = Math.max(0, maxArenaW - CANVAS_SIZE - 4);
+          const maxTop = Math.max(0, 230 - CANVAS_SIZE - 4);
 
           const randomLeft = Math.floor(Math.random() * (maxLeft + 1));
           const randomTop = Math.floor(Math.random() * (maxTop + 1));
-          const randomRotation = Math.floor(Math.random() * 25) - 12;
+          const randomRotation = Math.floor(Math.random() * 20) - 10;
 
-          piece.dataset.rot = randomRotation;
-          piece.style.left = `${randomLeft}px`;
-          piece.style.top = `${randomTop}px`;
-          piece.style.transform = `rotate(${randomRotation}deg)`;
+          canvas.dataset.rot = randomRotation;
+          canvas.style.left = `${randomLeft}px`;
+          canvas.style.top = `${randomTop}px`;
+          canvas.style.transform = `rotate(${randomRotation}deg)`;
 
-          bindPieceEvents(piece);
-          arenaEl.appendChild(piece);
+          bindPieceEvents(canvas);
+          arenaEl.appendChild(canvas);
         }
       }
 
@@ -633,8 +750,8 @@
         piece.dataset.currentSlot = slotIndex;
         gridState[slotIndex] = piece;
 
-        piece.style.left = '0px';
-        piece.style.top = '0px';
+        piece.style.left = `-${PADDING}px`;
+        piece.style.top = `-${PADDING}px`;
         piece.style.transform = 'rotate(0deg)';
         piece.classList.add('placed');
       }
@@ -645,11 +762,11 @@
         piece.classList.remove('placed');
 
         const arenaRect = arenaEl.getBoundingClientRect();
-        let localX = clientX - arenaRect.left - (PIECE_SIZE / 2);
-        let localY = clientY - arenaRect.top - (PIECE_SIZE / 2);
+        let localX = clientX - arenaRect.left - (CANVAS_SIZE / 2);
+        let localY = clientY - arenaRect.top - (CANVAS_SIZE / 2);
 
-        const maxW = Math.max(0, arenaRect.width - PIECE_SIZE);
-        const maxH = Math.max(0, 220 - PIECE_SIZE);
+        const maxW = Math.max(0, arenaRect.width - CANVAS_SIZE);
+        const maxH = Math.max(0, 230 - CANVAS_SIZE);
 
         localX = Math.max(0, Math.min(localX, maxW));
         localY = Math.max(0, Math.min(localY, maxH));
@@ -666,8 +783,8 @@
         piece.classList.remove('placed');
 
         const arenaRect = arenaEl.getBoundingClientRect();
-        const maxW = Math.max(0, arenaRect.width - PIECE_SIZE);
-        const maxH = Math.max(0, 220 - PIECE_SIZE);
+        const maxW = Math.max(0, arenaRect.width - CANVAS_SIZE);
+        const maxH = Math.max(0, 230 - CANVAS_SIZE);
         const randomLeft = Math.floor(Math.random() * (maxW + 1));
         const randomTop = Math.floor(Math.random() * (maxH + 1));
         const rot = piece.dataset.rot || 0;
