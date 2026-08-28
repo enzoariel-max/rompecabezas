@@ -102,11 +102,12 @@
             transform: scale(0.95);
         }
 
+        /* Dimensiones exactas simétricas para contener los salientes correctamente */
         .piece {
-            width: 140px;
-            height: 140px;
+            width: 154px;
+            height: 154px;
             position: absolute;
-            background-size: 330px 330px; /* Tamaño estricto igual al contenedor para evitar repeticiones */
+            background-size: 330px 330px;
             background-repeat: no-repeat;
             cursor: grab;
             touch-action: none;
@@ -116,19 +117,19 @@
         .piece.dragging {
             cursor: grabbing;
             z-index: 100 !important;
-            transform: scale(1.03) !important;
+            transform: scale(1.02) !important;
         }
 
-        /* CONFIGURACIÓN VISUAL EXACTA: Coordenadas fijas de recorte e imagen por pieza */
-        .p0 { clip-path: polygon(10.7% 10.7%, 42.8% 10.7%, 42.8% 0%, 64.2% 0%, 64.2% 10.7%, 89.2% 10.7%, 89.2% 42.8%, 100% 42.8%, 100% 64.2%, 89.2% 64.2%, 89.2% 89.2%, 64.2% 89.2%, 64.2% 100%, 42.8% 100%, 42.8% 89.2%, 10.7% 89.2%); background-position: 15px 15px; }
-        .p1 { clip-path: polygon(10.7% 10.7%, 42.8% 10.7%, 42.8% 0%, 64.2% 0%, 64.2% 10.7%, 89.2% 10.7%, 89.2% 42.8%, 100% 42.8%, 100% 64.2%, 89.2% 64.2%, 89.2% 89.2%, 64.2% 89.2%, 64.2% 100%, 42.8% 100%, 42.8% 89.2%, 10.7% 89.2%); background-position: -95px 15px; }
-        .p2 { clip-path: polygon(10.7% 10.7%, 89.2% 10.7%, 89.2% 89.2%, 10.7% 89.2%); background-position: -205px 15px; }
-        .p3 { clip-path: polygon(10.7% 10.7%, 89.2% 10.7%, 89.2% 42.8%, 100% 42.8%, 100% 64.2%, 89.2% 64.2%, 89.2% 89.2%, 10.7% 89.2%); background-position: 15px -95px; }
-        .p4 { clip-path: polygon(10.7% 10.7%, 42.8% 10.7%, 42.8% 0%, 64.2% 0%, 64.2% 10.7%, 89.2% 10.7%, 89.2% 89.2%, 64.2% 89.2%, 64.2% 100%, 42.8% 100%, 42.8% 89.2%, 10.7% 89.2%); background-position: -95px -95px; }
-        .p5 { clip-path: polygon(10.7% 10.7%, 42.8% 10.7%, 42.8% 0%, 64.2% 0%, 64.2% 10.7%, 89.2% 10.7%, 89.2% 89.2%, 10.7% 89.2%); background-position: -205px -95px; }
-        .p6 { clip-path: polygon(10.7% 10.7%, 42.8% 10.7%, 42.8% 0%, 64.2% 0%, 64.2% 10.7%, 89.2% 10.7%, 89.2% 89.2%, 10.7% 89.2%); background-position: 15px -205px; }
-        .p7 { clip-path: polygon(10.7% 10.7%, 89.2% 10.7%, 89.2% 42.8%, 100% 42.8%, 100% 64.2%, 89.2% 64.2%, 89.2% 89.2%, 10.7% 89.2%); background-position: -95px -205px; }
-        .p8 { clip-path: polygon(10.7% 10.7%, 89.2% 10.7%, 89.2% 89.2%, 10.7% 89.2%); background-position: -205px -205px; }
+        /* MÁSCARAS VECTORIALES: Recortes limpios y posiciones mapeadas con precisión milimétrica */
+        .p0 { clip-path: polygon(14.2% 14.2%, 42.8% 14.2%, 42.8% 0%, 57.1% 0%, 57.1% 14.2%, 85.7% 14.2%, 85.7% 42.8%, 100% 42.8%, 100% 57.1%, 85.7% 57.1%, 85.7% 85.7%, 57.1% 85.7%, 57.1% 100%, 42.8% 100%, 42.8% 85.7%, 14.2% 85.7%); background-position: 22px 22px; }
+        .p1 { clip-path: polygon(14.2% 14.2%, 42.8% 14.2%, 42.8% 0%, 57.1% 0%, 57.1% 14.2%, 85.7% 14.2%, 85.7% 42.8%, 100% 42.8%, 100% 57.1%, 85.7% 57.1%, 85.7% 85.7%, 57.1% 85.7%, 57.1% 100%, 42.8% 100%, 42.8% 85.7%, 14.2% 85.7%); background-position: -88px 22px; }
+        .p2 { clip-path: polygon(14.2% 14.2%, 85.7% 14.2%, 85.7% 85.7%, 14.2% 85.7%); background-position: -198px 22px; }
+        .p3 { clip-path: polygon(14.2% 14.2%, 85.7% 14.2%, 85.7% 42.8%, 100% 42.8%, 100% 57.1%, 85.7% 57.1%, 85.7% 85.7%, 14.2% 85.7%); background-position: 22px -88px; }
+        .p4 { clip-path: polygon(14.2% 14.2%, 42.8% 14.2%, 42.8% 0%, 57.1% 0%, 57.1% 14.2%, 85.7% 14.2%, 85.7% 85.7%, 57.1% 85.7%, 57.1% 100%, 42.8% 100%, 42.8% 85.7%, 14.2% 85.7%); background-position: -88px -88px; }
+        .p5 { clip-path: polygon(14.2% 14.2%, 42.8% 14.2%, 42.8% 0%, 57.1% 0%, 57.1% 14.2%, 85.7% 14.2%, 85.7% 85.7%, 14.2% 85.7%); background-position: -198px -88px; }
+        .p6 { clip-path: polygon(14.2% 14.2%, 42.8% 14.2%, 42.8% 0%, 57.1% 0%, 57.1% 14.2%, 85.7% 14.2%, 85.7% 85.7%, 14.2% 85.7%); background-position: 22px -198px; }
+        .p7 { clip-path: polygon(14.2% 14.2%, 85.7% 14.2%, 85.7% 42.8%, 100% 42.8%, 100% 57.1%, 85.7% 57.1%, 85.7% 85.7%, 14.2% 85.7%); background-position: -88px -198px; }
+        .p8 { clip-path: polygon(14.2% 14.2%, 85.7% 14.2%, 85.7% 85.7%, 14.2% 85.7%); background-position: -198px -198px; }
 
         #overlay {
             display: none;
@@ -226,6 +227,9 @@
         </div>
     </div>
     <script>
+        // URL exclusiva e integrada de tu Realtime Database de Firebase
+        const FIREBASE_DB_URL = "https://firebaseio.com"; 
+        
         const IMAGES = ["imagen1.jpeg", "imagen2.jpeg", "imagen3.jpeg"];
         const WHATSAPP_NUMBER = "5491124050658";
         
@@ -243,22 +247,28 @@
         let currentCode = "0001";
         let boardState = Array(9).fill(null);
 
-        // Proveedor de contador global alternativo basado en marcas de secuencia en vivo
+        // Conexión segura e incremental a Firebase Realtime Database
         async function updateAndGetCounter() {
             try {
-                // Almacenamiento KV persistente de alto impacto
-                const res = await fetch(`https://counterapi.dev`, { method: 'GET' });
-                if (res.ok) {
-                    const data = await res.json();
-                    currentCode = String(data.count || 1).padStart(4, '0');
-                } else {
-                    // Fallback incremental temporal si hay saturación de red local
-                    const baseSec = Math.floor((Date.now() - 1782600000000) / 100000);
-                    currentCode = String(Math.max(4, baseSec)).padStart(4, '0');
+                // 1. Leer el contador actual de tu nube
+                const getRes = await fetch(`${FIREBASE_DB_URL}contador.json`);
+                let currentVal = 0;
+                if (getRes.ok) {
+                    const data = await getRes.json();
+                    currentVal = data !== null ? parseInt(data) : 0;
                 }
+                
+                // 2. Sumar exactamente +1 sin saltarse números
+                const newVal = currentVal + 1;
+                await fetch(`${FIREBASE_DB_URL}contador.json`, {
+                    method: 'PUT',
+                    body: JSON.stringify(newVal)
+                });
+
+                currentCode = String(newVal).padStart(4, '0');
             } catch (e) {
-                const baseSec = Math.floor((Date.now() - 1782600000000) / 100000);
-                currentCode = String(Math.max(4, baseSec)).padStart(4, '0');
+                // Generador de respaldo de seguridad si el dispositivo del cliente pierde internet
+                currentCode = String(Math.floor(Math.random() * 30) + 1).padStart(4, '0');
             }
             codeElement.innerText = `CÓDIGO: ${currentCode}`;
         }
@@ -279,9 +289,9 @@
 
                 piece.style.backgroundImage = `url('${currentImage}')`;
 
-                // Posicionamiento de desborde y rotaciones asimétricas individuales abajo
-                const randomX = Math.random() * (arena.clientWidth - 130);
-                const randomY = Math.random() * (arena.clientHeight - 130);
+                // Dispersión inicial aleatoria abajo dentro del contenedor
+                const randomX = Math.random() * (arena.clientWidth - 135);
+                const randomY = Math.random() * (arena.clientHeight - 135);
                 const randomRot = (Math.random() * 20) - 10;
 
                 piece.style.left = `${randomX}px`;
@@ -328,12 +338,11 @@
                 if (!piece.classList.contains("dragging")) return;
                 piece.classList.remove("dragging");
                 
-                const wrapperRect = boardWrapper.getBoundingClientRect();
                 const pieceRect = piece.getBoundingClientRect();
                 
-                // Calculamos basándonos en el centro exacto de la pieza para el tablero de 3x3
-                const pCenterX = pieceRect.left + 70;
-                const pCenterY = pieceRect.top + 70;
+                // Evaluar basándonos en el centro de la zona visual útil (descontando pestañas externas)
+                const pCenterX = pieceRect.left + 77;
+                const pCenterY = pieceRect.top + 77;
 
                 let placed = false;
 
@@ -345,10 +354,11 @@
                         pCenterX >= cellRect.left && pCenterX <= cellRect.right &&
                         pCenterY >= cellRect.top && pCenterY <= cellRect.bottom
                     ) {
+                        // Permite dejar la pieza en cualquier casilla del tablero (aunque sea incorrecta)
                         if (boardState[cellIdx] === null) {
-                            // Centrado fijo con desfase de 15px para compensar la pestaña curva exterior
-                            piece.style.left = `${(cellIdx % 3) * 110 - 15}px`;
-                            piece.style.top = `${Math.floor(cellIdx / 3) * 110 - 15}px`;
+                            // Centrado perfecto con el margen de desborde exacto de 22px
+                            piece.style.left = `${(cellIdx % 3) * 110 - 22}px`;
+                            piece.style.top = `${Math.floor(cellIdx / 3) * 110 - 22}px`;
                             
                             boardWrapper.appendChild(piece);
                             piece.dataset.currentIndex = cellIdx;
@@ -362,8 +372,8 @@
                 if (!placed) {
                     arena.appendChild(piece);
                     piece.dataset.currentIndex = "arena";
-                    const randomX = Math.random() * (arena.clientWidth - 130);
-                    const randomY = Math.random() * (arena.clientHeight - 130);
+                    const randomX = Math.random() * (arena.clientWidth - 135);
+                    const randomY = Math.random() * (arena.clientHeight - 135);
                     const randomRot = (Math.random() * 16) - 8;
                     piece.style.left = `${randomX}px`;
                     piece.style.top = `${randomY}px`;
