@@ -1,7 +1,3 @@
-<!-- ================================================================= -->
-<!-- BLOQUE 1: ESTRUCTURA HTML Y ESTILOS CSS (Bold Typography Theme)   -->
-<!-- Guardar como o pegar dentro del archivo index.html                -->
-<!-- ================================================================= -->
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -22,7 +18,6 @@
       --bg: #0a0a0a;
       --gold: #d4af37;
       --gold-glow: rgba(212, 175, 55, 0.65);
-      --gold-dark: #8a6d1c;
       --ink: #ffffff;
     }
 
@@ -37,7 +32,7 @@
 
     html, body {
       width: 100%;
-      height: 100%;
+      min-height: 100vh;
       background-color: var(--bg);
       color: var(--ink);
       font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -49,12 +44,11 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      min-height: 100vh;
-      padding: 10px;
+      padding: 12px 8px;
       background: radial-gradient(circle at 50% 15%, #1c180a 0%, #0a0a0a 75%);
     }
 
-    /* CONTENEDOR TIPO DISPOSITIVO MÓVIL */
+    /* CONTENEDOR TIPO DISPOSITIVO MÓVIL (MOBILE-FIRST) */
     .device-container {
       width: 100%;
       max-width: 390px;
@@ -270,13 +264,6 @@
       transform: scale(0.96);
     }
 
-    .btn-primary {
-      background: var(--gold);
-      color: #000000;
-      font-weight: 900;
-      box-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
-    }
-
     .btn-whatsapp {
       background: linear-gradient(135deg, #25d366 0%, #128c7e 100%);
       color: #ffffff;
@@ -439,372 +426,374 @@
     </div>
   </div>
 
-  <!-- PEGAR EL BLOQUE 2 DE JAVASCRIPT AQUÍ ABAJO O EN UN ARCHIVO EXTERNO -->
+  <!-- PEGA EL BLOQUE 2 JUSTO AQUÍ DEBAJO -->
 </body>
 </html>
-// =================================================================
-// BLOQUE 2: LÓGICA COMPLETA DE JAVASCRIPT NATIVO (Vanilla JS)
-// Pegar dentro de una etiqueta <script> antes de cerrar el </body>
-// =================================================================
+<script>
+  // =================================================================
+  // LÓGICA DE JAVASCRIPT NATIVO (Vanilla JS)
+  // Rompecabezas El Rey - Mobile-First & Firebase Realtime
+  // =================================================================
 
-document.addEventListener('DOMContentLoaded', () => {
-  // 1. CONFIGURACIÓN Y PARÁMETROS MATRICIALES
-  const IMAGES = ['imagen1.jpeg', 'imagen2.jpeg', 'imagen3.jpeg'];
-  const FIREBASE_DB_URL = "https://firebaseio.com";
-  const GRID_SIZE = 3;
-  const PIECE_SIZE = 110;
-  const TOTAL_SIZE = 330;
+  document.addEventListener('DOMContentLoaded', () => {
+    // 1. CONFIGURACIÓN Y PARÁMETROS MATRICIALES
+    const IMAGES = ['imagen1.jpeg', 'imagen2.jpeg', 'imagen3.jpeg'];
+    const FIREBASE_DB_URL = "https://firebaseio.com";
+    const GRID_SIZE = 3;
+    const PIECE_SIZE = 110;
+    const TOTAL_SIZE = 330;
 
-  // 2. REFERENCIAS A ELEMENTOS DEL DOM
-  const boardEl = document.getElementById('board');
-  const arenaEl = document.getElementById('arena');
-  const slots = Array.from(document.querySelectorAll('.slot'));
-  const editionIndicator = document.getElementById('edition-indicator');
-  const btnReset = document.getElementById('btn-reset');
-  const modalVictoria = document.getElementById('modal-victoria');
-  const codigoGanadorEl = document.getElementById('codigo-ganador');
-  const btnCobrar = document.getElementById('btn-cobrar');
-  const btnModalReiniciar = document.getElementById('btn-modal-reiniciar');
+    // 2. REFERENCIAS A ELEMENTOS DEL DOM
+    const boardEl = document.getElementById('board');
+    const arenaEl = document.getElementById('arena');
+    const slots = Array.from(document.querySelectorAll('.slot'));
+    const editionIndicator = document.getElementById('edition-indicator');
+    const btnReset = document.getElementById('btn-reset');
+    const modalVictoria = document.getElementById('modal-victoria');
+    const codigoGanadorEl = document.getElementById('codigo-ganador');
+    const btnCobrar = document.getElementById('btn-cobrar');
+    const btnModalReiniciar = document.getElementById('btn-modal-reiniciar');
 
-  // 3. ESTADO GLOBAL DEL JUEGO
-  let currentImage = '';
-  let currentImageIndex = 0;
-  let gridState = new Array(9).fill(null); // Casillas del tablero: almacena elemento o null
-  let isGameFinished = false;
-  let ganadorCodigoActual = '0001';
+    // 3. ESTADO GLOBAL DEL JUEGO
+    let currentImage = '';
+    let currentImageIndex = 0;
+    let gridState = new Array(9).fill(null); // Casillas del tablero: almacena elemento o null
+    let isGameFinished = false;
+    let ganadorCodigoActual = '0001';
 
-  // 4. CONTROL DE EVENTOS TÁCTILES Y ARRASTRE
-  let draggedPiece = null;
-  let touchStartX = 0;
-  let touchStartY = 0;
-  let pieceInitialLeft = 0;
-  let pieceInitialTop = 0;
-  let currentSlotHovered = null;
+    // 4. CONTROL DE EVENTOS TÁCTILES Y ARRASTRE
+    let draggedPiece = null;
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let pieceInitialLeft = 0;
+    let pieceInitialTop = 0;
+    let currentSlotHovered = null;
 
-  // INICIALIZACIÓN
-  initGame();
-
-  // BOTONES
-  btnReset.addEventListener('click', () => initGame());
-  btnModalReiniciar.addEventListener('click', () => {
-    modalVictoria.classList.remove('active');
+    // INICIALIZACIÓN
     initGame();
-  });
 
-  // REDIRECCIÓN DIRECTA A WHATSAPP
-  btnCobrar.addEventListener('click', () => {
-    const textoMensaje = `felicitaciones por finalizar el rompecabezas. Mi código es: ${ganadorCodigoActual}`;
-    const urlWa = `https://wa.me/?text=${encodeURIComponent(textoMensaje)}`;
-    window.location.href = urlWa;
-  });
+    // BOTONES
+    btnReset.addEventListener('click', () => initGame());
+    btnModalReiniciar.addEventListener('click', () => {
+      modalVictoria.classList.remove('active');
+      initGame();
+    });
 
-  // =========================================================
-  // CARGA ALEATORIA Y DISPERSIÓN MATRICIAL ASIMÉTRICA
-  // =========================================================
-  function initGame() {
-    isGameFinished = false;
-    modalVictoria.classList.remove('active');
-    gridState.fill(null);
-    arenaEl.innerHTML = '';
+    // REDIRECCIÓN DIRECTA A WHATSAPP
+    btnCobrar.addEventListener('click', () => {
+      const textoMensaje = `felicitaciones por finalizar el rompecabezas. Mi código es: ${ganadorCodigoActual}`;
+      const urlWa = `https://wa.me/?text=${encodeURIComponent(textoMensaje)}`;
+      window.location.href = urlWa;
+    });
 
-    // Selección aleatoria de una de las 3 imágenes
-    currentImageIndex = Math.floor(Math.random() * IMAGES.length);
-    currentImage = IMAGES[currentImageIndex];
-    if (editionIndicator) {
-      editionIndicator.textContent = `Edición ${currentImageIndex + 1} de 3`;
+    // =========================================================
+    // CARGA ALEATORIA Y DISPERSIÓN MATRICIAL ASIMÉTRICA
+    // =========================================================
+    function initGame() {
+      isGameFinished = false;
+      modalVictoria.classList.remove('active');
+      gridState.fill(null);
+      arenaEl.innerHTML = '';
+
+      // Selección aleatoria de una de las 3 imágenes
+      currentImageIndex = Math.floor(Math.random() * IMAGES.length);
+      currentImage = IMAGES[currentImageIndex];
+      if (editionIndicator) {
+        editionIndicator.textContent = `Edición ${currentImageIndex + 1} de 3`;
+      }
+
+      // Instanciar las 9 piezas con fondo fijo y coordenadas absolutas
+      for (let i = 0; i < 9; i++) {
+        const piece = document.createElement('div');
+        piece.classList.add('piece', `p${i}`);
+        piece.dataset.pieceIndex = i;
+        piece.dataset.currentSlot = -1; // -1 indica que está en la arena
+
+        // CÁLCULO MATRICIAL EXACTO: background-size 330px 330px y desfase absoluto
+        const col = i % GRID_SIZE;
+        const row = Math.floor(i / GRID_SIZE);
+        const bgX = -(col * PIECE_SIZE);
+        const bgY = -(row * PIECE_SIZE);
+
+        piece.style.backgroundImage = `url('${currentImage}')`;
+        piece.style.backgroundSize = `${TOTAL_SIZE}px ${TOTAL_SIZE}px`;
+        piece.style.backgroundPosition = `${bgX}px ${bgY}px`;
+
+        // Posicionamiento aleatorio controlado en la arena (sin desbordar)
+        const arenaRect = arenaEl.getBoundingClientRect();
+        const maxArenaW = arenaRect.width > 0 ? arenaRect.width : 340;
+        const maxLeft = Math.max(0, maxArenaW - PIECE_SIZE - 8);
+        const maxTop = Math.max(0, 220 - PIECE_SIZE - 8);
+
+        const randomLeft = Math.floor(Math.random() * (maxLeft + 1));
+        const randomTop = Math.floor(Math.random() * (maxTop + 1));
+        const randomRotation = Math.floor(Math.random() * 25) - 12; // Entre -12deg y 12deg
+
+        piece.dataset.rot = randomRotation;
+        piece.style.left = `${randomLeft}px`;
+        piece.style.top = `${randomTop}px`;
+        piece.style.transform = `rotate(${randomRotation}deg)`;
+
+        // Asignar controladores táctiles nativos
+        bindPieceEvents(piece);
+
+        arenaEl.appendChild(piece);
+      }
     }
 
-    // Instanciar las 9 piezas con fondo fijo y coordenadas absolutas
-    for (let i = 0; i < 9; i++) {
-      const piece = document.createElement('div');
-      piece.classList.add('piece', `p${i}`);
-      piece.dataset.pieceIndex = i;
-      piece.dataset.currentSlot = -1; // -1 indica que está en la arena
+    // =========================================================
+    // EVENTOS TÁCTILES PUROS PARA CELULARES (SIN BLOQUEOS)
+    // =========================================================
+    function bindPieceEvents(el) {
+      // TOUCH START
+      el.addEventListener('touchstart', (e) => {
+        if (isGameFinished) return;
+        const touch = e.touches[0];
+        startDrag(el, touch.clientX, touch.clientY);
+      }, { passive: false });
 
-      // CÁLCULO MATRICIAL EXACTO: background-size 330px 330px y desfase absoluto
-      const col = i % GRID_SIZE;
-      const row = Math.floor(i / GRID_SIZE);
-      const bgX = -(col * PIECE_SIZE);
-      const bgY = -(row * PIECE_SIZE);
+      // MOUSE FALLBACK (Para pruebas en navegador de escritorio)
+      el.addEventListener('mousedown', (e) => {
+        if (isGameFinished) return;
+        startDrag(el, e.clientX, e.clientY);
 
-      piece.style.backgroundImage = `url('${currentImage}')`;
-      piece.style.backgroundSize = `${TOTAL_SIZE}px ${TOTAL_SIZE}px`;
-      piece.style.backgroundPosition = `${bgX}px ${bgY}px`;
+        const onMouseMove = (moveEvent) => {
+          handleMove(moveEvent.clientX, moveEvent.clientY);
+        };
 
-      // Posicionamiento aleatorio controlado en la arena (sin desbordar)
-      const arenaRect = arenaEl.getBoundingClientRect();
-      const maxArenaW = arenaRect.width > 0 ? arenaRect.width : 340;
-      const maxLeft = Math.max(0, maxArenaW - PIECE_SIZE - 8);
-      const maxTop = Math.max(0, 220 - PIECE_SIZE - 8);
+        const onMouseUp = (upEvent) => {
+          window.removeEventListener('mousemove', onMouseMove);
+          window.removeEventListener('mouseup', onMouseUp);
+          endDrag(upEvent.clientX, upEvent.clientY);
+        };
 
-      const randomLeft = Math.floor(Math.random() * (maxLeft + 1));
-      const randomTop = Math.floor(Math.random() * (maxTop + 1));
-      const randomRotation = Math.floor(Math.random() * 25) - 12; // Entre -12deg y 12deg
-
-      piece.dataset.rot = randomRotation;
-      piece.style.left = `${randomLeft}px`;
-      piece.style.top = `${randomTop}px`;
-      piece.style.transform = `rotate(${randomRotation}deg)`;
-
-      // Asignar controladores táctiles nativos
-      bindPieceEvents(piece);
-
-      arenaEl.appendChild(piece);
+        window.addEventListener('mousemove', onMouseMove);
+        window.addEventListener('mouseup', onMouseUp);
+      });
     }
-  }
 
-  // =========================================================
-  // EVENTOS TÁCTILES PUROS PARA CELULARES (SIN BLOQUEOS)
-  // =========================================================
-  function bindPieceEvents(el) {
-    // TOUCH START
-    el.addEventListener('touchstart', (e) => {
-      if (isGameFinished) return;
+    // TOUCH MOVE Y TOUCH END GLOBALES
+    window.addEventListener('touchmove', (e) => {
+      if (!draggedPiece) return;
+      if (e.cancelable) e.preventDefault(); // Evita scroll vertical de pantalla
       const touch = e.touches[0];
-      startDrag(el, touch.clientX, touch.clientY);
+      handleMove(touch.clientX, touch.clientY);
     }, { passive: false });
 
-    // MOUSE FALLBACK (Para pruebas en navegador de escritorio)
-    el.addEventListener('mousedown', (e) => {
-      if (isGameFinished) return;
-      startDrag(el, e.clientX, e.clientY);
-
-      const onMouseMove = (moveEvent) => {
-        handleMove(moveEvent.clientX, moveEvent.clientY);
-      };
-
-      const onMouseUp = (upEvent) => {
-        window.removeEventListener('mousemove', onMouseMove);
-        window.removeEventListener('mouseup', onMouseUp);
-        endDrag(upEvent.clientX, upEvent.clientY);
-      };
-
-      window.addEventListener('mousemove', onMouseMove);
-      window.addEventListener('mouseup', onMouseUp);
+    window.addEventListener('touchend', (e) => {
+      if (!draggedPiece) return;
+      const touch = e.changedTouches[0];
+      endDrag(touch.clientX, touch.clientY);
     });
-  }
 
-  // TOUCH MOVE Y TOUCH END GLOBALES
-  window.addEventListener('touchmove', (e) => {
-    if (!draggedPiece) return;
-    if (e.cancelable) e.preventDefault(); // Evita scroll vertical de pantalla
-    const touch = e.touches[0];
-    handleMove(touch.clientX, touch.clientY);
-  }, { passive: false });
+    function startDrag(el, clientX, clientY) {
+      draggedPiece = el;
+      touchStartX = clientX;
+      touchStartY = clientY;
 
-  window.addEventListener('touchend', (e) => {
-    if (!draggedPiece) return;
-    const touch = e.changedTouches[0];
-    endDrag(touch.clientX, touch.clientY);
+      const rect = el.getBoundingClientRect();
+      pieceInitialLeft = rect.left;
+      pieceInitialTop = rect.top;
+
+      // Si estaba alojada en una casilla del tablero, liberarla
+      const currentSlot = parseInt(el.dataset.currentSlot, 10);
+      if (currentSlot !== -1) {
+        gridState[currentSlot] = null;
+        el.dataset.currentSlot = -1;
+      }
+
+      // Mover temporalmente al body para evitar recortes de overflow
+      document.body.appendChild(el);
+      el.style.left = `${pieceInitialLeft}px`;
+      el.style.top = `${pieceInitialTop}px`;
+      el.style.transform = 'scale(1.06) rotate(0deg)';
+      el.classList.add('dragging');
+      el.classList.remove('placed');
+    }
+
+    function handleMove(clientX, clientY) {
+      if (!draggedPiece) return;
+
+      const deltaX = clientX - touchStartX;
+      const deltaY = clientY - touchStartY;
+
+      draggedPiece.style.left = `${pieceInitialLeft + deltaX}px`;
+      draggedPiece.style.top = `${pieceInitialTop + deltaY}px`;
+
+      checkSlotHover(clientX, clientY);
+    }
+
+    function endDrag(clientX, clientY) {
+      if (!draggedPiece) return;
+      const el = draggedPiece;
+      el.classList.remove('dragging');
+
+      const targetSlotIndex = findTargetSlot(clientX, clientY);
+
+      if (targetSlotIndex !== -1) {
+        // REGLA: Si la casilla ya está ocupada por otra pieza, enviar la anterior a la arena
+        if (gridState[targetSlotIndex] !== null && gridState[targetSlotIndex] !== el) {
+          const occupiedPiece = gridState[targetSlotIndex];
+          returnPieceToArena(occupiedPiece);
+        }
+
+        // Alojar fijamente la pieza en la casilla (correcta o incorrecta)
+        snapPieceToSlot(el, targetSlotIndex);
+      } else {
+        // Soltada fuera del tablero: regresar y asentar en la arena
+        dropPieceToArena(el, clientX, clientY);
+      }
+
+      clearSlotHover();
+      draggedPiece = null;
+
+      // Validar si el juego se completó
+      checkVictory();
+    }
+
+    // =========================================================
+    // DETECCIÓN DE COLISIONES Y ALOJAMIENTO EN CUADRÍCULA
+    // =========================================================
+    function checkSlotHover(clientX, clientY) {
+      clearSlotHover();
+      const slotIdx = findTargetSlot(clientX, clientY);
+      if (slotIdx !== -1) {
+        slots[slotIdx].classList.add('hovered');
+        currentSlotHovered = slots[slotIdx];
+      }
+    }
+
+    function clearSlotHover() {
+      if (currentSlotHovered) {
+        currentSlotHovered.classList.remove('hovered');
+        currentSlotHovered = null;
+      }
+    }
+
+    function findTargetSlot(clientX, clientY) {
+      const boardRect = boardEl.getBoundingClientRect();
+      if (
+        clientX >= boardRect.left &&
+        clientX <= boardRect.right &&
+        clientY >= boardRect.top &&
+        clientY <= boardRect.bottom
+      ) {
+        const relX = clientX - boardRect.left;
+        const relY = clientY - boardRect.top;
+        const col = Math.floor(relX / PIECE_SIZE);
+        const row = Math.floor(relY / PIECE_SIZE);
+        const idx = row * GRID_SIZE + col;
+        if (idx >= 0 && idx < 9) return idx;
+      }
+      return -1;
+    }
+
+    function snapPieceToSlot(piece, slotIndex) {
+      const slot = slots[slotIndex];
+      slot.appendChild(piece);
+      piece.dataset.currentSlot = slotIndex;
+      gridState[slotIndex] = piece;
+
+      piece.style.left = '0px';
+      piece.style.top = '0px';
+      piece.style.transform = 'rotate(0deg)';
+      piece.classList.add('placed');
+    }
+
+    function dropPieceToArena(piece, clientX, clientY) {
+      arenaEl.appendChild(piece);
+      piece.dataset.currentSlot = -1;
+      piece.classList.remove('placed');
+
+      const arenaRect = arenaEl.getBoundingClientRect();
+      let localX = clientX - arenaRect.left - (PIECE_SIZE / 2);
+      let localY = clientY - arenaRect.top - (PIECE_SIZE / 2);
+
+      const maxW = Math.max(0, arenaRect.width - PIECE_SIZE);
+      const maxH = Math.max(0, 220 - PIECE_SIZE);
+
+      localX = Math.max(0, Math.min(localX, maxW));
+      localY = Math.max(0, Math.min(localY, maxH));
+
+      const rot = piece.dataset.rot || 0;
+      piece.style.left = `${localX}px`;
+      piece.style.top = `${localY}px`;
+      piece.style.transform = `rotate(${rot}deg)`;
+    }
+
+    function returnPieceToArena(piece) {
+      arenaEl.appendChild(piece);
+      piece.dataset.currentSlot = -1;
+      piece.classList.remove('placed');
+
+      const arenaRect = arenaEl.getBoundingClientRect();
+      const maxW = Math.max(0, arenaRect.width - PIECE_SIZE);
+      const maxH = Math.max(0, 220 - PIECE_SIZE);
+      const randomLeft = Math.floor(Math.random() * (maxW + 1));
+      const randomTop = Math.floor(Math.random() * (maxH + 1));
+      const rot = piece.dataset.rot || 0;
+
+      piece.style.left = `${randomLeft}px`;
+      piece.style.top = `${randomTop}px`;
+      piece.style.transform = `rotate(${rot}deg)`;
+    }
+
+    // =========================================================
+    // VALIDACIÓN DE GRILLA Y CONEXIÓN DIRECTA CON FIREBASE
+    // =========================================================
+    function checkVictory() {
+      for (let i = 0; i < 9; i++) {
+        const piece = gridState[i];
+        if (!piece) return false;
+        if (parseInt(piece.dataset.pieceIndex, 10) !== i) {
+          return false;
+        }
+      }
+
+      isGameFinished = true;
+      onPuzzleVictory();
+      return true;
+    }
+
+    async function onPuzzleVictory() {
+      try {
+        const dbBase = FIREBASE_DB_URL.replace(/\/+$/, '');
+        const endpoint = `${dbBase}/ganadores.json`;
+
+        // 1. POST histórico para asentar la victoria en la nube
+        const nuevoRegistro = {
+          timestamp: Date.now(),
+          fecha: new Date().toISOString(),
+          juego: "Rompecabezas El Rey",
+          imagen: currentImage
+        };
+
+        await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(nuevoRegistro)
+        });
+
+        // 2. GET limpio sin caché para contar registros reales
+        const respuesta = await fetch(`${endpoint}?nocache=${Date.now()}`);
+        const datos = await respuesta.json();
+
+        let cantidadGanadores = 1;
+        if (datos && typeof datos === 'object') {
+          cantidadGanadores = Object.keys(datos).length;
+        }
+
+        // Formato a 4 dígitos con ceros a la izquierda (ej: 0001, 0012)
+        ganadorCodigoActual = String(cantidadGanadores).padStart(4, '0');
+      } catch (error) {
+        console.warn("Firebase offline o de prueba, generando código local:", error);
+        const codigoLocal = Math.floor(Math.random() * 900) + 1;
+        ganadorCodigoActual = String(codigoLocal).padStart(4, '0');
+      }
+
+      // Mostrar el cartel flotante de victoria
+      codigoGanadorEl.textContent = `CÓDIGO: ${ganadorCodigoActual}`;
+      modalVictoria.classList.add('active');
+    }
   });
-
-  function startDrag(el, clientX, clientY) {
-    draggedPiece = el;
-    touchStartX = clientX;
-    touchStartY = clientY;
-
-    const rect = el.getBoundingClientRect();
-    pieceInitialLeft = rect.left;
-    pieceInitialTop = rect.top;
-
-    // Si estaba alojada en una casilla del tablero, liberarla
-    const currentSlot = parseInt(el.dataset.currentSlot, 10);
-    if (currentSlot !== -1) {
-      gridState[currentSlot] = null;
-      el.dataset.currentSlot = -1;
-    }
-
-    // Mover temporalmente al body para evitar recortes de overflow
-    document.body.appendChild(el);
-    el.style.left = `${pieceInitialLeft}px`;
-    el.style.top = `${pieceInitialTop}px`;
-    el.style.transform = 'scale(1.06) rotate(0deg)';
-    el.classList.add('dragging');
-    el.classList.remove('placed');
-  }
-
-  function handleMove(clientX, clientY) {
-    if (!draggedPiece) return;
-
-    const deltaX = clientX - touchStartX;
-    const deltaY = clientY - touchStartY;
-
-    draggedPiece.style.left = `${pieceInitialLeft + deltaX}px`;
-    draggedPiece.style.top = `${pieceInitialTop + deltaY}px`;
-
-    checkSlotHover(clientX, clientY);
-  }
-
-  function endDrag(clientX, clientY) {
-    if (!draggedPiece) return;
-    const el = draggedPiece;
-    el.classList.remove('dragging');
-
-    const targetSlotIndex = findTargetSlot(clientX, clientY);
-
-    if (targetSlotIndex !== -1) {
-      // REGLA: Si la casilla ya está ocupada por otra pieza, enviar la anterior a la arena
-      if (gridState[targetSlotIndex] !== null && gridState[targetSlotIndex] !== el) {
-        const occupiedPiece = gridState[targetSlotIndex];
-        returnPieceToArena(occupiedPiece);
-      }
-
-      // Alojar fijamente la pieza en la casilla (correcta o incorrecta)
-      snapPieceToSlot(el, targetSlotIndex);
-    } else {
-      // Soltada fuera del tablero: regresar y asentar en la arena
-      dropPieceToArena(el, clientX, clientY);
-    }
-
-    clearSlotHover();
-    draggedPiece = null;
-
-    // Validar si el juego se completó
-    checkVictory();
-  }
-
-  // =========================================================
-  // DETECCIÓN DE COLISIONES Y ALOJAMIENTO EN CUADRÍCULA
-  // =========================================================
-  function checkSlotHover(clientX, clientY) {
-    clearSlotHover();
-    const slotIdx = findTargetSlot(clientX, clientY);
-    if (slotIdx !== -1) {
-      slots[slotIdx].classList.add('hovered');
-      currentSlotHovered = slots[slotIdx];
-    }
-  }
-
-  function clearSlotHover() {
-    if (currentSlotHovered) {
-      currentSlotHovered.classList.remove('hovered');
-      currentSlotHovered = null;
-    }
-  }
-
-  function findTargetSlot(clientX, clientY) {
-    const boardRect = boardEl.getBoundingClientRect();
-    if (
-      clientX >= boardRect.left &&
-      clientX <= boardRect.right &&
-      clientY >= boardRect.top &&
-      clientY <= boardRect.bottom
-    ) {
-      const relX = clientX - boardRect.left;
-      const relY = clientY - boardRect.top;
-      const col = Math.floor(relX / PIECE_SIZE);
-      const row = Math.floor(relY / PIECE_SIZE);
-      const idx = row * GRID_SIZE + col;
-      if (idx >= 0 && idx < 9) return idx;
-    }
-    return -1;
-  }
-
-  function snapPieceToSlot(piece, slotIndex) {
-    const slot = slots[slotIndex];
-    slot.appendChild(piece);
-    piece.dataset.currentSlot = slotIndex;
-    gridState[slotIndex] = piece;
-
-    piece.style.left = '0px';
-    piece.style.top = '0px';
-    piece.style.transform = 'rotate(0deg)';
-    piece.classList.add('placed');
-  }
-
-  function dropPieceToArena(piece, clientX, clientY) {
-    arenaEl.appendChild(piece);
-    piece.dataset.currentSlot = -1;
-    piece.classList.remove('placed');
-
-    const arenaRect = arenaEl.getBoundingClientRect();
-    let localX = clientX - arenaRect.left - (PIECE_SIZE / 2);
-    let localY = clientY - arenaRect.top - (PIECE_SIZE / 2);
-
-    const maxW = Math.max(0, arenaRect.width - PIECE_SIZE);
-    const maxH = Math.max(0, 220 - PIECE_SIZE);
-
-    localX = Math.max(0, Math.min(localX, maxW));
-    localY = Math.max(0, Math.min(localY, maxH));
-
-    const rot = piece.dataset.rot || 0;
-    piece.style.left = `${localX}px`;
-    piece.style.top = `${localY}px`;
-    piece.style.transform = `rotate(${rot}deg)`;
-  }
-
-  function returnPieceToArena(piece) {
-    arenaEl.appendChild(piece);
-    piece.dataset.currentSlot = -1;
-    piece.classList.remove('placed');
-
-    const arenaRect = arenaEl.getBoundingClientRect();
-    const maxW = Math.max(0, arenaRect.width - PIECE_SIZE);
-    const maxH = Math.max(0, 220 - PIECE_SIZE);
-    const randomLeft = Math.floor(Math.random() * (maxW + 1));
-    const randomTop = Math.floor(Math.random() * (maxH + 1));
-    const rot = piece.dataset.rot || 0;
-
-    piece.style.left = `${randomLeft}px`;
-    piece.style.top = `${randomTop}px`;
-    piece.style.transform = `rotate(${rot}deg)`;
-  }
-
-  // =========================================================
-  // VALIDACIÓN DE GRILLA Y CONEXIÓN DIRECTA CON FIREBASE
-  // =========================================================
-  function checkVictory() {
-    for (let i = 0; i < 9; i++) {
-      const piece = gridState[i];
-      if (!piece) return false;
-      if (parseInt(piece.dataset.pieceIndex, 10) !== i) {
-        return false;
-      }
-    }
-
-    isGameFinished = true;
-    onPuzzleVictory();
-    return true;
-  }
-
-  async function onPuzzleVictory() {
-    try {
-      const dbBase = FIREBASE_DB_URL.replace(/\/+$/, '');
-      const endpoint = `${dbBase}/ganadores.json`;
-
-      // 1. POST histórico para asentar la victoria en la nube
-      const nuevoRegistro = {
-        timestamp: Date.now(),
-        fecha: new Date().toISOString(),
-        juego: "Rompecabezas El Rey",
-        imagen: currentImage
-      };
-
-      await fetch(endpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(nuevoRegistro)
-      });
-
-      // 2. GET limpio sin caché para contar registros reales
-      const respuesta = await fetch(`${endpoint}?nocache=${Date.now()}`);
-      const datos = await respuesta.json();
-
-      let cantidadGanadores = 1;
-      if (datos && typeof datos === 'object') {
-        cantidadGanadores = Object.keys(datos).length;
-      }
-
-      // Formato a 4 dígitos con ceros a la izquierda (ej: 0001, 0012)
-      ganadorCodigoActual = String(cantidadGanadores).padStart(4, '0');
-    } catch (error) {
-      console.warn("Firebase offline o de prueba, generando código local:", error);
-      const codigoLocal = Math.floor(Math.random() * 900) + 1;
-      ganadorCodigoActual = String(codigoLocal).padStart(4, '0');
-    }
-
-    // Mostrar el cartel flotante de victoria
-    codigoGanadorEl.textContent = `CÓDIGO: ${ganadorCodigoActual}`;
-    modalVictoria.classList.add('active');
-  }
-});
+</script>
