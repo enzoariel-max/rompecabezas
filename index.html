@@ -97,7 +97,6 @@
             box-shadow: 0 4px 10px rgba(255, 223, 0, 0.3);
         }
 
-        /* Dimensiones estandarizadas para evitar descalces */
         .piece {
             width: 140px;
             height: 140px;
@@ -114,18 +113,13 @@
             z-index: 100 !important;
         }
 
-        /* GRILA FIJA CORRELATIVA DE ROMPECABEZAS (Uniones matemáticas exactas) */
-        /* Fila 1 */
+        /* GRUPO DE MÁSCARAS FIJAS COMPLEMENTARIAS - ENCAJE PERFECTO */
         .p0 { clip-path: polygon(10.7% 10.7%, 89.2% 10.7%, 89.2% 35.7%, 100% 35.7%, 100% 57.1%, 89.2% 57.1%, 89.2% 89.2%, 64.2% 89.2%, 64.2% 100%, 42.8% 100%, 42.8% 89.2%, 10.7% 89.2%); background-position: 15px 15px; }
         .p1 { clip-path: polygon(10.7% 10.7%, 10.7% 35.7%, 0% 35.7%, 0% 57.1%, 10.7% 57.1%, 10.7% 89.2%, 42.8% 89.2%, 42.8% 78.5%, 64.2% 78.5%, 64.2% 89.2%, 89.2% 89.2%, 89.2% 57.1%, 100% 57.1%, 100% 35.7%, 89.2% 35.7%, 89.2% 10.7%); background-position: -95px 15px; }
         .p2 { clip-path: polygon(10.7% 10.7%, 10.7% 35.7%, 0% 35.7%, 0% 57.1%, 10.7% 57.1%, 10.7% 89.2%, 64.2% 89.2%, 64.2% 100%, 42.8% 100%, 42.8% 89.2%, 89.2% 89.2%, 89.2% 10.7%); background-position: -205px 15px; }
-        
-        /* Fila 2 */
         .p3 { clip-path: polygon(10.7% 10.7%, 42.8% 10.7%, 42.8% 0%, 64.2% 0%, 64.2% 10.7%, 89.2% 10.7%, 89.2% 89.2%, 57.1% 89.2%, 57.1% 78.5%, 35.7% 78.5%, 35.7% 89.2%, 10.7% 89.2%); background-position: 15px -95px; }
         .p4 { clip-path: polygon(10.7% 10.7%, 42.8% 10.7%, 42.8% 21.4%, 64.2% 21.4%, 64.2% 10.7%, 89.2% 10.7%, 89.2% 35.7%, 78.5% 35.7%, 78.5% 57.1%, 89.2% 57.1%, 89.2% 89.2%, 64.2% 89.2%, 64.2% 100%, 42.8% 100%, 42.8% 89.2%, 10.7% 89.2%); background-position: -95px -95px; }
         .p5 { clip-path: polygon(10.7% 10.7%, 42.8% 10.7%, 42.8% 0%, 64.2% 0%, 64.2% 10.7%, 89.2% 10.7%, 89.2% 89.2%, 64.2% 89.2%, 64.2% 78.5%, 42.8% 78.5%, 42.8% 89.2%, 10.7% 89.2%); background-position: -205px -95px; }
-        
-        /* Fila 3 */
         .p6 { clip-path: polygon(10.7% 10.7%, 42.8% 10.7%, 42.8% 0%, 64.2% 0%, 64.2% 10.7%, 89.2% 10.7%, 89.2% 89.2%, 10.7% 89.2%); background-position: 15px -205px; }
         .p7 { clip-path: polygon(10.7% 10.7%, 42.8% 10.7%, 42.8% 21.4%, 64.2% 21.4%, 64.2% 10.7%, 89.2% 10.7%, 89.2% 89.2%, 10.7% 89.2%); background-position: -95px -205px; }
         .p8 { clip-path: polygon(10.7% 10.7%, 42.8% 10.7%, 42.8% 0%, 64.2% 0%, 64.2% 10.7%, 89.2% 10.7%, 89.2% 89.2%, 10.7% 89.2%); background-position: -205px -205px; }
@@ -226,9 +220,7 @@
         </div>
     </div>
     <script>
-        // URL exclusiva verificada de tu Firebase Realtime Database
         const FIREBASE_DB_URL = "https://firebaseio.com"; 
-        
         const IMAGES = ["imagen1.jpeg", "imagen2.jpeg", "imagen3.jpeg"];
         const WHATSAPP_NUMBER = "5491124050658";
         
@@ -246,29 +238,27 @@
         let currentCode = "0001";
         let boardState = Array(9).fill(null);
 
-        // Sistema exclusivo Firebase Realtime Database sin APIs externas públicas
+        // Registro seguro y directo mediante logs históricos en Firebase
         async function updateAndGetCounter() {
             try {
-                // Forzar lectura limpia de tu base de datos de Firebase agregando estampa de tiempo
-                const getRes = await fetch(`${FIREBASE_DB_URL}contador.json?v=${Date.now()}`);
-                let currentVal = 0;
-                
-                if (getRes.ok) {
-                    const data = await getRes.json();
-                    currentVal = data !== null ? parseInt(data) : 0;
-                }
-                
-                // Suma +1 exacto e incremental directo en tu nube
-                const newVal = currentVal + 1;
-                await fetch(`${FIREBASE_DB_URL}contador.json`, {
-                    method: 'PUT',
+                // 1. Enviamos un POST (una marca de victoria) a la base de datos abierta
+                const pushResponse = await fetch(`${FIREBASE_DB_URL}ganadores.json`, {
+                    method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(newVal)
+                    body: JSON.stringify({ fecha: Date.now() })
                 });
 
-                currentCode = String(newVal).padStart(4, '0');
+                // 2. Leemos la lista completa de marcas para saber cuántos ganaron en total
+                const getResponse = await fetch(`${FIREBASE_DB_URL}ganadores.json?v=${Date.now()}`);
+                if (getResponse.ok) {
+                    const data = await getResponse.json();
+                    const totalGanadores = Object.keys(data || {}).length;
+                    currentCode = String(totalGanadores).padStart(4, '0');
+                } else {
+                    currentCode = "0001";
+                }
             } catch (e) {
-                currentCode = String(Math.floor(Math.random() * 15) + 1).padStart(4, '0');
+                currentCode = String(Math.floor(Math.random() * 9) + 1).padStart(4, '0');
             }
             codeElement.innerText = `CÓDIGO: ${currentCode}`;
         }
@@ -289,7 +279,6 @@
 
                 piece.style.backgroundImage = `url('${currentImage}')`;
 
-                // Distribución dispersa abajo sin orden formal
                 const randomX = Math.random() * (arena.clientWidth - 135);
                 const randomY = Math.random() * (arena.clientHeight - 135);
                 const randomRot = (Math.random() * 20) - 10;
@@ -353,7 +342,6 @@
                         pCenterY >= cellRect.top && pCenterY <= cellRect.bottom
                     ) {
                         if (boardState[cellIdx] === null) {
-                            // Centrado e inyección fija con desfase de 15px por el margen de la pestaña estándar
                             piece.style.left = `${(cellIdx % 3) * 110 - 15}px`;
                             piece.style.top = `${Math.floor(cellIdx / 3) * 110 - 15}px`;
                             
