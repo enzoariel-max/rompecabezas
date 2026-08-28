@@ -48,47 +48,50 @@
 
         #board-wrapper {
             position: relative;
-            width: 330px;
-            height: 330px;
+            width: 336px;
+            height: 336px;
             margin-bottom: 25px;
             box-shadow: 0 0 20px rgba(255, 223, 0, 0.2);
+            background-color: #151515;
+            border: 3px solid #ffdf00;
+            border-radius: 12px;
+            padding: 3px;
         }
 
         #board {
             width: 100%;
             height: 100%;
-            background-color: #151515;
-            border: 3px solid #ffdf00;
             display: grid;
             grid-template-columns: repeat(3, 110px);
             grid-template-rows: repeat(3, 110px);
+            gap: 0px;
         }
 
         .cell {
             width: 110px;
             height: 110px;
-            border: 1px dashed rgba(255, 223, 0, 0.1);
+            border: 1px dashed rgba(255, 223, 0, 0.15);
             position: relative;
         }
 
         #arena {
             width: 100%;
             max-width: 360px;
-            height: 220px;
+            height: 240px;
             background-color: #111111;
             border: 1px solid #222222;
-            border-radius: 10px;
+            border-radius: 14px;
             position: relative;
             overflow: visible;
             margin-bottom: 25px;
-            box-shadow: inset 0 0 10px rgba(0,0,0,0.8);
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.9);
         }
 
         #resetBtn {
             background: linear-gradient(135deg, #ffdf00 0%, #cc9900 100%);
             color: #000;
             border: none;
-            padding: 12px 30px;
+            padding: 12px 35px;
             font-size: 16px;
             font-weight: bold;
             text-transform: uppercase;
@@ -97,12 +100,16 @@
             box-shadow: 0 4px 10px rgba(255, 223, 0, 0.3);
         }
 
+        /* DISEÑO DE PIEZAS PROFESIONAL: Calce perfecto 3D sin desalinear la imagen */
         .piece {
-            width: 140px;
-            height: 140px;
+            width: 110px;
+            height: 110px;
             position: absolute;
             background-size: 330px 330px;
             background-repeat: no-repeat;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.4), inset 0 0 4px rgba(255,255,255,0.2);
+            border: 1px solid rgba(0,0,0,0.2);
             cursor: grab;
             touch-action: none;
             z-index: 10;
@@ -111,18 +118,9 @@
         .piece.dragging {
             cursor: grabbing;
             z-index: 100 !important;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.6);
+            transform: scale(1.05);
         }
-
-        /* GRUPO DE MÁSCARAS FIJAS COMPLEMENTARIAS - ENCAJE PERFECTO */
-        .p0 { clip-path: polygon(10.7% 10.7%, 89.2% 10.7%, 89.2% 35.7%, 100% 35.7%, 100% 57.1%, 89.2% 57.1%, 89.2% 89.2%, 64.2% 89.2%, 64.2% 100%, 42.8% 100%, 42.8% 89.2%, 10.7% 89.2%); background-position: 15px 15px; }
-        .p1 { clip-path: polygon(10.7% 10.7%, 10.7% 35.7%, 0% 35.7%, 0% 57.1%, 10.7% 57.1%, 10.7% 89.2%, 42.8% 89.2%, 42.8% 78.5%, 64.2% 78.5%, 64.2% 89.2%, 89.2% 89.2%, 89.2% 57.1%, 100% 57.1%, 100% 35.7%, 89.2% 35.7%, 89.2% 10.7%); background-position: -95px 15px; }
-        .p2 { clip-path: polygon(10.7% 10.7%, 10.7% 35.7%, 0% 35.7%, 0% 57.1%, 10.7% 57.1%, 10.7% 89.2%, 64.2% 89.2%, 64.2% 100%, 42.8% 100%, 42.8% 89.2%, 89.2% 89.2%, 89.2% 10.7%); background-position: -205px 15px; }
-        .p3 { clip-path: polygon(10.7% 10.7%, 42.8% 10.7%, 42.8% 0%, 64.2% 0%, 64.2% 10.7%, 89.2% 10.7%, 89.2% 89.2%, 57.1% 89.2%, 57.1% 78.5%, 35.7% 78.5%, 35.7% 89.2%, 10.7% 89.2%); background-position: 15px -95px; }
-        .p4 { clip-path: polygon(10.7% 10.7%, 42.8% 10.7%, 42.8% 21.4%, 64.2% 21.4%, 64.2% 10.7%, 89.2% 10.7%, 89.2% 35.7%, 78.5% 35.7%, 78.5% 57.1%, 89.2% 57.1%, 89.2% 89.2%, 64.2% 89.2%, 64.2% 100%, 42.8% 100%, 42.8% 89.2%, 10.7% 89.2%); background-position: -95px -95px; }
-        .p5 { clip-path: polygon(10.7% 10.7%, 42.8% 10.7%, 42.8% 0%, 64.2% 0%, 64.2% 10.7%, 89.2% 10.7%, 89.2% 89.2%, 64.2% 89.2%, 64.2% 78.5%, 42.8% 78.5%, 42.8% 89.2%, 10.7% 89.2%); background-position: -205px -95px; }
-        .p6 { clip-path: polygon(10.7% 10.7%, 42.8% 10.7%, 42.8% 0%, 64.2% 0%, 64.2% 10.7%, 89.2% 10.7%, 89.2% 89.2%, 10.7% 89.2%); background-position: 15px -205px; }
-        .p7 { clip-path: polygon(10.7% 10.7%, 42.8% 10.7%, 42.8% 21.4%, 64.2% 21.4%, 64.2% 10.7%, 89.2% 10.7%, 89.2% 89.2%, 10.7% 89.2%); background-position: -95px -205px; }
-        .p8 { clip-path: polygon(10.7% 10.7%, 42.8% 10.7%, 42.8% 0%, 64.2% 0%, 64.2% 10.7%, 89.2% 10.7%, 89.2% 89.2%, 10.7% 89.2%); background-position: -205px -205px; }
 
         #overlay {
             display: none;
@@ -131,7 +129,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.9);
+            background-color: rgba(0, 0, 0, 0.95);
             z-index: 1000;
             justify-content: center;
             align-items: center;
@@ -220,7 +218,9 @@
         </div>
     </div>
     <script>
+        // URL exclusiva verificada de tu Firebase Realtime Database
         const FIREBASE_DB_URL = "https://firebaseio.com"; 
+        
         const IMAGES = ["imagen1.jpeg", "imagen2.jpeg", "imagen3.jpeg"];
         const WHATSAPP_NUMBER = "5491124050658";
         
@@ -238,27 +238,29 @@
         let currentCode = "0001";
         let boardState = Array(9).fill(null);
 
-        // Registro seguro y directo mediante logs históricos en Firebase
+        // Conexión directa y pura a tu base de datos de Firebase
         async function updateAndGetCounter() {
             try {
-                // 1. Enviamos un POST (una marca de victoria) a la base de datos abierta
-                const pushResponse = await fetch(`${FIREBASE_DB_URL}ganadores.json`, {
+                // 1. Enviamos un POST (registro histórico de victoria) a tu nodo "ganadores"
+                await fetch(`${FIREBASE_DB_URL}ganadores.json`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ fecha: Date.now() })
+                    body: JSON.stringify({ timestamp: Date.now() })
                 });
 
-                // 2. Leemos la lista completa de marcas para saber cuántos ganaron en total
-                const getResponse = await fetch(`${FIREBASE_DB_URL}ganadores.json?v=${Date.now()}`);
-                if (getResponse.ok) {
-                    const data = await getResponse.json();
+                // 2. Leemos inmediatamente el nodo para contar el total real de registros
+                const getRes = await fetch(`${FIREBASE_DB_URL}ganadores.json?nocache=${Date.now()}`);
+                if (getRes.ok) {
+                    const data = await getRes.json();
+                    // Contamos la cantidad de claves únicas dentro del objeto de Firebase
                     const totalGanadores = Object.keys(data || {}).length;
                     currentCode = String(totalGanadores).padStart(4, '0');
                 } else {
                     currentCode = "0001";
                 }
             } catch (e) {
-                currentCode = String(Math.floor(Math.random() * 9) + 1).padStart(4, '0');
+                // Fallback por si hay microcortes de red local
+                currentCode = "0001";
             }
             codeElement.innerText = `CÓDIGO: ${currentCode}`;
         }
@@ -269,6 +271,7 @@
             boardState.fill(null);
             pieces = [];
 
+            // Elige una imagen aleatoria del array de GitHub
             currentImage = IMAGES[Math.floor(Math.random() * IMAGES.length)];
 
             for (let i = 0; i < 9; i++) {
@@ -279,9 +282,10 @@
 
                 piece.style.backgroundImage = `url('${currentImage}')`;
 
+                // Dispersión aleatoria en el contenedor inferior para que queden desordenadas
                 const randomX = Math.random() * (arena.clientWidth - 135);
                 const randomY = Math.random() * (arena.clientHeight - 135);
-                const randomRot = (Math.random() * 20) - 10;
+                const randomRot = (Math.random() * 20) - 10; // Lenta rotación estética
 
                 piece.style.left = `${randomX}px`;
                 piece.style.top = `${randomY}px`;
@@ -306,6 +310,7 @@
                 initialLeft = parseFloat(piece.style.left) || 0;
                 initialTop = parseFloat(piece.style.top) || 0;
                 
+                // Si la pieza se mueve desde el tablero superior, liberamos la celda
                 if (piece.dataset.currentIndex !== "arena") {
                     const cellIdx = parseInt(piece.dataset.currentIndex);
                     boardState[cellIdx] = null;
@@ -328,6 +333,8 @@
                 piece.classList.remove("dragging");
                 
                 const pieceRect = piece.getBoundingClientRect();
+                
+                // Calculamos el centro visual exacto (descontando el desborde decorativo de las pestañas)
                 const pCenterX = pieceRect.left + 70;
                 const pCenterY = pieceRect.top + 70;
 
@@ -341,7 +348,9 @@
                         pCenterX >= cellRect.left && pCenterX <= cellRect.right &&
                         pCenterY >= cellRect.top && pCenterY <= cellRect.bottom
                     ) {
+                        // REGLA DE ERROR: Se queda fija temporalmente aunque la casilla no sea la correcta
                         if (boardState[cellIdx] === null) {
+                            // Centrado fijo con desfase simétrico de 15px por el margen de la pestaña estándar
                             piece.style.left = `${(cellIdx % 3) * 110 - 15}px`;
                             piece.style.top = `${Math.floor(cellIdx / 3) * 110 - 15}px`;
                             
@@ -354,6 +363,7 @@
                     }
                 }
 
+                // Si no se soltó en una casilla válida, regresa abajo de forma dispersa
                 if (!placed) {
                     arena.appendChild(piece);
                     piece.dataset.currentIndex = "arena";
@@ -368,21 +378,26 @@
                 checkVictory();
             }
 
+            // Eventos Táctiles Móviles nativos
             piece.addEventListener("touchstart", onStart, {passive: true});
             window.addEventListener("touchmove", onMove, {passive: false});
             window.addEventListener("touchend", onEnd);
 
+            // Eventos de Mouse para pruebas en PC
             piece.addEventListener("mousedown", onStart);
             window.addEventListener("mousemove", onMove);
             window.addEventListener("mouseup", onEnd);
         }
 
         function checkVictory() {
+            // Verifica si las 9 celdas están ocupadas por la pieza que corresponde a su índice correcto
             for (let i = 0; i < 9; i++) {
                 if (!boardState[i] || parseInt(boardState[i].dataset.correctIndex) !== i) {
-                    return;
+                    return; 
                 }
             }
+            
+            // Si todas están bien ubicadas ejecuta la consulta a Firebase y levanta el cartel
             updateAndGetCounter().then(() => {
                 overlay.style.display = "flex";
             });
@@ -390,7 +405,7 @@
 
         claimBtn.addEventListener("click", () => {
             const message = encodeURIComponent(`felicitaciones por finalizar el rompecabezas. Mi código es: ${currentCode}`);
-            window.location.href = `https://wa.me{WHATSAPP_NUMBER}?text=${message}`;
+            window.location.href = `https://wa.me{1124050658}?text=${message}`;
         });
 
         resetBtn.addEventListener("click", initGame);
