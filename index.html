@@ -97,14 +97,14 @@
       height: 330px;
       position: relative;
       background: #111111;
-      border: 2px solid rgba(212, 175, 55, 0.45);
+      border: 2px solid rgba(212, 175, 55, 0.5);
       border-radius: 12px;
       box-shadow: 0 0 30px rgba(212, 175, 55, 0.25), inset 0 0 30px rgba(0, 0, 0, 0.95);
       margin-bottom: 14px;
       overflow: hidden;
     }
 
-    /* LÍNEAS DE GUÍA SVG CON LAS FORMAS EXACTAS DE LAS PIEZAS */
+    /* LÍNEAS DE GUÍA SVG EXACTAS (SIN NÚMEROS, CORTE UNIFICADO) */
     .board-grid-svg {
       position: absolute;
       top: 0;
@@ -115,35 +115,11 @@
       z-index: 1;
     }
 
-    /* Estilos de las siluetas de guía en SVG */
-    .slot-guide-path {
-      fill: rgba(212, 175, 55, 0.03);
-      stroke: rgba(212, 175, 55, 0.4);
-      stroke-width: 1.5;
-      stroke-dasharray: 4 3;
-      transition: all 0.2s ease;
-    }
-
-    .slot-guide-path.hovered {
-      fill: rgba(212, 175, 55, 0.22);
-      stroke: var(--gold);
-      stroke-width: 2.5;
-      stroke-dasharray: none;
-      filter: drop-shadow(0 0 8px var(--gold-glow));
-    }
-
-    .slot-guide-number {
-      font-family: 'Cinzel', serif;
-      font-size: 15px;
-      font-weight: 700;
-      fill: rgba(212, 175, 55, 0.28);
-      pointer-events: none;
-      transition: fill 0.2s ease, opacity 0.2s ease;
-    }
-
-    .slot-guide-number.hovered {
-      fill: rgba(212, 175, 55, 0.9);
-      filter: drop-shadow(0 0 6px var(--gold-glow));
+    .guide-cut-line {
+      fill: none;
+      stroke: rgba(212, 175, 55, 0.55);
+      stroke-width: 1.6;
+      stroke-dasharray: 5 3;
     }
 
     #board {
@@ -166,6 +142,11 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      transition: background-color 0.15s ease;
+    }
+
+    .slot.hovered {
+      background-color: rgba(212, 175, 55, 0.18);
     }
 
     /* ARENA DE PIEZAS INFERIOR */
@@ -360,7 +341,7 @@
       <h1 class="title">Rompecabezas El Rey</h1>
     </header>
 
-    <!-- TABLERO 3x3 UNIFICADO CON LÍNEAS CURVAS DE GUÍA IDÉNTICAS A LAS PIEZAS -->
+    <!-- TABLERO 3x3 UNIFICADO CON LÍNEAS CURVAS DE GUÍA IDÉNTICAS A LAS PIEZAS (SIN NÚMEROS) -->
     <div class="board-container">
       <svg id="board-svg" class="board-grid-svg" viewBox="0 0 330 330"></svg>
 
@@ -406,7 +387,7 @@
     </div>
   </div>
   <!-- ================================================================= -->
-<!-- BLOQUE 2: LÓGICA JAVASCRIPT CON CURVAS BÉZIER Y ENCAJE PERFECTO   -->
+<!-- BLOQUE 2: LÓGICA JAVASCRIPT CON CURVAS BÉZIER Y ENCAJE EXACTO     -->
 <!-- ================================================================= -->
   <script>
     document.addEventListener('DOMContentLoaded', () => {
@@ -438,7 +419,7 @@
       let touchStartY = 0;
       let pieceInitialLeft = 0;
       let pieceInitialTop = 0;
-      let currentSlotHoveredIndex = -1;
+      let currentSlotHovered = null;
 
       // Matriz de pestañas: [Top, Right, Bottom, Left]
       // 1 = Pestaña saliente (Tab hacia afuera), -1 = Hueco entrante (Hole hacia adentro), 0 = Borde recto
@@ -454,7 +435,7 @@
         [1, 0, 0, -1]   // Pieza 8 (fila 2, col 2)
       ];
 
-      // Dibuja las líneas de guía grabadas en el fondo del tablero usando la forma exacta de cada pieza
+      // Dibuja las líneas de guía grabadas en el fondo del tablero usando las líneas de corte unificadas
       renderBoardGuideLines();
       initGame();
 
@@ -471,7 +452,7 @@
       });
 
       // Trazo de una arista curva de rompecabezas clásica
-      // tab: 1 = saliente (hacia afuera en recorrido horario), -1 = hueco (hacia adentro), 0 = recta
+      // tab: 1 = saliente (hacia afuera en sentido horario), -1 = entrante (hacia adentro), 0 = recta
       function drawPuzzleEdge(ctxOrPath, x1, y1, x2, y2, tab, isSvg = false) {
         if (tab === 0) {
           if (isSvg) return `L ${x2.toFixed(2)} ${y2.toFixed(2)} `;
@@ -485,7 +466,7 @@
         const ux = dx / len;
         const uy = dy / len;
         
-        // Vector normal perpendicular: positivo hacia afuera de la pieza en recorrido horario
+        // Vector normal perpendicular
         const nx = uy * tab;
         const ny = -ux * tab;
 
@@ -504,7 +485,7 @@
 
         if (isSvg) {
           return `L ${p0.x.toFixed(2)} ${p0.y.toFixed(2)} ` +
-                 `C ${cp1.x.toFixed(2)} ${cp1.y.toFixed(2)}, ${cp2.x.toFixed(2)} ${cp2.x.toFixed(2)}, ${cp3.x.toFixed(2)} ${cp3.y.toFixed(2)} ` +
+                 `C ${cp1.x.toFixed(2)} ${cp1.y.toFixed(2)}, ${cp2.x.toFixed(2)} ${cp2.y.toFixed(2)}, ${cp3.x.toFixed(2)} ${cp3.y.toFixed(2)} ` +
                  `C ${cp4.x.toFixed(2)} ${cp4.y.toFixed(2)}, ${cp5.x.toFixed(2)} ${cp5.y.toFixed(2)}, ${p1.x.toFixed(2)} ${p1.y.toFixed(2)} ` +
                  `L ${x2.toFixed(2)} ${y2.toFixed(2)} `;
         } else {
@@ -515,45 +496,38 @@
         }
       }
 
-      // Genera la silueta SVG exacta de una pieza / casilla en coordenadas del tablero
-      function getSlotPath(slotIdx) {
-        const col = slotIdx % GRID_SIZE;
-        const row = Math.floor(slotIdx / GRID_SIZE);
-        const [t, r, b, l] = PIECE_EDGES[slotIdx];
-
-        const x0 = col * PIECE_SIZE;
-        const y0 = row * PIECE_SIZE;
-        const x1 = (col + 1) * PIECE_SIZE;
-        const y1 = (row + 1) * PIECE_SIZE;
-
-        let d = `M ${x0.toFixed(2)} ${y0.toFixed(2)} `;
-        d += drawPuzzleEdge(null, x0, y0, x1, y0, t, true); // Top
-        d += drawPuzzleEdge(null, x1, y0, x1, y1, r, true); // Right
-        d += drawPuzzleEdge(null, x1, y1, x0, y1, b, true); // Bottom
-        d += drawPuzzleEdge(null, x0, y1, x0, y0, l, true); // Left
-        d += 'Z';
-        return d;
-      }
-
       function renderBoardGuideLines() {
-        let svgContent = '';
+        // Línea Vertical 1 (entre columna 0 y 1, x=110)
+        let v1 = `M 110 0 ` +
+                 drawPuzzleEdge(null, 110, 0, 110, 110, 1, true) +
+                 drawPuzzleEdge(null, 110, 110, 110, 220, 1, true) +
+                 drawPuzzleEdge(null, 110, 220, 110, 330, 1, true);
 
-        for (let i = 0; i < 9; i++) {
-          const col = i % GRID_SIZE;
-          const row = Math.floor(i / GRID_SIZE);
-          const pathData = getSlotPath(i);
-          const centerX = (col + 0.5) * PIECE_SIZE;
-          const centerY = (row + 0.5) * PIECE_SIZE + 5;
+        // Línea Vertical 2 (entre columna 1 y 2, x=220)
+        let v2 = `M 220 0 ` +
+                 drawPuzzleEdge(null, 220, 0, 220, 110, 1, true) +
+                 drawPuzzleEdge(null, 220, 110, 220, 220, -1, true) +
+                 drawPuzzleEdge(null, 220, 220, 220, 330, 1, true);
 
-          svgContent += `
-            <g id="slot-guide-group-${i}">
-              <path id="slot-guide-path-${i}" class="slot-guide-path" d="${pathData}" />
-              <text id="slot-guide-num-${i}" class="slot-guide-number" x="${centerX}" y="${centerY}" text-anchor="middle">${i + 1}</text>
-            </g>
-          `;
-        }
+        // Línea Horizontal 1 (entre fila 0 y 1, y=110)
+        let h1 = `M 0 110 ` +
+                 drawPuzzleEdge(null, 0, 110, 110, 110, -1, true) +
+                 drawPuzzleEdge(null, 110, 110, 220, 110, 1, true) +
+                 drawPuzzleEdge(null, 220, 110, 330, 110, -1, true);
 
-        boardSvg.innerHTML = svgContent;
+        // Línea Horizontal 2 (entre fila 1 y 2, y=220)
+        let h2 = `M 0 220 ` +
+                 drawPuzzleEdge(null, 0, 220, 110, 220, 1, true) +
+                 drawPuzzleEdge(null, 110, 220, 220, 220, -1, true) +
+                 drawPuzzleEdge(null, 220, 220, 330, 220, 1, true);
+
+        boardSvg.innerHTML = `
+          <rect x="1" y="1" width="328" height="328" rx="8" class="guide-cut-line" />
+          <path d="${v1}" class="guide-cut-line" />
+          <path d="${v2}" class="guide-cut-line" />
+          <path d="${h1}" class="guide-cut-line" />
+          <path d="${h2}" class="guide-cut-line" />
+        `;
       }
 
       function initGame() {
@@ -707,7 +681,6 @@
         if (currentSlot !== -1) {
           gridState[currentSlot] = null;
           el.dataset.currentSlot = -1;
-          updateGuideNumbersVisibility();
         }
 
         document.body.appendChild(el);
@@ -748,41 +721,23 @@
         }
 
         clearSlotHover();
-        updateGuideNumbersVisibility();
         draggedPiece = null;
         checkVictory();
       }
 
       function checkSlotHover(clientX, clientY) {
+        clearSlotHover();
         const slotIdx = findTargetSlot(clientX, clientY);
-        if (slotIdx !== currentSlotHoveredIndex) {
-          clearSlotHover();
-          if (slotIdx !== -1) {
-            currentSlotHoveredIndex = slotIdx;
-            const pathEl = document.getElementById(`slot-guide-path-${slotIdx}`);
-            const numEl = document.getElementById(`slot-guide-num-${slotIdx}`);
-            if (pathEl) pathEl.classList.add('hovered');
-            if (numEl) numEl.classList.add('hovered');
-          }
+        if (slotIdx !== -1) {
+          slots[slotIdx].classList.add('hovered');
+          currentSlotHovered = slots[slotIdx];
         }
       }
 
       function clearSlotHover() {
-        if (currentSlotHoveredIndex !== -1) {
-          const pathEl = document.getElementById(`slot-guide-path-${currentSlotHoveredIndex}`);
-          const numEl = document.getElementById(`slot-guide-num-${currentSlotHoveredIndex}`);
-          if (pathEl) pathEl.classList.remove('hovered');
-          if (numEl) numEl.classList.remove('hovered');
-          currentSlotHoveredIndex = -1;
-        }
-      }
-
-      function updateGuideNumbersVisibility() {
-        for (let i = 0; i < 9; i++) {
-          const numEl = document.getElementById(`slot-guide-num-${i}`);
-          if (numEl) {
-            numEl.style.opacity = gridState[i] !== null ? '0' : '1';
-          }
+        if (currentSlotHovered) {
+          currentSlotHovered.classList.remove('hovered');
+          currentSlotHovered = null;
         }
       }
 
@@ -810,11 +765,11 @@
         piece.dataset.currentSlot = slotIndex;
         gridState[slotIndex] = piece;
 
+        // La pieza tiene un margen de PADDING (22px) alrededor para sus pestañas
         piece.style.left = `-${PADDING}px`;
         piece.style.top = `-${PADDING}px`;
         piece.style.transform = 'rotate(0deg)';
         piece.classList.add('placed');
-        updateGuideNumbersVisibility();
       }
 
       function dropPieceToArena(piece, clientX, clientY) {
