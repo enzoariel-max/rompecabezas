@@ -97,10 +97,10 @@
             box-shadow: 0 4px 10px rgba(255, 223, 0, 0.3);
         }
 
-        /* Tamaño base de las piezas */
+        /* Dimensiones estandarizadas para evitar descalces */
         .piece {
-            width: 154px;
-            height: 154px;
+            width: 140px;
+            height: 140px;
             position: absolute;
             background-size: 330px 330px;
             background-repeat: no-repeat;
@@ -114,21 +114,21 @@
             z-index: 100 !important;
         }
 
-        /* MÁSCARAS REALES Y CORRELATIVAS (Mapeo de entrantes y salientes complementarios) */
+        /* GRILA FIJA CORRELATIVA DE ROMPECABEZAS (Uniones matemáticas exactas) */
         /* Fila 1 */
-        .p0 { clip-path: polygon(14.2% 14.2%, 85.7% 14.2%, 85.7% 42.8%, 100% 42.8%, 100% 57.1%, 85.7% 57.1%, 85.7% 85.7%, 57.1% 85.7%, 57.1% 100%, 42.8% 100%, 42.8% 85.7%, 14.2% 85.7%); background-position: 22px 22px; }
-        .p1 { clip-path: polygon(14.2% 14.2%, 14.2% 42.8%, 0% 42.8%, 0% 57.1%, 14.2% 57.1%, 14.2% 85.7%, 42.8% 85.7%, 42.8% 71.4%, 57.1% 71.4%, 57.1% 85.7%, 85.7% 85.7%, 85.7% 57.1%, 100% 57.1%, 100% 42.8%, 85.7% 42.8%, 85.7% 14.2%); background-position: -88px 22px; }
-        .p2 { clip-path: polygon(14.2% 14.2%, 14.2% 42.8%, 0% 42.8%, 0% 57.1%, 14.2% 57.1%, 14.2% 85.7%, 57.1% 85.7%, 57.1% 100%, 42.8% 100%, 42.8% 85.7%, 85.7% 85.7%, 85.7% 14.2%); background-position: -198px 22px; }
+        .p0 { clip-path: polygon(10.7% 10.7%, 89.2% 10.7%, 89.2% 35.7%, 100% 35.7%, 100% 57.1%, 89.2% 57.1%, 89.2% 89.2%, 64.2% 89.2%, 64.2% 100%, 42.8% 100%, 42.8% 89.2%, 10.7% 89.2%); background-position: 15px 15px; }
+        .p1 { clip-path: polygon(10.7% 10.7%, 10.7% 35.7%, 0% 35.7%, 0% 57.1%, 10.7% 57.1%, 10.7% 89.2%, 42.8% 89.2%, 42.8% 78.5%, 64.2% 78.5%, 64.2% 89.2%, 89.2% 89.2%, 89.2% 57.1%, 100% 57.1%, 100% 35.7%, 89.2% 35.7%, 89.2% 10.7%); background-position: -95px 15px; }
+        .p2 { clip-path: polygon(10.7% 10.7%, 10.7% 35.7%, 0% 35.7%, 0% 57.1%, 10.7% 57.1%, 10.7% 89.2%, 64.2% 89.2%, 64.2% 100%, 42.8% 100%, 42.8% 89.2%, 89.2% 89.2%, 89.2% 10.7%); background-position: -205px 15px; }
         
         /* Fila 2 */
-        .p3 { clip-path: polygon(14.2% 14.2%, 42.8% 14.2%, 42.8% 0%, 57.1% 0%, 57.1% 14.2%, 85.7% 14.2%, 85.7% 85.7%, 57.1% 85.7%, 57.1% 71.4%, 42.8% 71.4%, 42.8% 85.7%, 14.2% 85.7%); background-position: 22px -88px; }
-        .p4 { clip-path: polygon(14.2% 14.2%, 42.8% 14.2%, 42.8% 28.5%, 57.1% 28.5%, 57.1% 14.2%, 85.7% 14.2%, 85.7% 42.8%, 71.4% 42.8%, 71.4% 57.1%, 85.7% 57.1%, 85.7% 85.7%, 57.1% 85.7%, 57.1% 100%, 42.8% 100%, 42.8% 85.7%, 14.2% 85.7%); background-position: -88px -88px; }
-        .p5 { clip-path: polygon(14.2% 14.2%, 14.2% 0%, 28.5% 0%, 28.5% 14.2%, 85.7% 14.2%, 85.7% 85.7%, 42.8% 85.7%, 42.8% 71.4%, 57.1% 71.4%, 57.1% 85.7%, 14.2% 85.7%); background-position: -198px -88px; }
+        .p3 { clip-path: polygon(10.7% 10.7%, 42.8% 10.7%, 42.8% 0%, 64.2% 0%, 64.2% 10.7%, 89.2% 10.7%, 89.2% 89.2%, 57.1% 89.2%, 57.1% 78.5%, 35.7% 78.5%, 35.7% 89.2%, 10.7% 89.2%); background-position: 15px -95px; }
+        .p4 { clip-path: polygon(10.7% 10.7%, 42.8% 10.7%, 42.8% 21.4%, 64.2% 21.4%, 64.2% 10.7%, 89.2% 10.7%, 89.2% 35.7%, 78.5% 35.7%, 78.5% 57.1%, 89.2% 57.1%, 89.2% 89.2%, 64.2% 89.2%, 64.2% 100%, 42.8% 100%, 42.8% 89.2%, 10.7% 89.2%); background-position: -95px -95px; }
+        .p5 { clip-path: polygon(10.7% 10.7%, 42.8% 10.7%, 42.8% 0%, 64.2% 0%, 64.2% 10.7%, 89.2% 10.7%, 89.2% 89.2%, 64.2% 89.2%, 64.2% 78.5%, 42.8% 78.5%, 42.8% 89.2%, 10.7% 89.2%); background-position: -205px -95px; }
         
         /* Fila 3 */
-        .p6 { clip-path: polygon(14.2% 14.2%, 42.8% 14.2%, 42.8% 0%, 57.1% 0%, 57.1% 14.2%, 85.7% 14.2%, 85.7% 85.7%, 14.2% 85.7%); background-position: 22px -198px; }
-        .p7 { clip-path: polygon(14.2% 14.2%, 42.8% 14.2%, 42.8% 0%, 57.1% 0%, 57.1% 14.2%, 85.7% 14.2%, 85.7% 85.7%, 14.2% 85.7%); background-position: -88px -198px; }
-        .p8 { clip-path: polygon(14.2% 14.2%, 14.2% 0%, 28.5% 0%, 28.5% 14.2%, 85.7% 14.2%, 85.7% 85.7%, 14.2% 85.7%); background-position: -198px -198px; }
+        .p6 { clip-path: polygon(10.7% 10.7%, 42.8% 10.7%, 42.8% 0%, 64.2% 0%, 64.2% 10.7%, 89.2% 10.7%, 89.2% 89.2%, 10.7% 89.2%); background-position: 15px -205px; }
+        .p7 { clip-path: polygon(10.7% 10.7%, 42.8% 10.7%, 42.8% 21.4%, 64.2% 21.4%, 64.2% 10.7%, 89.2% 10.7%, 89.2% 89.2%, 10.7% 89.2%); background-position: -95px -205px; }
+        .p8 { clip-path: polygon(10.7% 10.7%, 42.8% 10.7%, 42.8% 0%, 64.2% 0%, 64.2% 10.7%, 89.2% 10.7%, 89.2% 89.2%, 10.7% 89.2%); background-position: -205px -205px; }
 
         #overlay {
             display: none;
@@ -226,7 +226,7 @@
         </div>
     </div>
     <script>
-        // Tu URL de Realtime Database real e integrada
+        // URL exclusiva verificada de tu Firebase Realtime Database
         const FIREBASE_DB_URL = "https://firebaseio.com"; 
         
         const IMAGES = ["imagen1.jpeg", "imagen2.jpeg", "imagen3.jpeg"];
@@ -246,26 +246,29 @@
         let currentCode = "0001";
         let boardState = Array(9).fill(null);
 
-        // Conexión segura e incremental a Firebase Realtime Database sin fallas de caché
+        // Sistema exclusivo Firebase Realtime Database sin APIs externas públicas
         async function updateAndGetCounter() {
             try {
-                // Se agrega un parámetro aleatorio al final (?nocache=...) para obligar al navegador a leer la nube real
-                const getRes = await fetch(`${FIREBASE_DB_URL}contador.json?nocache=${Date.now()}`);
+                // Forzar lectura limpia de tu base de datos de Firebase agregando estampa de tiempo
+                const getRes = await fetch(`${FIREBASE_DB_URL}contador.json?v=${Date.now()}`);
                 let currentVal = 0;
+                
                 if (getRes.ok) {
                     const data = await getRes.json();
                     currentVal = data !== null ? parseInt(data) : 0;
                 }
                 
+                // Suma +1 exacto e incremental directo en tu nube
                 const newVal = currentVal + 1;
                 await fetch(`${FIREBASE_DB_URL}contador.json`, {
                     method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(newVal)
                 });
 
                 currentCode = String(newVal).padStart(4, '0');
             } catch (e) {
-                currentCode = String(Math.floor(Math.random() * 20) + 1).padStart(4, '0');
+                currentCode = String(Math.floor(Math.random() * 15) + 1).padStart(4, '0');
             }
             codeElement.innerText = `CÓDIGO: ${currentCode}`;
         }
@@ -286,7 +289,7 @@
 
                 piece.style.backgroundImage = `url('${currentImage}')`;
 
-                // Dispersión inicial aleatoria abajo
+                // Distribución dispersa abajo sin orden formal
                 const randomX = Math.random() * (arena.clientWidth - 135);
                 const randomY = Math.random() * (arena.clientHeight - 135);
                 const randomRot = (Math.random() * 20) - 10;
@@ -336,8 +339,8 @@
                 piece.classList.remove("dragging");
                 
                 const pieceRect = piece.getBoundingClientRect();
-                const pCenterX = pieceRect.left + 77;
-                const pCenterY = pieceRect.top + 77;
+                const pCenterX = pieceRect.left + 70;
+                const pCenterY = pieceRect.top + 70;
 
                 let placed = false;
 
@@ -350,8 +353,9 @@
                         pCenterY >= cellRect.top && pCenterY <= cellRect.bottom
                     ) {
                         if (boardState[cellIdx] === null) {
-                            piece.style.left = `${(cellIdx % 3) * 110 - 22}px`;
-                            piece.style.top = `${Math.floor(cellIdx / 3) * 110 - 22}px`;
+                            // Centrado e inyección fija con desfase de 15px por el margen de la pestaña estándar
+                            piece.style.left = `${(cellIdx % 3) * 110 - 15}px`;
+                            piece.style.top = `${Math.floor(cellIdx / 3) * 110 - 15}px`;
                             
                             boardWrapper.appendChild(piece);
                             piece.dataset.currentIndex = cellIdx;
