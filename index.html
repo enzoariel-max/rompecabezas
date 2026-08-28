@@ -1,769 +1,853 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta name="theme-color" content="#0a0a0a">
-  <title>Rompecabezas El Rey</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0a0a0a">
+<title>Rompecabezas El Rey</title>
 
-  <style>
-    * {
-      box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
-    }
+<style>
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
 
-    :root {
-      --gold: #f5c451;
-      --gold-light: #ffe9a3;
-      --gold-dark: #a56b00;
-      --bg: #0a0a0a;
-      --panel: #111111;
-      --line: rgba(245, 196, 81, .35);
-      --piece-size: min(28vw, 108px);
-    }
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+  background: #0a0a0a;
+  color: white;
+  font-family: Arial, Helvetica, sans-serif;
+}
 
-    html, body {
-      margin: 0;
-      padding: 0;
-      min-height: 100%;
-      background:
-        radial-gradient(circle at 50% 0%, rgba(245,196,81,.10), transparent 35%),
-        #0a0a0a;
-      color: #fff;
-      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont,
-                   "Segoe UI", sans-serif;
-      overflow-x: hidden;
-    }
+body {
+  display: flex;
+  justify-content: center;
+  overflow-x: hidden;
+}
 
-    body {
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-    }
+#app {
+  width: 100%;
+  max-width: 520px;
+  min-height: 100vh;
+  padding: 18px 12px 35px;
+  text-align: center;
+}
 
-    #app {
-      width: 100%;
-      max-width: 520px;
-      min-height: 100vh;
-      padding: 18px 12px 35px;
-      position: relative;
-    }
+header {
+  margin-bottom: 18px;
+}
 
-    header {
-      text-align: center;
-      margin-bottom: 18px;
-    }
+.crown {
+  font-size: 30px;
+  color: #f5c451;
+  text-shadow:
+    0 0 8px #f5c451,
+    0 0 20px rgba(245,196,81,.6);
+}
 
-    .crown {
-      color: var(--gold);
-      font-size: 30px;
-      line-height: 1;
-      filter: drop-shadow(0 0 10px rgba(245,196,81,.7));
-      margin-bottom: 5px;
-    }
+h1 {
+  margin: 2px 0 5px;
+  font-family: Georgia, serif;
+  font-size: clamp(30px, 9vw, 45px);
+  line-height: .95;
+  font-weight: 900;
+  background: linear-gradient(
+    180deg,
+    #fff8d6,
+    #f5c451 40%,
+    #b87500 75%,
+    #ffeaa3
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 0 10px rgba(245,196,81,.3));
+}
 
-    h1 {
-      margin: 0;
-      font-size: clamp(27px, 8vw, 42px);
-      font-weight: 900;
-      letter-spacing: -1.5px;
-      text-transform: uppercase;
-      background: linear-gradient(
-        180deg,
-        #fff6cf 0%,
-        #f5c451 35%,
-        #b87500 70%,
-        #ffe69a 100%
-      );
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-      text-shadow: 0 0 25px rgba(245,196,81,.2);
-    }
+.subtitle {
+  color: #8e8e8e;
+  font-size: 11px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+}
 
-    .subtitle {
-      margin-top: 5px;
-      color: #999;
-      font-size: 12px;
-      letter-spacing: 3px;
-      text-transform: uppercase;
-    }
+/* TABLERO */
 
-    /* TABLERO */
+#board {
+  width: min(94vw, 345px);
+  aspect-ratio: 1;
+  margin: auto;
+  padding: 5px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  gap: 3px;
 
-    #board {
-      width: min(94vw, 330px);
-      aspect-ratio: 1;
-      margin: 0 auto;
-      padding: 5px;
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      grid-template-rows: repeat(3, 1fr);
-      gap: 3px;
-      border-radius: 15px;
-      border: 1px solid var(--line);
-      background: #050505;
-      box-shadow:
-        0 0 0 1px rgba(255,255,255,.03),
-        0 0 30px rgba(245,196,81,.12),
-        inset 0 0 30px rgba(0,0,0,.9);
-    }
+  background: #050505;
+  border: 1px solid rgba(245,196,81,.35);
+  border-radius: 16px;
 
-    .slot {
-      position: relative;
-      min-width: 0;
-      min-height: 0;
-      border-radius: 6px;
-      border: 1px dashed rgba(245,196,81,.18);
-      background: rgba(255,255,255,.018);
-    }
+  box-shadow:
+    0 0 15px rgba(245,196,81,.12),
+    0 0 45px rgba(245,196,81,.08),
+    inset 0 0 30px rgba(0,0,0,.9);
+}
 
-    /* ARENA */
+.slot {
+  position: relative;
+  overflow: visible;
+  border: 1px dashed rgba(245,196,81,.2);
+  border-radius: 5px;
+  background: rgba(255,255,255,.018);
+}
 
-    .arena-title {
-      text-align: center;
-      margin: 24px 0 8px;
-      color: #777;
-      font-size: 10px;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-    }
+/* ARENA */
 
-    #arena {
-      height: 240px;
-      min-height: 200px;
-      width: 100%;
-      position: relative;
-      overflow: visible;
-      border-radius: 18px;
-      border: 1px solid rgba(245,196,81,.18);
-      background:
-        radial-gradient(circle at 50% 50%, rgba(245,196,81,.045), transparent 65%),
-        rgba(255,255,255,.015);
-      box-shadow: inset 0 0 35px rgba(0,0,0,.65);
-    }
+.arena-title {
+  margin: 20px 0 8px;
+  color: #777;
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
 
-    /* PIEZAS */
+#arena {
+  position: relative;
+  width: 100%;
+  height: 260px;
+  min-height: 200px;
+  overflow: visible;
 
-    .piece {
-      --x: 0%;
-      --y: 0%;
+  border: 1px solid rgba(245,196,81,.2);
+  border-radius: 18px;
 
-      position: absolute;
-      width: var(--piece-size);
-      height: var(--piece-size);
+  background:
+    radial-gradient(
+      circle at center,
+      rgba(245,196,81,.05),
+      transparent 65%
+    );
 
-      background-repeat: no-repeat;
-      background-size: 300% 300%;
+  box-shadow:
+    inset 0 0 30px rgba(0,0,0,.8);
+}
 
-      cursor: grab;
-      touch-action: none;
-      user-select: none;
-      -webkit-user-select: none;
+/* PIEZAS */
 
-      z-index: 10;
-      will-change: left, top, transform;
+.piece {
+  position: absolute;
 
-      border: 1px solid rgba(255,255,255,.16);
+  width: 95px;
+  height: 95px;
 
-      filter:
-        drop-shadow(0 5px 7px rgba(0,0,0,.7))
-        drop-shadow(0 0 4px rgba(245,196,81,.08));
+  background-repeat: no-repeat;
+  background-size: 300% 300%;
 
-      transition:
-        box-shadow .15s ease,
-        filter .15s ease;
-    }
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
 
-    .piece.dragging {
-      cursor: grabbing;
-      z-index: 1000;
-      filter:
-        drop-shadow(0 12px 15px rgba(0,0,0,.9))
-        drop-shadow(0 0 12px rgba(245,196,81,.4));
-    }
+  cursor: grab;
 
-    .piece.locked {
-      cursor: grab;
-      z-index: 50;
-    }
+  will-change: left, top, transform;
 
-    /*
-      Formas de rompecabezas.
+  filter:
+    drop-shadow(0 6px 8px rgba(0,0,0,.8))
+    drop-shadow(0 0 5px rgba(245,196,81,.12));
 
-      Cada pieza posee una geometría diferente.
-      Las formas se realizan con clip-path para evitar
-      que sean simples cuadrados.
-    */
+  transition:
+    filter .15s ease;
+}
 
-    .p0 {
-      clip-path: polygon(
-        0 0, 38% 0,
-        42% 8%, 50% 13%, 58% 8%, 62% 0,
-        100% 0, 100% 38%,
-        93% 42%, 88% 50%, 93% 58%, 100% 62%,
-        100% 100%, 0 100%
-      );
-    }
+.piece.dragging {
+  cursor: grabbing;
+  z-index: 9999 !important;
 
-    .p1 {
-      clip-path: polygon(
-        0 0, 38% 0,
-        42% 7%, 50% 12%, 58% 7%, 62% 0,
-        100% 0, 100% 40%,
-        92% 44%, 88% 50%, 92% 56%, 100% 60%,
-        100% 100%, 62% 100%,
-        58% 92%, 50% 88%, 42% 92%, 38% 100%,
-        0 100%, 0 62%,
-        8% 58%, 12% 50%, 8% 42%, 0 38%
-      );
-    }
+  filter:
+    drop-shadow(0 12px 15px rgba(0,0,0,.9))
+    drop-shadow(0 0 12px rgba(245,196,81,.45));
+}
 
-    .p2 {
-      clip-path: polygon(
-        0 0, 100% 0,
-        100% 38%,
-        92% 42%, 88% 50%, 92% 58%, 100% 62%,
-        100% 100%, 62% 100%,
-        58% 92%, 50% 88%, 42% 92%, 38% 100%,
-        0 100%
-      );
-    }
+/*
+  Formas individuales mediante clip-path.
+*/
 
-    .p3 {
-      clip-path: polygon(
-        0 0, 38% 0,
-        42% 8%, 50% 12%, 58% 8%, 62% 0,
-        100% 0, 100% 100%,
-        62% 100%, 58% 92%, 50% 88%, 42% 92%, 38% 100%,
-        0 100%, 0 62%,
-        8% 58%, 12% 50%, 8% 42%, 0 38%
-      );
-    }
+.p0 {
+  clip-path: polygon(
+    0 0, 38% 0,
+    43% 8%, 50% 12%, 57% 8%, 62% 0,
+    100% 0, 100% 38%,
+    92% 43%, 88% 50%, 92% 57%, 100% 62%,
+    100% 100%, 0 100%
+  );
+}
 
-    .p4 {
-      clip-path: polygon(
-        0 0, 38% 0,
-        42% 8%, 50% 12%, 58% 8%, 62% 0,
-        100% 0, 100% 38%,
-        92% 42%, 88% 50%, 92% 58%, 100% 62%,
-        100% 100%, 62% 100%,
-        58% 92%, 50% 88%, 42% 92%, 38% 100%,
-        0 100%, 0 62%,
-        8% 58%, 12% 50%, 8% 42%, 0 38%
-      );
-    }
+.p1 {
+  clip-path: polygon(
+    0 0, 38% 0,
+    43% 8%, 50% 12%, 57% 8%, 62% 0,
+    100% 0, 100% 40%,
+    92% 44%, 88% 50%, 92% 56%, 100% 60%,
+    100% 100%, 62% 100%,
+    57% 92%, 50% 88%, 43% 92%, 38% 100%,
+    0 100%, 0 62%,
+    8% 57%, 12% 50%, 8% 43%, 0 38%
+  );
+}
 
-    .p5 {
-      clip-path: polygon(
-        0 0, 100% 0, 100% 38%,
-        92% 42%, 88% 50%, 92% 58%, 100% 62%,
-        100% 100%, 62% 100%,
-        58% 92%, 50% 88%, 42% 92%, 38% 100%,
-        0 100%, 0 62%,
-        8% 58%, 12% 50%, 8% 42%, 0 38%
-      );
-    }
+.p2 {
+  clip-path: polygon(
+    0 0, 100% 0,
+    100% 38%,
+    92% 43%, 88% 50%, 92% 57%, 100% 62%,
+    100% 100%, 62% 100%,
+    57% 92%, 50% 88%, 43% 92%, 38% 100%,
+    0 100%
+  );
+}
 
-    .p6 {
-      clip-path: polygon(
-        0 0, 38% 0,
-        42% 8%, 50% 12%, 58% 8%, 62% 0,
-        100% 0, 100% 100%, 62% 100%,
-        58% 92%, 50% 88%, 42% 92%, 38% 100%,
-        0 100%
-      );
-    }
+.p3 {
+  clip-path: polygon(
+    0 0, 38% 0,
+    43% 8%, 50% 12%, 57% 8%, 62% 0,
+    100% 0, 100% 100%,
+    62% 100%, 57% 92%, 50% 88%, 43% 92%, 38% 100%,
+    0 100%, 0 62%,
+    8% 57%, 12% 50%, 8% 43%, 0 38%
+  );
+}
 
-    .p7 {
-      clip-path: polygon(
-        0 0, 38% 0,
-        42% 8%, 50% 12%, 58% 8%, 62% 0,
-        100% 0, 100% 100%,
-        62% 100%, 58% 92%, 50% 88%, 42% 92%, 38% 100%,
-        0 100%
-      );
-    }
+.p4 {
+  clip-path: polygon(
+    0 0, 38% 0,
+    43% 8%, 50% 12%, 57% 8%, 62% 0,
+    100% 0, 100% 38%,
+    92% 43%, 88% 50%, 92% 57%, 100% 62%,
+    100% 100%, 62% 100%,
+    57% 92%, 50% 88%, 43% 92%, 38% 100%,
+    0 100%, 0 62%,
+    8% 57%, 12% 50%, 8% 43%, 0 38%
+  );
+}
 
-    .p8 {
-      clip-path: polygon(
-        0 0, 100% 0, 100% 100%,
-        62% 100%, 58% 92%, 50% 88%, 42% 92%, 38% 100%,
-        0 100%, 0 62%,
-        8% 58%, 12% 50%, 8% 42%, 0 38%
-      );
-    }
+.p5 {
+  clip-path: polygon(
+    0 0, 100% 0,
+    100% 38%,
+    92% 43%, 88% 50%, 92% 57%, 100% 62%,
+    100% 100%, 62% 100%,
+    57% 92%, 50% 88%, 43% 92%, 38% 100%,
+    0 100%, 0 62%,
+    8% 57%, 12% 50%, 8% 43%, 0 38%
+  );
+}
 
-    /* CONTROLES */
+.p6 {
+  clip-path: polygon(
+    0 0, 38% 0,
+    43% 8%, 50% 12%, 57% 8%, 62% 0,
+    100% 0, 100% 100%,
+    62% 100%, 57% 92%, 50% 88%, 43% 92%, 38% 100%,
+    0 100%
+  );
+}
 
-    .controls {
-      display: flex;
-      justify-content: center;
-      margin-top: 18px;
-    }
+.p7 {
+  clip-path: polygon(
+    0 0, 38% 0,
+    43% 8%, 50% 12%, 57% 8%, 62% 0,
+    100% 0, 100% 100%,
+    62% 100%, 57% 92%, 50% 88%, 43% 92%, 38% 100%,
+    0 100%
+  );
+}
 
-    button {
-      border: 0;
-      font: inherit;
-    }
+.p8 {
+  clip-path: polygon(
+    0 0, 100% 0,
+    100% 100%,
+    62% 100%, 57% 92%, 50% 88%, 43% 92%, 38% 100%,
+    0 100%, 0 62%,
+    8% 57%, 12% 50%, 8% 43%, 0 38%
+  );
+}
 
-    #restart {
-      min-width: 190px;
-      padding: 12px 22px;
-      border-radius: 999px;
-      color: #0a0a0a;
-      background: linear-gradient(
-        135deg,
-        #fff1b5,
-        #f5c451 45%,
-        #a56b00
-      );
-      font-weight: 900;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      box-shadow:
-        0 0 18px rgba(245,196,81,.25),
-        inset 0 1px rgba(255,255,255,.7);
-      cursor: pointer;
-    }
+/* BOTÓN */
 
-    #restart:active {
-      transform: scale(.96);
-    }
+#restart {
+  margin-top: 18px;
+  padding: 13px 28px;
 
-    /* VICTORIA */
+  border: none;
+  border-radius: 50px;
 
-    #victory {
-      position: fixed;
-      inset: 0;
-      z-index: 5000;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-      background: rgba(0,0,0,.82);
-      backdrop-filter: blur(8px);
-    }
+  color: #090909;
+  background: linear-gradient(
+    135deg,
+    #fff1b5,
+    #f5c451,
+    #a56b00
+  );
 
-    #victory.show {
-      display: flex;
-    }
+  font-size: 14px;
+  font-weight: 900;
+  letter-spacing: 1px;
+  text-transform: uppercase;
 
-    .victory-card {
-      width: min(92vw, 380px);
-      padding: 30px 22px 25px;
-      text-align: center;
-      border-radius: 24px;
-      border: 1px solid rgba(245,196,81,.55);
-      background:
-        radial-gradient(circle at 50% 0%, rgba(245,196,81,.16), transparent 50%),
-        #101010;
-      box-shadow:
-        0 0 20px rgba(245,196,81,.18),
-        0 0 80px rgba(245,196,81,.12),
-        inset 0 0 30px rgba(0,0,0,.8);
-      animation: victoryIn .45s cubic-bezier(.2,.9,.3,1.3);
-    }
+  cursor: pointer;
 
-    @keyframes victoryIn {
-      from {
-        opacity: 0;
-        transform: scale(.7) translateY(30px);
-      }
-      to {
-        opacity: 1;
-        transform: scale(1) translateY(0);
-      }
-    }
+  box-shadow:
+    0 0 20px rgba(245,196,81,.25),
+    inset 0 1px rgba(255,255,255,.7);
+}
 
-    .victory-crown {
-      font-size: 52px;
-      filter: drop-shadow(0 0 15px rgba(245,196,81,.8));
-    }
+#restart:active {
+  transform: scale(.95);
+}
 
-    .victory-card h2 {
-      margin: 5px 0;
-      font-size: 32px;
-      color: var(--gold);
-      text-transform: uppercase;
-    }
+/* VICTORIA */
 
-    .victory-card p {
-      color: #aaa;
-      margin: 10px 0 5px;
-    }
+#victory {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
 
-    #code {
-      display: inline-block;
-      margin: 5px 0 22px;
-      font-size: 36px;
-      font-weight: 900;
-      letter-spacing: 4px;
-      color: #fff3bf;
-      text-shadow: 0 0 15px rgba(245,196,81,.65);
-    }
+  display: none;
+  align-items: center;
+  justify-content: center;
 
-    #cash {
-      display: block;
-      width: 100%;
-      padding: 15px;
-      border-radius: 12px;
-      background: linear-gradient(135deg, #ffe99b, #f5c451, #a56b00);
-      color: #080808;
-      font-weight: 1000;
-      font-size: 18px;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      box-shadow: 0 0 25px rgba(245,196,81,.3);
-      cursor: pointer;
-    }
+  padding: 20px;
 
-    #cash:active {
-      transform: scale(.97);
-    }
+  background: rgba(0,0,0,.84);
+  backdrop-filter: blur(8px);
+}
 
-    .small-note {
-      margin-top: 13px !important;
-      font-size: 10px;
-      color: #666 !important;
-    }
+#victory.show {
+  display: flex;
+}
 
-    @media (min-width: 500px) {
-      :root {
-        --piece-size: 105px;
-      }
+.victory-card {
+  width: min(92vw, 380px);
+  padding: 30px 22px 25px;
 
-      #arena {
-        height: 270px;
-      }
-    }
-  </style>
+  border: 1px solid rgba(245,196,81,.6);
+  border-radius: 24px;
+
+  background:
+    radial-gradient(
+      circle at 50% 0%,
+      rgba(245,196,81,.18),
+      transparent 55%
+    ),
+    #101010;
+
+  box-shadow:
+    0 0 25px rgba(245,196,81,.2),
+    0 0 80px rgba(245,196,81,.12);
+
+  animation: aparecer .4s ease-out;
+}
+
+@keyframes aparecer {
+  from {
+    opacity: 0;
+    transform: scale(.7);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.victory-crown {
+  font-size: 50px;
+  color: #f5c451;
+  text-shadow: 0 0 20px #f5c451;
+}
+
+.victory-card h2 {
+  margin: 5px 0;
+  color: #f5c451;
+  font-size: 32px;
+}
+
+.victory-card p {
+  color: #aaa;
+}
+
+#code {
+  display: block;
+
+  margin: 15px 0 22px;
+
+  color: #fff2bb;
+  font-size: 38px;
+  font-weight: 900;
+  letter-spacing: 5px;
+
+  text-shadow:
+    0 0 10px rgba(245,196,81,.8),
+    0 0 25px rgba(245,196,81,.4);
+}
+
+#cash {
+  width: 100%;
+  padding: 15px;
+
+  border: none;
+  border-radius: 12px;
+
+  color: #080808;
+  background: linear-gradient(
+    135deg,
+    #fff0ac,
+    #f5c451,
+    #a56b00
+  );
+
+  font-size: 18px;
+  font-weight: 900;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+
+  cursor: pointer;
+
+  box-shadow:
+    0 0 25px rgba(245,196,81,.3);
+}
+
+#cash:active {
+  transform: scale(.97);
+}
+
+.small-note {
+  font-size: 10px !important;
+  color: #666 !important;
+}
+</style>
 </head>
 
 <body>
 
-  <main id="app">
+<main id="app">
 
-    <header>
-      <div class="crown">♛</div>
-      <h1>Rompecabezas El Rey</h1>
-      <div class="subtitle">Desafío VIP</div>
-    </header>
+  <header>
+    <div class="crown">♛</div>
+    <h1>Rompecabezas<br>El Rey</h1>
+    <div class="subtitle">Desafío VIP</div>
+  </header>
 
-    <section id="board" aria-label="Tablero del rompecabezas">
-      <div class="slot" data-slot="0"></div>
-      <div class="slot" data-slot="1"></div>
-      <div class="slot" data-slot="2"></div>
-      <div class="slot" data-slot="3"></div>
-      <div class="slot" data-slot="4"></div>
-      <div class="slot" data-slot="5"></div>
-      <div class="slot" data-slot="6"></div>
-      <div class="slot" data-slot="7"></div>
-      <div class="slot" data-slot="8"></div>
-    </section>
+  <section id="board">
 
-    <div class="arena-title">Arrastra las piezas al tablero</div>
+    <div class="slot" data-slot="0"></div>
+    <div class="slot" data-slot="1"></div>
+    <div class="slot" data-slot="2"></div>
 
-    <section id="arena" aria-label="Área de piezas"></section>
+    <div class="slot" data-slot="3"></div>
+    <div class="slot" data-slot="4"></div>
+    <div class="slot" data-slot="5"></div>
 
-    <div class="controls">
-      <button id="restart" type="button">↻ Reiniciar</button>
-    </div>
+    <div class="slot" data-slot="6"></div>
+    <div class="slot" data-slot="7"></div>
+    <div class="slot" data-slot="8"></div>
 
-  </main>
+  </section>
 
-  <div id="victory">
-    <div class="victory-card">
-      <div class="victory-crown">♛</div>
-      <h2>¡Ganaste!</h2>
-      <p>Completaste el rompecabezas</p>
-
-      <div id="code">0001</div>
-
-      <button id="cash" type="button">Cobrar</button>
-
-      <p class="small-note">
-        Presentá este código al solicitar tu premio.
-      </p>
-    </div>
+  <div class="arena-title">
+    Arrastra las piezas al tablero
   </div>
 
-  <script src="app.js"></script>
+  <section id="arena"></section>
+
+  <button id="restart">
+    ↻ Reiniciar
+  </button>
+
+</main>
+
+<div id="victory">
+
+  <div class="victory-card">
+
+    <div class="victory-crown">♛</div>
+
+    <h2>¡GANASTE!</h2>
+
+    <p>Completaste el rompecabezas</p>
+
+    <span id="code">0001</span>
+
+    <button id="cash">
+      Cobrar
+    </button>
+
+    <p class="small-note">
+      Presentá este código al solicitar tu premio.
+    </p>
+
+  </div>
+
+</div>
+
+<!-- =====================================================
+     IMPORTANTE:
+     EL BLOQUE 2 VA EXACTAMENTE AQUÍ,
+     ANTES DE </body>.
+     NO LO PEGUES FUERA DE <script>.
+     ===================================================== -->
+
+<script>
+
+<!-- PEGAR AQUÍ EL BLOQUE 2 -->
+
+</script>
 
 </body>
 </html>
+"use strict";
+
 /* =========================================================
-   ROMPECABEZAS EL REY
-   JavaScript Vanilla
+   IMÁGENES
    ========================================================= */
 
-/*
-  IMPORTANTE:
-  Colocá estas tres imágenes en la misma carpeta que este HTML.
-*/
-const imagenes = [
+const IMAGES = [
   "imagen1.jpeg",
   "imagen2.jpeg",
   "imagen3.jpeg"
 ];
 
+
+/* =========================================================
+   CONFIGURACIÓN DEL CONTADOR
+   ========================================================= */
+
 /*
-  Contador global.
+  Contador REST público.
 
-  Esta implementación usa CountAPI como almacenamiento REST
-  público para un sitio estático, sin base de datos propia.
-
-  Si el servicio deja de estar disponible, el juego sigue
-  funcionando y utiliza un identificador local como respaldo.
+  No requiere una base de datos propia ni una API Key.
 */
 const COUNTER_NAMESPACE = "rompecabezas-el-rey-2026";
 const COUNTER_KEY = "rompecabezas_rey_counter_2026";
 
-const board = document.getElementById("board");
+const COUNTER_URL =
+  "https://api.counterapi.com/v1/" +
+  encodeURIComponent(COUNTER_NAMESPACE) +
+  "/victoria/" +
+  encodeURIComponent(COUNTER_KEY);
+
+
+/* =========================================================
+   WHATSAPP
+   ========================================================= */
+
+const WHATSAPP_NUMBER = "541124050658";
+
+
+/* =========================================================
+   ELEMENTOS
+   ========================================================= */
+
 const arena = document.getElementById("arena");
-const restartButton = document.getElementById("restart");
+const board = document.getElementById("board");
+const restartBtn = document.getElementById("restart");
+
 const victory = document.getElementById("victory");
 const codeElement = document.getElementById("code");
-const cashButton = document.getElementById("cash");
+const cashBtn = document.getElementById("cash");
 
-const slots = [...document.querySelectorAll(".slot")];
+const slots = [
+  ...document.querySelectorAll(".slot")
+];
 
-let piezas = [];
-let imagenActual = "";
-let partidaGanada = false;
 
-let piezaArrastrada = null;
+/* =========================================================
+   ESTADO
+   ========================================================= */
 
-const estado = {
-  x: 0,
-  y: 0,
-  offsetX: 0,
-  offsetY: 0,
-  origen: null,
-  pointerId: null
-};
+let pieces = [];
+let currentImage = "";
+let gameWon = false;
+
+let draggedPiece = null;
+
+let dragOffsetX = 0;
+let dragOffsetY = 0;
+
+let lastX = 0;
+let lastY = 0;
 
 
 /* =========================================================
    UTILIDADES
    ========================================================= */
 
-function aleatorio(min, max) {
+function randomInt(min, max) {
+  return Math.floor(
+    Math.random() * (max - min + 1)
+  ) + min;
+}
+
+
+function randomFloat(min, max) {
   return Math.random() * (max - min) + min;
 }
 
-function enteroAleatorio(min, max) {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
 
-function mezclar(array) {
-  const copia = [...array];
+function shuffle(array) {
 
-  for (let i = copia.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
+  const result = [...array];
 
-    [copia[i], copia[j]] = [copia[j], copia[i]];
+  for (
+    let i = result.length - 1;
+    i > 0;
+    i--
+  ) {
+
+    const j = Math.floor(
+      Math.random() * (i + 1)
+    );
+
+    [
+      result[i],
+      result[j]
+    ] = [
+      result[j],
+      result[i]
+    ];
   }
 
-  return copia;
+  return result;
 }
 
-function numeroConCeros(numero) {
-  return String(numero).padStart(4, "0");
+
+function formatCode(number) {
+
+  return String(number)
+    .padStart(4, "0");
 }
 
 
 /* =========================================================
-   CREACIÓN DE PIEZAS
+   ELEGIR IMAGEN
    ========================================================= */
 
-function crearPiezas() {
-  piezas = [];
+function chooseImage() {
 
-  for (let i = 0; i < 9; i++) {
+  let image;
 
-    const pieza = document.createElement("div");
+  do {
 
-    pieza.className = `piece p${i}`;
-    pieza.dataset.index = String(i);
-    pieza.dataset.position = "arena";
+    image =
+      IMAGES[
+        randomInt(0, IMAGES.length - 1)
+      ];
 
-    pieza.style.backgroundImage = `url("${imagenActual}")`;
+  } while (
+    IMAGES.length > 1 &&
+    image === currentImage
+  );
+
+  currentImage = image;
+
+  return image;
+}
+
+
+/* =========================================================
+   CREAR LAS 9 PIEZAS
+   ========================================================= */
+
+function createPieces() {
+
+  pieces = [];
+
+  document
+    .querySelectorAll(".piece")
+    .forEach(piece => piece.remove());
+
+  for (let index = 0; index < 9; index++) {
+
+    const piece =
+      document.createElement("div");
+
+    piece.className =
+      `piece p${index}`;
+
+    piece.dataset.index =
+      String(index);
+
+    piece.dataset.position =
+      "arena";
+
+    piece.dataset.slot =
+      "";
+
+    piece.draggable = false;
 
     /*
-      background-position:
-      0% / 50% / 100% horizontal
-      0% / 50% / 100% vertical
+      Cada pieza utiliza la misma imagen,
+      pero cambia su background-position.
     */
-    const columna = i % 3;
-    const fila = Math.floor(i / 3);
 
-    const posiciones = ["0%", "50%", "100%"];
+    piece.style.backgroundImage =
+      `url("${currentImage}")`;
 
-    pieza.style.backgroundPosition =
-      `${posiciones[columna]} ${posiciones[fila]}`;
+    const column = index % 3;
+    const row = Math.floor(index / 3);
+
+    const positionValues = [
+      "0%",
+      "50%",
+      "100%"
+    ];
+
+    piece.style.backgroundPosition =
+      `${positionValues[column]} ` +
+      `${positionValues[row]}`;
 
     /*
-      Evita que el navegador intente seleccionar o arrastrar
-      la imagen como si fuese una imagen normal.
+      Eventos táctiles nativos.
     */
-    pieza.draggable = false;
 
-    agregarEventosTouch(pieza);
+    piece.addEventListener(
+      "touchstart",
+      handleTouchStart,
+      { passive: false }
+    );
 
-    arena.appendChild(pieza);
+    piece.addEventListener(
+      "touchmove",
+      handleTouchMove,
+      { passive: false }
+    );
 
-    piezas.push(pieza);
+    piece.addEventListener(
+      "touchend",
+      handleTouchEnd,
+      { passive: false }
+    );
+
+    /*
+      Eventos de mouse para probarlo
+      también desde PC.
+    */
+
+    piece.addEventListener(
+      "mousedown",
+      handleMouseDown
+    );
+
+    arena.appendChild(piece);
+
+    pieces.push(piece);
   }
 }
 
 
 /* =========================================================
-   DISPERSIÓN INICIAL
+   DISPERSAR PIEZAS
    ========================================================= */
 
-function dispersarPiezas() {
+function scatterPieces() {
 
-  const arenaRect = arena.getBoundingClientRect();
+  const arenaRect =
+    arena.getBoundingClientRect();
 
-  /*
-    Calculamos el tamaño real de la pieza después de que
-    el navegador haya aplicado --piece-size.
-  */
-  const piezaSize =
-    piezas[0]?.getBoundingClientRect().width || 90;
-
-  const margen = 4;
+  const pieceSize = 95;
 
   const maxX = Math.max(
-    margen,
-    arenaRect.width - piezaSize - margen
+    2,
+    arenaRect.width - pieceSize - 2
   );
 
   const maxY = Math.max(
-    margen,
-    arenaRect.height - piezaSize - margen
+    2,
+    arenaRect.height - pieceSize - 2
   );
 
-  /*
-    Mezclamos el orden visual para que cada partida
-    tenga una distribución diferente.
-  */
-  const orden = mezclar(piezas);
+  const shuffled =
+    shuffle(pieces);
 
-  orden.forEach((pieza, posicion) => {
+  shuffled.forEach((piece, index) => {
 
-    pieza.dataset.position = "arena";
-    pieza.dataset.slot = "";
+    piece.dataset.position = "arena";
+    piece.dataset.slot = "";
 
-    pieza.classList.remove("locked");
+    piece.classList.remove("locked");
 
-    arena.appendChild(pieza);
+    arena.appendChild(piece);
 
     /*
-      Intentamos mantener una separación razonable
-      entre las piezas, pero sin impedir el desorden.
+      Distribución en 3 x 3 con variación aleatoria.
+      Esto evita que las piezas aparezcan todas juntas.
     */
-    let x;
-    let y;
 
-    if (posicion < 9) {
-      const columna = posicion % 3;
-      const fila = Math.floor(posicion / 3);
+    const column = index % 3;
+    const row = Math.floor(index / 3);
 
-      const celdaX = maxX / 2;
-      const celdaY = maxY / 2;
+    let x =
+      column * (maxX / 2) +
+      randomFloat(-22, 22);
 
-      x =
-        columna * celdaX +
-        aleatorio(-20, 20);
+    let y =
+      row * (maxY / 2) +
+      randomFloat(-20, 20);
 
-      y =
-        fila * celdaY +
-        aleatorio(-15, 15);
-    }
-
-    x = Math.max(margen, Math.min(x, maxX));
-    y = Math.max(margen, Math.min(y, maxY));
-
-    const rotacion = aleatorio(-16, 16);
-
-    pieza.style.left = `${x}px`;
-    pieza.style.top = `${y}px`;
-    pieza.style.transform = `rotate(${rotacion}deg)`;
-
-    /*
-      z-index aleatorio para dar sensación de piezas
-      físicamente apiladas.
-    */
-    pieza.style.zIndex = String(
-      10 + enteroAleatorio(0, 20)
+    x = Math.max(
+      2,
+      Math.min(x, maxX)
     );
+
+    y = Math.max(
+      2,
+      Math.min(y, maxY)
+    );
+
+    piece.style.position =
+      "absolute";
+
+    piece.style.width =
+      "95px";
+
+    piece.style.height =
+      "95px";
+
+    piece.style.left =
+      `${x}px`;
+
+    piece.style.top =
+      `${y}px`;
+
+    piece.style.transform =
+      `rotate(${randomFloat(-15, 15)}deg)`;
+
+    piece.style.zIndex =
+      String(
+        10 + randomInt(0, 20)
+      );
   });
 }
 
 
 /* =========================================================
-   EVENTOS TÁCTILES
+   TOUCH START
    ========================================================= */
 
-function agregarEventosTouch(pieza) {
-
-  pieza.addEventListener(
-    "touchstart",
-    iniciarArrastre,
-    { passive: false }
-  );
-
-  pieza.addEventListener(
-    "touchmove",
-    moverPieza,
-    { passive: false }
-  );
-
-  pieza.addEventListener(
-    "touchend",
-    terminarArrastre,
-    { passive: false }
-  );
-
-  /*
-    También agregamos Pointer Events como complemento.
-    En navegadores modernos esto permite mejor compatibilidad
-    con mouse y dispositivos híbridos.
-  */
-  pieza.addEventListener(
-    "pointerdown",
-    iniciarPointer
-  );
-}
-
-
-function obtenerTouch(event) {
-
-  if (!event.touches || !event.touches.length) {
-    return null;
-  }
-
-  return event.touches[0];
-}
-
-
-/* =========================================================
-   TOUCHSTART
-   ========================================================= */
-
-function iniciarArrastre(event) {
+function handleTouchStart(event) {
 
   event.preventDefault();
 
-  if (partidaGanada) return;
+  if (gameWon) return;
 
-  const touch = obtenerTouch(event);
+  const touch =
+    event.touches[0];
 
   if (!touch) return;
 
-  comenzarArrastre(
+  startDrag(
     event.currentTarget,
     touch.clientX,
     touch.clientY
@@ -772,178 +856,83 @@ function iniciarArrastre(event) {
 
 
 /* =========================================================
-   POINTERDOWN
+   TOUCH MOVE
    ========================================================= */
 
-function iniciarPointer(event) {
-
-  /*
-    Los eventos touch disparan también pointer events en
-    determinados navegadores. Para evitar doble manejo,
-    usamos Pointer Events principalmente para mouse.
-  */
-  if (event.pointerType === "touch") return;
-
-  if (partidaGanada) return;
+function handleTouchMove(event) {
 
   event.preventDefault();
 
-  comenzarArrastre(
+  if (!draggedPiece) return;
+
+  const touch =
+    event.touches[0];
+
+  if (!touch) return;
+
+  movePiece(
+    touch.clientX,
+    touch.clientY
+  );
+}
+
+
+/* =========================================================
+   TOUCH END
+   ========================================================= */
+
+function handleTouchEnd(event) {
+
+  event.preventDefault();
+
+  if (!draggedPiece) return;
+
+  const touch =
+    event.changedTouches[0];
+
+  const x =
+    touch
+      ? touch.clientX
+      : lastX;
+
+  const y =
+    touch
+      ? touch.clientY
+      : lastY;
+
+  finishDrag(x, y);
+}
+
+
+/* =========================================================
+   MOUSE DOWN
+   ========================================================= */
+
+function handleMouseDown(event) {
+
+  if (gameWon) return;
+
+  event.preventDefault();
+
+  startDrag(
     event.currentTarget,
     event.clientX,
     event.clientY
   );
-
-  event.currentTarget.setPointerCapture?.(event.pointerId);
 }
 
 
 /* =========================================================
-   COMIENZO DEL ARRASTRE
-   ========================================================= */
-
-function comenzarArrastre(pieza, clientX, clientY) {
-
-  piezaArrastrada = pieza;
-
-  const rect = pieza.getBoundingClientRect();
-
-  estado.offsetX = clientX - rect.left;
-  estado.offsetY = clientY - rect.top;
-
-  estado.x = clientX;
-  estado.y = clientY;
-
-  /*
-    Guardamos el contenedor actual.
-
-    Puede ser arena O una casilla incorrecta.
-    Esto permite volver a sacar una pieza que haya quedado
-    colocada incorrectamente.
-  */
-  estado.origen = pieza.parentElement;
-
-  pieza.classList.add("dragging");
-
-  pieza.style.zIndex = "2000";
-
-  /*
-    Mientras se arrastra, la pieza pasa temporalmente
-    a ser hija del body. Esto permite moverla libremente
-    por toda la pantalla sin quedar limitada por el tablero
-    o la arena.
-  */
-  document.body.appendChild(pieza);
-
-  pieza.style.position = "fixed";
-  pieza.style.left = `${clientX - estado.offsetX}px`;
-  pieza.style.top = `${clientY - estado.offsetY}px`;
-  pieza.style.transform = "rotate(0deg)";
-}
-
-
-/* =========================================================
-   TOUCHMOVE
-   ========================================================= */
-
-function moverPieza(event) {
-
-  event.preventDefault();
-
-  if (!piezaArrastrada) return;
-
-  const touch = obtenerTouch(event);
-
-  if (!touch) return;
-
-  moverElemento(
-    touch.clientX,
-    touch.clientY
-  );
-}
-
-
-/* =========================================================
-   POINTERMOVE
+   MOUSE MOVE
    ========================================================= */
 
 document.addEventListener(
-  "pointermove",
+  "mousemove",
   event => {
 
-    if (
-      !piezaArrastrada ||
-      event.pointerType === "touch"
-    ) {
-      return;
-    }
+    if (!draggedPiece) return;
 
-    event.preventDefault();
-
-    moverElemento(
-      event.clientX,
-      event.clientY
-    );
-  },
-  { passive: false }
-);
-
-
-function moverElemento(clientX, clientY) {
-
-  if (!piezaArrastrada) return;
-
-  estado.x = clientX;
-  estado.y = clientY;
-
-  piezaArrastrada.style.left =
-    `${clientX - estado.offsetX}px`;
-
-  piezaArrastrada.style.top =
-    `${clientY - estado.offsetY}px`;
-}
-
-
-/* =========================================================
-   TOUCHEND
-   ========================================================= */
-
-function terminarArrastre(event) {
-
-  event.preventDefault();
-
-  if (!piezaArrastrada) return;
-
-  const touch = event.changedTouches?.[0];
-
-  const x = touch
-    ? touch.clientX
-    : estado.x;
-
-  const y = touch
-    ? touch.clientY
-    : estado.y;
-
-  finalizarArrastre(x, y);
-}
-
-
-/* =========================================================
-   POINTERUP
-   ========================================================= */
-
-document.addEventListener(
-  "pointerup",
-  event => {
-
-    if (
-      !piezaArrastrada ||
-      event.pointerType === "touch"
-    ) {
-      return;
-    }
-
-    finalizarArrastre(
+    movePiece(
       event.clientX,
       event.clientY
     );
@@ -952,169 +941,320 @@ document.addEventListener(
 
 
 /* =========================================================
-   FINALIZACIÓN DEL ARRASTRE
+   MOUSE UP
    ========================================================= */
 
-function finalizarArrastre(clientX, clientY) {
+document.addEventListener(
+  "mouseup",
+  event => {
 
-  if (!piezaArrastrada) return;
+    if (!draggedPiece) return;
 
-  const pieza = piezaArrastrada;
+    finishDrag(
+      event.clientX,
+      event.clientY
+    );
+  }
+);
 
-  pieza.classList.remove("dragging");
 
-  const slot = obtenerSlotDebajo(
-    clientX,
-    clientY
-  );
+/* =========================================================
+   INICIAR ARRASTRE
+   ========================================================= */
+
+function startDrag(
+  piece,
+  clientX,
+  clientY
+) {
+
+  draggedPiece = piece;
+
+  const rect =
+    piece.getBoundingClientRect();
+
+  dragOffsetX =
+    clientX - rect.left;
+
+  dragOffsetY =
+    clientY - rect.top;
+
+  lastX = clientX;
+  lastY = clientY;
 
   /*
-    Si soltó encima de una casilla:
-    - CORRECTA: queda allí.
-    - INCORRECTA: también queda allí.
+    MUY IMPORTANTE:
 
-    Esto cumple la regla de permitir errores.
+    Una pieza puede estar:
+    - abajo en la arena
+    - en una posición correcta
+    - en una posición INCORRECTA
+
+    En cualquiera de esos casos puede
+    volver a ser arrastrada.
   */
+
+  document.body.appendChild(piece);
+
+  piece.style.position =
+    "fixed";
+
+  piece.style.width =
+    "95px";
+
+  piece.style.height =
+    "95px";
+
+  piece.style.left =
+    `${clientX - dragOffsetX}px`;
+
+  piece.style.top =
+    `${clientY - dragOffsetY}px`;
+
+  piece.style.transform =
+    "rotate(0deg)";
+
+  piece.style.zIndex =
+    "9999";
+
+  piece.classList.add("dragging");
+}
+
+
+/* =========================================================
+   MOVER PIEZA
+   ========================================================= */
+
+function movePiece(
+  clientX,
+  clientY
+) {
+
+  if (!draggedPiece) return;
+
+  lastX = clientX;
+  lastY = clientY;
+
+  draggedPiece.style.left =
+    `${clientX - dragOffsetX}px`;
+
+  draggedPiece.style.top =
+    `${clientY - dragOffsetY}px`;
+}
+
+
+/* =========================================================
+   FINALIZAR ARRASTRE
+   ========================================================= */
+
+function finishDrag(
+  clientX,
+  clientY
+) {
+
+  const piece =
+    draggedPiece;
+
+  if (!piece) return;
+
+  piece.classList.remove(
+    "dragging"
+  );
+
+  const slot =
+    getSlotAtPoint(
+      clientX,
+      clientY
+    );
+
+  /*
+    Si cae sobre el tablero,
+    SIEMPRE queda en esa casilla.
+
+    No importa si es correcta o incorrecta.
+    Esto permite equivocarse.
+  */
+
   if (slot) {
 
-    colocarEnSlot(
-      pieza,
+    putPieceInSlot(
+      piece,
       slot
     );
 
   } else {
 
     /*
-      Si no cayó sobre ninguna casilla,
+      Si cae fuera del tablero,
       vuelve a la arena.
     */
-    regresarArena(
-      pieza,
+
+    returnPieceToArena(
+      piece,
       clientX,
       clientY
     );
   }
 
-  piezaArrastrada = null;
+  draggedPiece = null;
 
-  comprobarVictoria();
+  checkVictory();
 }
 
 
 /* =========================================================
-   DETECTAR CASILLA
+   OBTENER CASILLA
    ========================================================= */
 
-function obtenerSlotDebajo(x, y) {
+function getSlotAtPoint(x, y) {
 
-  /*
-    Ocultamos momentáneamente la pieza para que
-    elementFromPoint pueda detectar lo que hay debajo.
-  */
-  if (piezaArrastrada) {
-    piezaArrastrada.style.visibility = "hidden";
+  if (draggedPiece) {
+    draggedPiece.style.visibility =
+      "hidden";
   }
 
-  const elemento = document.elementFromPoint(x, y);
+  const element =
+    document.elementFromPoint(
+      x,
+      y
+    );
 
-  if (piezaArrastrada) {
-    piezaArrastrada.style.visibility = "visible";
+  if (draggedPiece) {
+    draggedPiece.style.visibility =
+      "visible";
   }
 
-  if (!elemento) return null;
+  if (!element) {
+    return null;
+  }
 
-  return elemento.closest(".slot");
+  return element.closest(".slot");
 }
 
 
 /* =========================================================
-   COLOCAR EN TABLERO
+   COLOCAR EN CASILLA
    ========================================================= */
 
-function colocarEnSlot(pieza, slot) {
+function putPieceInSlot(
+  piece,
+  slot
+) {
 
-  slot.appendChild(pieza);
+  slot.appendChild(piece);
 
-  pieza.dataset.position = "board";
-  pieza.dataset.slot = slot.dataset.slot;
+  piece.dataset.position =
+    "board";
 
-  pieza.style.position = "absolute";
-  pieza.style.left = "50%";
-  pieza.style.top = "50%";
+  piece.dataset.slot =
+    slot.dataset.slot;
+
+  piece.style.position =
+    "absolute";
 
   /*
-    El tamaño se adapta al tamaño de la casilla.
-    Esto mantiene el rompecabezas visualmente compacto.
+    Se adapta al tamaño real de la casilla.
   */
-  pieza.style.width = "calc(100% + 4px)";
-  pieza.style.height = "calc(100% + 4px)";
 
-  pieza.style.transform =
+  piece.style.width =
+    "calc(100% + 4px)";
+
+  piece.style.height =
+    "calc(100% + 4px)";
+
+  piece.style.left =
+    "50%";
+
+  piece.style.top =
+    "50%";
+
+  piece.style.transform =
     "translate(-50%, -50%) rotate(0deg)";
 
-  pieza.style.zIndex = "50";
+  piece.style.zIndex =
+    "50";
 
-  pieza.classList.add("locked");
+  piece.classList.add(
+    "locked"
+  );
 }
 
 
 /* =========================================================
-   DEVOLVER A ARENA
+   DEVOLVER A LA ARENA
    ========================================================= */
 
-function regresarArena(pieza, x, y) {
+function returnPieceToArena(
+  piece,
+  clientX,
+  clientY
+) {
 
-  arena.appendChild(pieza);
+  arena.appendChild(piece);
 
   const arenaRect =
     arena.getBoundingClientRect();
 
-  const piezaSize =
-    pieza.getBoundingClientRect().width || 90;
+  const size = 95;
 
-  let left =
-    x - arenaRect.left - piezaSize / 2;
+  let x =
+    clientX -
+    arenaRect.left -
+    size / 2;
 
-  let top =
-    y - arenaRect.top - piezaSize / 2;
+  let y =
+    clientY -
+    arenaRect.top -
+    size / 2;
 
-  /*
-    Limitamos las coordenadas a la arena para que
-    la pieza siga siendo accesible.
-  */
-  left = Math.max(
+  x = Math.max(
     2,
     Math.min(
-      left,
-      arenaRect.width - piezaSize - 2
+      x,
+      arenaRect.width - size - 2
     )
   );
 
-  top = Math.max(
+  y = Math.max(
     2,
     Math.min(
-      top,
-      arenaRect.height - piezaSize - 2
+      y,
+      arenaRect.height - size - 2
     )
   );
 
-  pieza.dataset.position = "arena";
-  pieza.dataset.slot = "";
+  piece.dataset.position =
+    "arena";
 
-  pieza.style.position = "absolute";
-  pieza.style.width = "var(--piece-size)";
-  pieza.style.height = "var(--piece-size)";
+  piece.dataset.slot =
+    "";
 
-  pieza.style.left = `${left}px`;
-  pieza.style.top = `${top}px`;
+  piece.style.position =
+    "absolute";
 
-  pieza.style.transform =
-    `rotate(${aleatorio(-12, 12)}deg)`;
+  piece.style.width =
+    "95px";
 
-  pieza.style.zIndex =
-    String(10 + enteroAleatorio(0, 20));
+  piece.style.height =
+    "95px";
 
-  pieza.classList.remove("locked");
+  piece.style.left =
+    `${x}px`;
+
+  piece.style.top =
+    `${y}px`;
+
+  piece.style.transform =
+    `rotate(${randomFloat(-15, 15)}deg)`;
+
+  piece.style.zIndex =
+    String(
+      10 + randomInt(0, 20)
+    );
+
+  piece.classList.remove(
+    "locked"
+  );
 }
 
 
@@ -1122,41 +1262,55 @@ function regresarArena(pieza, x, y) {
    COMPROBAR VICTORIA
    ========================================================= */
 
-function comprobarVictoria() {
+function checkVictory() {
 
-  if (partidaGanada) return;
+  if (gameWon) return;
 
-  const completo = piezas.every(pieza => {
+  const completed =
+    pieces.every(piece => {
 
-    if (pieza.dataset.position !== "board") {
-      return false;
-    }
+      if (
+        piece.dataset.position !==
+        "board"
+      ) {
+        return false;
+      }
 
-    const slot = pieza.parentElement;
+      const slot =
+        piece.parentElement;
 
-    if (!slot) return false;
+      if (!slot) {
+        return false;
+      }
 
-    return (
-      Number(pieza.dataset.index) ===
-      Number(slot.dataset.slot)
-    );
-  });
+      return (
+        Number(piece.dataset.index) ===
+        Number(slot.dataset.slot)
+      );
+    });
 
-  if (!completo) return;
+  if (!completed) {
+    return;
+  }
 
-  partidaGanada = true;
+  gameWon = true;
 
   /*
-    Pequeña pausa para que el usuario vea el último
-    movimiento antes de mostrar la victoria.
+    Esperamos un instante para que
+    se vea la última pieza.
   */
-  setTimeout(async () => {
 
-    const numero = await incrementarContadorGlobal();
+  setTimeout(
+    async () => {
 
-    mostrarVictoria(numero);
+      const counter =
+        await incrementGlobalCounter();
 
-  }, 300);
+      showVictory(counter);
+
+    },
+    350
+  );
 }
 
 
@@ -1164,70 +1318,74 @@ function comprobarVictoria() {
    CONTADOR GLOBAL
    ========================================================= */
 
-/*
-  CountAPI:
-  GET /hit/{namespace}/{key}
-
-  La llamada incrementa atómicamente el contador y devuelve
-  el valor actualizado.
-
-  Se intenta primero el contador global.
-  Si el servicio no responde, usamos un respaldo local.
-*/
-async function incrementarContadorGlobal() {
+async function incrementGlobalCounter() {
 
   try {
 
-    const url =
-      `https://api.countapi.xyz/hit/` +
-      `${encodeURIComponent(COUNTER_NAMESPACE)}/` +
-      `${encodeURIComponent(COUNTER_KEY)}`;
-
-    const response = await fetch(
-      url,
-      {
-        method: "GET",
-        cache: "no-store"
-      }
-    );
+    const response =
+      await fetch(
+        COUNTER_URL,
+        {
+          method: "GET",
+          cache: "no-store"
+        }
+      );
 
     if (!response.ok) {
-      throw new Error("Contador no disponible");
+      throw new Error(
+        "Error HTTP " +
+        response.status
+      );
     }
 
-    const data = await response.json();
-
-    if (
-      typeof data.value !== "number" ||
-      !Number.isFinite(data.value)
-    ) {
-      throw new Error("Respuesta inválida");
-    }
+    const data =
+      await response.json();
 
     /*
-      Guardamos una copia local como respaldo.
+      CounterAPI puede entregar el valor
+      en diferentes propiedades dependiendo
+      de la versión del endpoint.
     */
+
+    const value =
+      Number(
+        data?.data?.up_count ??
+        data?.data?.value ??
+        data?.value ??
+        data?.count
+      );
+
+    if (
+      !Number.isFinite(value) ||
+      value < 1
+    ) {
+      throw new Error(
+        "Respuesta inválida del contador"
+      );
+    }
+
     localStorage.setItem(
       "rey_counter_backup",
-      String(data.value)
+      String(value)
     );
 
-    return data.value;
+    return value;
 
   } catch (error) {
 
-    console.warn(
+    console.error(
       "No se pudo actualizar el contador global:",
       error
     );
 
     /*
-      Fallback local.
+      Respaldo local.
 
-      IMPORTANTE:
-      Este valor no es global. Solo evita que el juego
-      quede sin código si la API externa está caída.
+      El juego continúa funcionando aunque
+      el servicio externo esté temporalmente
+      fuera de servicio.
     */
+
     let local =
       Number(
         localStorage.getItem(
@@ -1235,7 +1393,7 @@ async function incrementarContadorGlobal() {
         )
       ) || 0;
 
-    local += 1;
+    local++;
 
     localStorage.setItem(
       "rey_counter_backup",
@@ -1251,44 +1409,44 @@ async function incrementarContadorGlobal() {
    MOSTRAR VICTORIA
    ========================================================= */
 
-function mostrarVictoria(numero) {
+function showVictory(number) {
 
-  const codigo = numeroConCeros(numero);
+  const code =
+    formatCode(number);
 
-  codeElement.textContent = codigo;
+  codeElement.textContent =
+    code;
 
-  /*
-    Guardamos exactamente el código que recibió esta partida.
-  */
-  victory.dataset.codigo = codigo;
+  victory.dataset.code =
+    code;
 
-  victory.classList.add("show");
+  victory.classList.add(
+    "show"
+  );
 }
 
 
 /* =========================================================
-   WHATSAPP
+   BOTÓN COBRAR
    ========================================================= */
 
-cashButton.addEventListener(
+cashBtn.addEventListener(
   "click",
   () => {
 
-    const codigo =
-      victory.dataset.codigo ||
+    const code =
+      victory.dataset.code ||
       codeElement.textContent;
 
-    const mensaje =
-      `felicitaciones por finalizar el rompecabezas. Mi código es: ${codigo}`;
+    const message =
+      `felicitaciones por finalizar el rompecabezas. Mi código es: ${code}`;
 
-    const url =
-      `https://wa.me/1124050658?text=` +
-      encodeURIComponent(mensaje);
+    const whatsappURL =
+      `https://wa.me/${WHATSAPP_NUMBER}` +
+      `?text=${encodeURIComponent(message)}`;
 
-    /*
-      Universal Link de WhatsApp.
-    */
-    window.location.href = url;
+    window.location.href =
+      whatsappURL;
   }
 );
 
@@ -1297,134 +1455,136 @@ cashButton.addEventListener(
    REINICIAR
    ========================================================= */
 
-restartButton.addEventListener(
+restartBtn.addEventListener(
   "click",
-  reiniciarJuego
+  restartGame
 );
 
-function reiniciarJuego() {
 
-  partidaGanada = false;
+function restartGame() {
 
-  victory.classList.remove("show");
+  gameWon = false;
 
-  piezas = [];
+  victory.classList.remove(
+    "show"
+  );
 
-  /*
-    Elegimos una imagen aleatoria.
-  */
-  imagenActual =
-    imagenes[
-      enteroAleatorio(
-        0,
-        imagenes.length - 1
-      )
-    ];
+  currentImage =
+    chooseImage();
+
+  createPieces();
 
   /*
-    Eliminamos las piezas antiguas.
+    Esperamos a que el navegador
+    calcule las dimensiones.
   */
-  document.querySelectorAll(".piece")
-    .forEach(pieza => pieza.remove());
 
-  /*
-    Volvemos a crear las nueve piezas.
-  */
-  crearPiezas();
-
-  /*
-    Esperamos un frame para que el navegador
-    conozca las dimensiones definitivas de la arena.
-  */
-  requestAnimationFrame(() => {
-    dispersarPiezas();
-  });
+  requestAnimationFrame(
+    () => {
+      scatterPieces();
+    }
+  );
 }
 
 
 /* =========================================================
-   INICIO
+   INICIAR JUEGO
    ========================================================= */
 
-function iniciarJuego() {
+function initGame() {
 
-  imagenActual =
-    imagenes[
-      enteroAleatorio(
-        0,
-        imagenes.length - 1
-      )
-    ];
+  currentImage =
+    chooseImage();
 
-  crearPiezas();
+  createPieces();
 
-  requestAnimationFrame(() => {
-    dispersarPiezas();
-  });
+  requestAnimationFrame(
+    () => {
+      scatterPieces();
+    }
+  );
 }
 
 
-/*
-  Si cambia la orientación del teléfono o el tamaño de
-  ventana, recolocamos únicamente las piezas que estén
-  todavía en la arena.
-*/
+/* =========================================================
+   AJUSTE AL CAMBIAR TAMAÑO
+   ========================================================= */
+
 window.addEventListener(
   "resize",
   () => {
 
-    if (!piezas.length) return;
+    if (!pieces.length) {
+      return;
+    }
 
-    requestAnimationFrame(() => {
+    requestAnimationFrame(
+      () => {
 
-      piezas.forEach(pieza => {
+        pieces.forEach(piece => {
 
-        if (
-          pieza.dataset.position !== "arena"
-        ) {
-          return;
-        }
+          /*
+            Las piezas que ya están en el tablero
+            no necesitan recolocarse.
+          */
 
-        const arenaRect =
-          arena.getBoundingClientRect();
+          if (
+            piece.dataset.position !==
+            "arena"
+          ) {
+            return;
+          }
 
-        const piezaRect =
-          pieza.getBoundingClientRect();
+          const arenaRect =
+            arena.getBoundingClientRect();
 
-        let x =
-          parseFloat(pieza.style.left) || 0;
+          const pieceRect =
+            piece.getBoundingClientRect();
 
-        let y =
-          parseFloat(pieza.style.top) || 0;
+          let x =
+            parseFloat(
+              piece.style.left
+            ) || 0;
 
-        x = Math.max(
-          2,
-          Math.min(
-            x,
-            arenaRect.width -
-              piezaRect.width -
+          let y =
+            parseFloat(
+              piece.style.top
+            ) || 0;
+
+          x = Math.max(
+            2,
+            Math.min(
+              x,
+              arenaRect.width -
+              pieceRect.width -
               2
-          )
-        );
+            )
+          );
 
-        y = Math.max(
-          2,
-          Math.min(
-            y,
-            arenaRect.height -
-              piezaRect.height -
+          y = Math.max(
+            2,
+            Math.min(
+              y,
+              arenaRect.height -
+              pieceRect.height -
               2
-          )
-        );
+            )
+          );
 
-        pieza.style.left = `${x}px`;
-        pieza.style.top = `${y}px`;
-      });
+          piece.style.left =
+            `${x}px`;
 
-    });
+          piece.style.top =
+            `${y}px`;
+        });
+      }
+    );
   }
 );
 
 
-/* Arrancar */
-iniciarJuego();
+/* =========================================================
+   ARRANCAR
+   ========================================================= */
+
+initGame();
