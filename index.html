@@ -113,7 +113,7 @@
             z-index: 100 !important;
         }
 
-        /* DISEÑO DE CORTE FIJO ESTÁNDAR: Moldes acoplables para evitar errores visuales */
+        /* MOLDES DE RECORTE COMPLEMENTARIOS FIJOS */
         .p0 { clip-path: polygon(10.7% 10.7%, 89.2% 10.7%, 89.2% 35.7%, 100% 35.7%, 100% 57.1%, 89.2% 57.1%, 89.2% 89.2%, 64.2% 89.2%, 64.2% 100%, 42.8% 100%, 42.8% 89.2%, 10.7% 89.2%); }
         .p1 { clip-path: polygon(10.7% 10.7%, 10.7% 35.7%, 0% 35.7%, 0% 57.1%, 10.7% 57.1%, 10.7% 89.2%, 42.8% 89.2%, 42.8% 78.5%, 64.2% 78.5%, 64.2% 89.2%, 89.2% 89.2%, 89.2% 57.1%, 100% 57.1%, 100% 35.7%, 89.2% 35.7%, 89.2% 10.7%); }
         .p2 { clip-path: polygon(10.7% 10.7%, 10.7% 35.7%, 0% 35.7%, 0% 57.1%, 10.7% 57.1%, 10.7% 89.2%, 64.2% 89.2%, 64.2% 100%, 42.8% 100%, 42.8% 89.2%, 89.2% 89.2%, 89.2% 10.7%); }
@@ -238,22 +238,22 @@
         let currentCode = "0001";
         let boardState = Array(9).fill(null);
 
-        // Registro de auditoría real en Firebase sin intermediarios
+        // Sistema síncrono nativo para Firebase Realtime Database
         async function updateAndGetCounter() {
             try {
-                // Envía un log histórico con clave única aleatoria a tu nodo abierto
+                // 1. Guardamos la victoria con una clave aleatoria única en tu panel
                 await fetch(`${FIREBASE_DB_URL}ganadores.json`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ tick: Date.now() })
+                    body: JSON.stringify({ registro: Date.now() })
                 });
 
-                // Descarga el árbol del nodo para contar cuántas claves existen
-                const getRes = await fetch(`${FIREBASE_DB_URL}ganadores.json?v=${Date.now()}`);
+                // 2. Leemos la base de datos completa para procesar el total consecutivo real
+                const getRes = await fetch(`${FIREBASE_DB_URL}ganadores.json?nocache=${Date.now()}`);
                 if (getRes.ok) {
                     const data = await getRes.json();
-                    const totalRegistros = Object.keys(data || {}).length;
-                    currentCode = String(totalRegistros).padStart(4, '0');
+                    const totalGanadores = Object.keys(data || {}).length;
+                    currentCode = String(totalGanadores).padStart(4, '0');
                 } else {
                     currentCode = "0001";
                 }
@@ -271,17 +271,17 @@
 
             currentImage = IMAGES[Math.floor(Math.random() * IMAGES.length)];
 
-            // Coordenadas fijas por píxeles para forzar cortes estricto 3x3 sin desfases de renderizado
+            // Mapeo milimétrico fijo para rebanar la grilla 3x3 sin distorsiones
             const posicionesFijas = [
-                { x: 15, y: 15 },    // Fila 1, Celda 1
-                { x: -95, y: 15 },   // Fila 1, Celda 2
-                { x: -205, y: 15 },  // Fila 1, Celda 3
-                { x: 15, y: -95 },   // Fila 2, Celda 1
-                { x: -95, y: -95 },  // Fila 2, Celda 2
-                { x: -205, y: -95 }, // Fila 2, Celda 3
-                { x: 15, y: -205 },  // Fila 3, Celda 1
-                { x: -95, y: -205 }, // Fila 3, Celda 2
-                { x: -205, y: -205 } // Fila 3, Celda 3
+                { x: 15, y: 15 },    // Pieza 0
+                { x: -95, y: 15 },   // Pieza 1
+                { x: -205, y: 15 },  // Pieza 2
+                { x: 15, y: -95 },   // Pieza 3
+                { x: -95, y: -95 },  // Pieza 4
+                { x: -205, y: -95 }, // Pieza 5
+                { x: 15, y: -205 },  // Pieza 6
+                { x: -95, y: -205 }, // Pieza 7
+                { x: -205, y: -205 } // Pieza 8
             ];
 
             for (let i = 0; i < 9; i++) {
@@ -293,6 +293,7 @@
                 piece.style.backgroundImage = `url('${currentImage}')`;
                 piece.style.backgroundPosition = `${posicionesFijas[i].x}px ${posicionesFijas[i].y}px`;
 
+                // Dispersión inicial aleatoria abajo
                 const randomX = Math.random() * (arena.clientWidth - 135);
                 const randomY = Math.random() * (arena.clientHeight - 135);
                 const randomRot = (Math.random() * 20) - 10;
@@ -310,85 +311,101 @@
         function setupDragAndDrop(piece) {
             let startX = 0, startY = 0;
             let initialLeft = 0, initialTop = 0;
+            let isDragging = false;
 
-            function onStart(e) {
+            // Manejo de eventos táctiles para celular (Separado y limpio)
+            piece.addEventListener("touchstart", (e) => {
+                isDragging = true;
                 piece.classList.add("dragging");
-                const touch = e.touches ? e.touches : e;
-
+                const touch = e.touches[0];
                 startX = touch.clientX;
                 startY = touch.clientY;
                 initialLeft = parseFloat(piece.style.left) || 0;
                 initialTop = parseFloat(piece.style.top) || 0;
-                
+
                 if (piece.dataset.currentIndex !== "arena") {
-                    const cellIdx = parseInt(piece.dataset.currentIndex);
-                    boardState[cellIdx] = null;
+                    boardState[parseInt(piece.dataset.currentIndex)] = null;
                 }
                 piece.style.transform = "rotate(0deg)";
-            }
+            }, {passive: true});
 
-            function onMove(e) {
-                if (!piece.classList.contains("dragging")) return;
-                const touch = e.touches ? e.touches : e;
-                const dx = touch.clientX - startX;
-                const dy = touch.clientY - startY;
+            window.addEventListener("touchmove", (e) => {
+                if (!isDragging) return;
+                const touch = e.touches[0];
+                piece.style.left = `${initialLeft + (touch.clientX - startX)}px`;
+                piece.style.top = `${initialTop + (touch.clientY - startY)}px`;
+            }, {passive: false});
 
-                piece.style.left = `${initialLeft + dx}px`;
-                piece.style.top = `${initialTop + dy}px`;
-            }
-
-            function onEnd() {
-                if (!piece.classList.contains("dragging")) return;
+            window.addEventListener("touchend", () => {
+                if (!isDragging) return;
+                isDragging = false;
                 piece.classList.remove("dragging");
-                
-                const pieceRect = piece.getBoundingClientRect();
-                const pCenterX = pieceRect.left + 70;
-                const pCenterY = pieceRect.top + 70;
+                processDrop(piece);
+            });
 
-                let placed = false;
+            // Manejo de eventos de mouse para PC
+            piece.addEventListener("mousedown", (e) => {
+                isDragging = true;
+                piece.classList.add("dragging");
+                startX = e.clientX;
+                startY = e.clientY;
+                initialLeft = parseFloat(piece.style.left) || 0;
+                initialTop = parseFloat(piece.style.top) || 0;
 
-                for (let cell of cells) {
-                    const cellRect = cell.getBoundingClientRect();
-                    const cellIdx = parseInt(cell.dataset.index);
+                if (piece.dataset.currentIndex !== "arena") {
+                    boardState[parseInt(piece.dataset.currentIndex)] = null;
+                }
+                piece.style.transform = "rotate(0deg)";
+            });
 
-                    if (
-                        pCenterX >= cellRect.left && pCenterX <= cellRect.right &&
-                        pCenterY >= cellRect.top && pCenterY <= cellRect.bottom
-                    ) {
-                        if (boardState[cellIdx] === null) {
-                            piece.style.left = `${(cellIdx % 3) * 110 - 15}px`;
-                            piece.style.top = `${Math.floor(cellIdx / 3) * 110 - 15}px`;
-                            
-                            boardWrapper.appendChild(piece);
-                            piece.dataset.currentIndex = cellIdx;
-                            boardState[cellIdx] = piece;
-                            placed = true;
-                            break;
-                        }
+            window.addEventListener("mousemove", (e) => {
+                if (!isDragging) return;
+                piece.style.left = `${initialLeft + (e.clientX - startX)}px`;
+                piece.style.top = `${initialTop + (e.clientY - startY)}px`;
+            });
+
+            window.addEventListener("mouseup", () => {
+                if (!isDragging) return;
+                isDragging = false;
+                piece.classList.remove("dragging");
+                processDrop(piece);
+            });
+        }
+
+        function processDrop(piece) {
+            const pieceRect = piece.getBoundingClientRect();
+            const pCenterX = pieceRect.left + 70;
+            const pCenterY = pieceRect.top + 70;
+            let placed = false;
+
+            for (let cell of cells) {
+                const cellRect = cell.getBoundingClientRect();
+                const cellIdx = parseInt(cell.dataset.index);
+
+                if (pCenterX >= cellRect.left && pCenterX <= cellRect.right &&
+                    pCenterY >= cellRect.top && pCenterY <= cellRect.bottom) {
+                    
+                    if (boardState[cellIdx] === null) {
+                        piece.style.left = `${(cellIdx % 3) * 110 - 15}px`;
+                        piece.style.top = `${Math.floor(cellIdx / 3) * 110 - 15}px`;
+                        boardWrapper.appendChild(piece);
+                        piece.dataset.currentIndex = cellIdx;
+                        boardState[cellIdx] = piece;
+                        placed = true;
+                        break;
                     }
                 }
-
-                if (!placed) {
-                    arena.appendChild(piece);
-                    piece.dataset.currentIndex = "arena";
-                    const randomX = Math.random() * (arena.clientWidth - 135);
-                    const randomY = Math.random() * (arena.clientHeight - 135);
-                    const randomRot = (Math.random() * 16) - 8;
-                    piece.style.left = `${randomX}px`;
-                    piece.style.top = `${randomY}px`;
-                    piece.style.transform = `rotate(${randomRot}deg)`;
-                }
-
-                checkVictory();
             }
 
-            piece.addEventListener("touchstart", onStart, {passive: true});
-            window.addEventListener("touchmove", onMove, {passive: false});
-            window.addEventListener("touchend", onEnd);
+            if (!placed) {
+                arena.appendChild(piece);
+                piece.dataset.currentIndex = "arena";
+                piece.style.left = `${Math.random() * (arena.clientWidth - 135)}px`;
+                piece.style.top = `${Math.random() * (arena.clientHeight - 135)}px`;
+                piece.style.transform = `rotate(${(Math.random() * 16) - 8}deg)`;
+            }
 
-            piece.addEventListener("mousedown", onStart);
-            window.addEventListener("mousemove", onMove);
-            window.addEventListener("mouseup", onEnd);
+            checkVictory();
         }
 
         function checkVictory() {
