@@ -1,6 +1,6 @@
 <!-- ================================================================= -->
-<!-- BLOQUE 1: ESTRUCTURA HTML Y ESTILOS CSS UNIFICADOS                -->
-<!-- Pega este bloque completo en tu archivo index.html                -->
+<!-- BLOQUE 1: ESTRUCTURA HTML, ESTILOS Y TABLERO GRABADO EN ORO       -->
+<!-- Pega este bloque en tu index.html                                 -->
 <!-- ================================================================= -->
 <!DOCTYPE html>
 <html lang="es">
@@ -9,14 +9,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Rompecabezas El Rey</title>
 
-  <!-- Tipografías de Alto Impacto -->
+  <!-- Tipografías Premium -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Montserrat:wght@400;600;700;900&display=swap" rel="stylesheet">
 
   <style>
     /* ========================================================= */
-    /* RESET & ESTILOS BASE (NATIVO MÓVIL SIN ARMAZÓN ARTIFICIAL) */
+    /* VARIABLES Y ESTILOS GLOBALES                              */
     /* ========================================================= */
     :root {
       --bg: #0a0a0a;
@@ -49,11 +49,10 @@
       flex-direction: column;
       align-items: center;
       justify-content: flex-start;
-      padding: 16px 12px 28px 12px;
+      padding: 14px 10px 24px 10px;
       background: radial-gradient(circle at 50% 15%, #1d180a 0%, #0a0a0a 75%);
     }
 
-    /* CONTENEDOR RESPONSIVO LIMPIO */
     .game-wrapper {
       width: 100%;
       max-width: 360px;
@@ -63,7 +62,7 @@
       position: relative;
     }
 
-    /* ENCABEZADO Y TÍTULO PREMIUM */
+    /* ENCABEZADO */
     .header {
       margin-bottom: 12px;
       text-align: center;
@@ -77,7 +76,7 @@
       text-transform: uppercase;
       color: var(--gold);
       text-shadow: 0 0 10px var(--gold-glow);
-      margin-bottom: 3px;
+      margin-bottom: 2px;
     }
 
     .title {
@@ -91,16 +90,31 @@
       line-height: 1.15;
     }
 
-    /* TABLERO 3x3 (330px X 330px) */
+    /* ========================================================= */
+    /* TABLERO 3x3 UNIFICADO (SIN PARTES OSCURAS NI HUECOS)      */
+    /* ========================================================= */
     .board-container {
       width: 330px;
       height: 330px;
       position: relative;
-      background: #0d0d0d;
-      border: 2px solid rgba(212, 175, 55, 0.4);
+      background: #111111;
+      border: 2px solid rgba(212, 175, 55, 0.45);
       border-radius: 8px;
-      box-shadow: 0 0 25px rgba(212, 175, 55, 0.2), inset 0 0 20px rgba(0, 0, 0, 0.95);
+      box-shadow: 0 0 25px rgba(212, 175, 55, 0.2), inset 0 0 25px rgba(0, 0, 0, 0.95);
       margin-bottom: 14px;
+      overflow: hidden;
+    }
+
+    /* LÍNEAS DE GUÍA GRABADAS EN EL TABLERO (UNIFICADO) */
+    .board-grid-svg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 330px;
+      height: 330px;
+      pointer-events: none;
+      z-index: 1;
+      opacity: 0.5;
     }
 
     #board {
@@ -112,38 +126,24 @@
       position: absolute;
       top: 0;
       left: 0;
-      border-radius: 6px;
-      overflow: hidden;
+      z-index: 2;
     }
 
     .slot {
       width: 110px;
       height: 110px;
       position: relative;
-      border: 1px dashed rgba(212, 175, 55, 0.2);
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: background-color 0.15s ease, border-color 0.15s ease;
+      transition: background-color 0.15s ease;
     }
 
     .slot.hovered {
-      background-color: rgba(212, 175, 55, 0.25);
-      border-color: var(--gold);
+      background-color: rgba(212, 175, 55, 0.2);
     }
 
-    /* SILUETA GUÍA TRASLÚCIDA DENTRO DE CADA CASILLA */
-    .slot-silhouette {
-      width: 110px;
-      height: 110px;
-      position: absolute;
-      background-color: rgba(212, 175, 55, 0.08);
-      border: 1px solid rgba(212, 175, 55, 0.25);
-      pointer-events: none;
-      opacity: 0.85;
-    }
-
-    /* CONTENEDOR DE DISPERSIÓN INFERIOR (#arena) */
+    /* CONTENEDOR DE PIEZAS DISPERSAS (#arena) */
     .arena-section {
       width: 100%;
       max-width: 340px;
@@ -172,7 +172,7 @@
       box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.8);
     }
 
-    /* PIEZAS DEL ROMPECABEZAS (110px X 110px) */
+    /* PIEZAS REALES: OPACIDAD 100% Y NITIDEZ TOTAL */
     .piece {
       width: 110px;
       height: 110px;
@@ -180,15 +180,18 @@
       background-repeat: no-repeat;
       cursor: grab;
       touch-action: none;
-      filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.85));
+      filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.9));
       transition: transform 0.15s ease, filter 0.15s ease;
+      opacity: 1 !important;
       z-index: 10;
     }
 
     .piece.placed {
       cursor: pointer;
-      filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5));
+      filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.6));
       transition: none;
+      opacity: 1 !important;
+      z-index: 10;
     }
 
     .piece.dragging {
@@ -198,23 +201,24 @@
       filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.95)) drop-shadow(0 0 12px var(--gold-glow));
       transition: none;
       pointer-events: none;
+      opacity: 1 !important;
     }
 
     /* ========================================================= */
-    /* MOLDES MATRICIALES EXACTOS DE ENCAJE (CLIP-PATH 3x3)      */
-    /* Relación simétrica perfecta entre piezas adyacentes       */
+    /* MOLDES DE ENCAJE CONTINUOS (CLIP-PATH)                   */
+    /* Cada pieza encaja perfectamente con su vecina sin huecos */
     /* ========================================================= */
-    .p0 { clip-path: polygon(0 0, 100% 0, 100% 35%, 85% 50%, 100% 65%, 100% 100%, 65% 100%, 50% 115%, 35% 100%, 0 100%); }
-    .p1 { clip-path: polygon(0 0, 100% 0, 100% 35%, 115% 50%, 100% 65%, 100% 100%, 65% 100%, 50% 85%, 35% 100%, 0 100%, 0 65%, -15% 50%, 0 35%); }
-    .p2 { clip-path: polygon(0 0, 100% 0, 100% 100%, 65% 100%, 50% 115%, 35% 100%, 0 100%, 0 65%, 15% 50%, 0 35%); }
-    .p3 { clip-path: polygon(0 0, 35% 0, 50% 15%, 65% 0, 100% 0, 100% 35%, 115% 50%, 100% 65%, 100% 100%, 65% 100%, 50% 85%, 35% 100%, 0 100%); }
-    .p4 { clip-path: polygon(0 0, 35% 0, 50% -15%, 65% 0, 100% 0, 100% 35%, 85% 50%, 100% 65%, 100% 100%, 65% 100%, 50% 115%, 35% 100%, 0 100%, 0 65%, 15% 50%, 0 35%); }
-    .p5 { clip-path: polygon(0 0, 35% 0, 50% 15%, 65% 0, 100% 0, 100% 100%, 65% 100%, 50% 85%, 35% 100%, 0 100%, 0 65%, -15% 50%, 0 35%); }
-    .p6 { clip-path: polygon(0 0, 35% 0, 50% -15%, 65% 0, 100% 0, 100% 35%, 85% 50%, 100% 65%, 100% 100%, 0 100%); }
-    .p7 { clip-path: polygon(0 0, 35% 0, 50% 15%, 65% 0, 100% 0, 100% 35%, 115% 50%, 100% 65%, 100% 100%, 0 100%, 0 65%, -15% 50%, 0 35%); }
-    .p8 { clip-path: polygon(0 0, 35% 0, 50% -15%, 65% 0, 100% 0, 100% 100%, 0 100%, 0 65%, 15% 50%, 0 35%); }
+    .p0 { clip-path: polygon(0% 0%, 100% 0%, 100% 36%, 86% 50%, 100% 64%, 100% 100%, 64% 100%, 50% 114%, 36% 100%, 0% 100%); }
+    .p1 { clip-path: polygon(0% 0%, 100% 0%, 100% 36%, 114% 50%, 100% 64%, 100% 100%, 64% 100%, 50% 86%, 36% 100%, 0% 100%, 0% 64%, -14% 50%, 0% 36%); }
+    .p2 { clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 64% 100%, 50% 114%, 36% 100%, 0% 100%, 0% 64%, 14% 50%, 0% 36%); }
+    .p3 { clip-path: polygon(0% 0%, 36% 0%, 50% 14%, 64% 0%, 100% 0%, 100% 36%, 114% 50%, 100% 64%, 100% 100%, 64% 100%, 50% 86%, 36% 100%, 0% 100%); }
+    .p4 { clip-path: polygon(0% 0%, 36% 0%, 50% -14%, 64% 0%, 100% 0%, 100% 36%, 86% 50%, 100% 64%, 100% 100%, 64% 100%, 50% 114%, 36% 100%, 0% 100%, 0% 64%, 14% 50%, 0% 36%); }
+    .p5 { clip-path: polygon(0% 0%, 36% 0%, 50% 14%, 64% 0%, 100% 0%, 100% 100%, 64% 100%, 50% 86%, 36% 100%, 0% 100%, 0% 64%, -14% 50%, 0% 36%); }
+    .p6 { clip-path: polygon(0% 0%, 36% 0%, 50% -14%, 64% 0%, 100% 0%, 100% 36%, 86% 50%, 100% 64%, 100% 100%, 0% 100%); }
+    .p7 { clip-path: polygon(0% 0%, 36% 0%, 50% 14%, 64% 0%, 100% 0%, 100% 36%, 114% 50%, 100% 64%, 100% 100%, 0% 100%, 0% 64%, -14% 50%, 0% 36%); }
+    .p8 { clip-path: polygon(0% 0%, 36% 0%, 50% -14%, 64% 0%, 100% 0%, 100% 100%, 0% 100%, 0% 64%, 14% 50%, 0% 36%); }
 
-    /* BOTONES */
+    /* CONTROLES Y BOTONES */
     .controls {
       width: 100%;
       max-width: 340px;
@@ -278,12 +282,6 @@
       max-width: 310px;
       text-align: center;
       box-shadow: 0 0 50px rgba(0, 0, 0, 0.9), 0 0 20px var(--gold-glow);
-      animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
-
-    @keyframes popIn {
-      0% { transform: scale(0.7); opacity: 0; }
-      100% { transform: scale(1); opacity: 1; }
     }
 
     .victory-crown {
@@ -352,22 +350,37 @@
       <h1 class="title">Rompecabezas El Rey</h1>
     </header>
 
-    <!-- TABLERO SUPERIOR CON SILUETAS CURVAS DE GUÍA -->
+    <!-- TABLERO 3x3 UNIFICADO CON LÍNEAS DE CORTE GRABADAS -->
     <div class="board-container">
+      <svg class="board-grid-svg" viewBox="0 0 330 330">
+        <!-- Línea Vertical 1 (x=110) con curvas de pestañas -->
+        <path d="M 110,0 L 110,38 C 110,38 95,38 95,55 C 95,72 110,72 110,72 L 110,148 C 110,148 125,148 125,165 C 125,182 110,182 110,182 L 110,258 C 110,258 95,258 95,275 C 95,292 110,292 110,292 L 110,330" fill="none" stroke="rgba(212, 175, 55, 0.4)" stroke-width="1.5" stroke-dasharray="4 2" />
+        
+        <!-- Línea Vertical 2 (x=220) con curvas de pestañas -->
+        <path d="M 220,0 L 220,38 C 220,38 205,38 205,55 C 205,72 220,72 220,72 L 220,148 C 220,148 235,148 235,165 C 235,182 220,182 220,182 L 220,258 C 220,258 205,258 205,275 C 205,292 220,292 220,292 L 220,330" fill="none" stroke="rgba(212, 175, 55, 0.4)" stroke-width="1.5" stroke-dasharray="4 2" />
+
+        <!-- Línea Horizontal 1 (y=110) con curvas de pestañas -->
+        <path d="M 0,110 L 38,110 C 38,110 38,95 55,95 C 72,95 72,110 72,110 L 148,110 C 148,110 148,125 165,125 C 182,125 182,110 182,110 L 258,110 C 258,110 258,95 275,95 C 292,95 292,110 292,110 L 330,110" fill="none" stroke="rgba(212, 175, 55, 0.4)" stroke-width="1.5" stroke-dasharray="4 2" />
+
+        <!-- Línea Horizontal 2 (y=220) con curvas de pestañas -->
+        <path d="M 0,220 L 38,220 C 38,220 38,205 55,205 C 72,205 72,220 72,220 L 148,220 C 148,220 148,235 165,235 C 182,235 182,220 182,220 L 258,220 C 258,220 258,205 275,205 C 292,205 292,220 292,220 L 330,220" fill="none" stroke="rgba(212, 175, 55, 0.4)" stroke-width="1.5" stroke-dasharray="4 2" />
+      </svg>
+
+      <!-- CASILLAS PARA ACOMODAR LAS PIEZAS -->
       <div id="board">
-        <div class="slot" data-index="0"><div class="slot-silhouette p0"></div></div>
-        <div class="slot" data-index="1"><div class="slot-silhouette p1"></div></div>
-        <div class="slot" data-index="2"><div class="slot-silhouette p2"></div></div>
-        <div class="slot" data-index="3"><div class="slot-silhouette p3"></div></div>
-        <div class="slot" data-index="4"><div class="slot-silhouette p4"></div></div>
-        <div class="slot" data-index="5"><div class="slot-silhouette p5"></div></div>
-        <div class="slot" data-index="6"><div class="slot-silhouette p6"></div></div>
-        <div class="slot" data-index="7"><div class="slot-silhouette p7"></div></div>
-        <div class="slot" data-index="8"><div class="slot-silhouette p8"></div></div>
+        <div class="slot" data-index="0"></div>
+        <div class="slot" data-index="1"></div>
+        <div class="slot" data-index="2"></div>
+        <div class="slot" data-index="3"></div>
+        <div class="slot" data-index="4"></div>
+        <div class="slot" data-index="5"></div>
+        <div class="slot" data-index="6"></div>
+        <div class="slot" data-index="7"></div>
+        <div class="slot" data-index="8"></div>
       </div>
     </div>
 
-    <!-- ARENA DE PIEZAS DISPERSAS INFERIOR -->
+    <!-- ARENA DE PIEZAS DISPERSAS -->
     <div class="arena-section">
       <div class="arena-label">Arena de Piezas</div>
       <div id="arena"></div>
@@ -378,7 +391,7 @@
       <button id="btn-reset" class="btn" type="button">Reiniciar</button>
     </div>
 
-    <!-- MODAL FLOTANTE DE VICTORIA -->
+    <!-- MODAL DE VICTORIA -->
     <div id="modal-victoria">
       <div class="victory-card">
         <div class="victory-crown">👑</div>
@@ -394,368 +407,326 @@
       </div>
     </div>
   </div>
+  <!-- ================================================================= -->
+<!-- BLOQUE 2: LÓGICA COMPLETA DE JAVASCRIPT NATIVO (Vanilla JS)       -->
+<!-- Pega este bloque completo justo antes de cerrar </body> en index  -->
+<!-- ================================================================= -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const IMAGES = ['imagen1.jpeg', 'imagen2.jpeg', 'imagen3.jpeg'];
+      const FIREBASE_DB_URL = "https://firebaseio.com";
+      const GRID_SIZE = 3;
+      const PIECE_SIZE = 110;
+      const TOTAL_SIZE = 330;
 
-</body>
-</html>
-<script>
-  // =================================================================
-  // LÓGICA DE JAVASCRIPT NATIVO (Vanilla JS)
-  // Rompecabezas El Rey - Mobile-First & Firebase Realtime
-  // =================================================================
+      const boardEl = document.getElementById('board');
+      const arenaEl = document.getElementById('arena');
+      const slots = Array.from(document.querySelectorAll('.slot'));
+      const btnReset = document.getElementById('btn-reset');
+      const modalVictoria = document.getElementById('modal-victoria');
+      const codigoGanadorEl = document.getElementById('codigo-ganador');
+      const btnCobrar = document.getElementById('btn-cobrar');
+      const btnModalReiniciar = document.getElementById('btn-modal-reiniciar');
 
-  document.addEventListener('DOMContentLoaded', () => {
-    // 1. CONFIGURACIÓN Y CONSTANTES
-    const IMAGES = ['imagen1.jpeg', 'imagen2.jpeg', 'imagen3.jpeg'];
-    const FIREBASE_DB_URL = "https://firebaseio.com";
-    const GRID_SIZE = 3;
-    const PIECE_SIZE = 110;
-    const TOTAL_SIZE = 330;
+      let currentImage = '';
+      let gridState = new Array(9).fill(null);
+      let isGameFinished = false;
+      let ganadorCodigoActual = '0001';
 
-    // 2. REFERENCIAS A ELEMENTOS DEL DOM
-    const boardEl = document.getElementById('board');
-    const arenaEl = document.getElementById('arena');
-    const slots = Array.from(document.querySelectorAll('.slot'));
-    const btnReset = document.getElementById('btn-reset');
-    const modalVictoria = document.getElementById('modal-victoria');
-    const codigoGanadorEl = document.getElementById('codigo-ganador');
-    const btnCobrar = document.getElementById('btn-cobrar');
-    const btnModalReiniciar = document.getElementById('btn-modal-reiniciar');
+      let draggedPiece = null;
+      let touchStartX = 0;
+      let touchStartY = 0;
+      let pieceInitialLeft = 0;
+      let pieceInitialTop = 0;
+      let currentSlotHovered = null;
 
-    // 3. ESTADO GLOBAL
-    let currentImage = '';
-    let gridState = new Array(9).fill(null); // Casillas del tablero
-    let isGameFinished = false;
-    let ganadorCodigoActual = '0001';
-
-    // 4. CONTROL DE ARRASTRE TÁCTIL Y MOUSE
-    let draggedPiece = null;
-    let touchStartX = 0;
-    let touchStartY = 0;
-    let pieceInitialLeft = 0;
-    let pieceInitialTop = 0;
-    let currentSlotHovered = null;
-
-    // INICIALIZACIÓN
-    initGame();
-
-    btnReset.addEventListener('click', () => initGame());
-    btnModalReiniciar.addEventListener('click', () => {
-      modalVictoria.classList.remove('active');
       initGame();
-    });
 
-    // REDIRECCIÓN A WHATSAPP
-    btnCobrar.addEventListener('click', () => {
-      const textoMensaje = `felicitaciones por finalizar el rompecabezas. Mi código es: ${ganadorCodigoActual}`;
-      const urlWa = `https://wa.me/?text=${encodeURIComponent(textoMensaje)}`;
-      window.location.href = urlWa;
-    });
+      btnReset.addEventListener('click', () => initGame());
+      btnModalReiniciar.addEventListener('click', () => {
+        modalVictoria.classList.remove('active');
+        initGame();
+      });
 
-    // =========================================================
-    // CARGA ALEATORIA Y DISPERSIÓN MATRICIAL EXACTA
-    // =========================================================
-    function initGame() {
-      isGameFinished = false;
-      modalVictoria.classList.remove('active');
-      gridState.fill(null);
-      arenaEl.innerHTML = '';
+      btnCobrar.addEventListener('click', () => {
+        const textoMensaje = `felicitaciones por finalizar el rompecabezas. Mi código es: ${ganadorCodigoActual}`;
+        const urlWa = `https://wa.me/?text=${encodeURIComponent(textoMensaje)}`;
+        window.location.href = urlWa;
+      });
 
-      // Selección aleatoria de una de las 3 imágenes
-      const randomIndex = Math.floor(Math.random() * IMAGES.length);
-      currentImage = IMAGES[randomIndex];
+      function initGame() {
+        isGameFinished = false;
+        modalVictoria.classList.remove('active');
+        gridState.fill(null);
+        arenaEl.innerHTML = '';
 
-      // Instanciar las 9 piezas con recorte y fondo fijo
-      for (let i = 0; i < 9; i++) {
-        const piece = document.createElement('div');
-        piece.classList.add('piece', `p${i}`);
-        piece.dataset.pieceIndex = i;
-        piece.dataset.currentSlot = -1; // -1 indica que está en la arena
+        const randomIndex = Math.floor(Math.random() * IMAGES.length);
+        currentImage = IMAGES[randomIndex];
 
-        // CÁLCULO MATRICIAL EXACTO: background-size 330px 330px y desfase absoluto
-        const col = i % GRID_SIZE;
-        const row = Math.floor(i / GRID_SIZE);
-        const bgX = -(col * PIECE_SIZE);
-        const bgY = -(row * PIECE_SIZE);
+        for (let i = 0; i < 9; i++) {
+          const piece = document.createElement('div');
+          piece.classList.add('piece', `p${i}`);
+          piece.dataset.pieceIndex = i;
+          piece.dataset.currentSlot = -1;
 
-        piece.style.backgroundImage = `url('${currentImage}')`;
-        piece.style.backgroundSize = `${TOTAL_SIZE}px ${TOTAL_SIZE}px`;
-        piece.style.backgroundPosition = `${bgX}px ${bgY}px`;
+          const col = i % GRID_SIZE;
+          const row = Math.floor(i / GRID_SIZE);
+          const bgX = -(col * PIECE_SIZE);
+          const bgY = -(row * PIECE_SIZE);
 
-        // Posicionamiento aleatorio dentro de la arena sin desbordar
-        const arenaRect = arenaEl.getBoundingClientRect();
-        const maxArenaW = arenaRect.width > 0 ? arenaRect.width : 340;
-        const maxLeft = Math.max(0, maxArenaW - PIECE_SIZE - 6);
-        const maxTop = Math.max(0, 220 - PIECE_SIZE - 6);
+          piece.style.backgroundImage = `url('${currentImage}')`;
+          piece.style.backgroundSize = `${TOTAL_SIZE}px ${TOTAL_SIZE}px`;
+          piece.style.backgroundPosition = `${bgX}px ${bgY}px`;
 
-        const randomLeft = Math.floor(Math.random() * (maxLeft + 1));
-        const randomTop = Math.floor(Math.random() * (maxTop + 1));
-        const randomRotation = Math.floor(Math.random() * 25) - 12; // Entre -12deg y 12deg
+          const arenaRect = arenaEl.getBoundingClientRect();
+          const maxArenaW = arenaRect.width > 0 ? arenaRect.width : 340;
+          const maxLeft = Math.max(0, maxArenaW - PIECE_SIZE - 6);
+          const maxTop = Math.max(0, 220 - PIECE_SIZE - 6);
 
-        piece.dataset.rot = randomRotation;
-        piece.style.left = `${randomLeft}px`;
-        piece.style.top = `${randomTop}px`;
-        piece.style.transform = `rotate(${randomRotation}deg)`;
+          const randomLeft = Math.floor(Math.random() * (maxLeft + 1));
+          const randomTop = Math.floor(Math.random() * (maxTop + 1));
+          const randomRotation = Math.floor(Math.random() * 25) - 12;
 
-        // Asignar controladores táctiles
-        bindPieceEvents(piece);
+          piece.dataset.rot = randomRotation;
+          piece.style.left = `${randomLeft}px`;
+          piece.style.top = `${randomTop}px`;
+          piece.style.transform = `rotate(${randomRotation}deg)`;
 
-        arenaEl.appendChild(piece);
+          bindPieceEvents(piece);
+          arenaEl.appendChild(piece);
+        }
       }
-    }
 
-    // =========================================================
-    // EVENTOS TÁCTILES PUROS PARA CELULARES (SIN BLOQUEOS)
-    // =========================================================
-    function bindPieceEvents(el) {
-      // TOUCH START
-      el.addEventListener('touchstart', (e) => {
-        if (isGameFinished) return;
+      function bindPieceEvents(el) {
+        el.addEventListener('touchstart', (e) => {
+          if (isGameFinished) return;
+          const touch = e.touches[0];
+          startDrag(el, touch.clientX, touch.clientY);
+        }, { passive: false });
+
+        el.addEventListener('mousedown', (e) => {
+          if (isGameFinished) return;
+          startDrag(el, e.clientX, e.clientY);
+
+          const onMouseMove = (moveEvent) => {
+            handleMove(moveEvent.clientX, moveEvent.clientY);
+          };
+
+          const onMouseUp = (upEvent) => {
+            window.removeEventListener('mousemove', onMouseMove);
+            window.removeEventListener('mouseup', onMouseUp);
+            endDrag(upEvent.clientX, upEvent.clientY);
+          };
+
+          window.addEventListener('mousemove', onMouseMove);
+          window.addEventListener('mouseup', onMouseUp);
+        });
+      }
+
+      window.addEventListener('touchmove', (e) => {
+        if (!draggedPiece) return;
+        if (e.cancelable) e.preventDefault();
         const touch = e.touches[0];
-        startDrag(el, touch.clientX, touch.clientY);
+        handleMove(touch.clientX, touch.clientY);
       }, { passive: false });
 
-      // MOUSE FALLBACK (Para escritorio)
-      el.addEventListener('mousedown', (e) => {
-        if (isGameFinished) return;
-        startDrag(el, e.clientX, e.clientY);
-
-        const onMouseMove = (moveEvent) => {
-          handleMove(moveEvent.clientX, moveEvent.clientY);
-        };
-
-        const onMouseUp = (upEvent) => {
-          window.removeEventListener('mousemove', onMouseMove);
-          window.removeEventListener('mouseup', onMouseUp);
-          endDrag(upEvent.clientX, upEvent.clientY);
-        };
-
-        window.addEventListener('mousemove', onMouseMove);
-        window.addEventListener('mouseup', onMouseUp);
+      window.addEventListener('touchend', (e) => {
+        if (!draggedPiece) return;
+        const touch = e.changedTouches[0];
+        endDrag(touch.clientX, touch.clientY);
       });
-    }
 
-    // TOUCH MOVE Y TOUCH END GLOBALES
-    window.addEventListener('touchmove', (e) => {
-      if (!draggedPiece) return;
-      if (e.cancelable) e.preventDefault(); // Evita scroll vertical en móviles
-      const touch = e.touches[0];
-      handleMove(touch.clientX, touch.clientY);
-    }, { passive: false });
+      function startDrag(el, clientX, clientY) {
+        draggedPiece = el;
+        touchStartX = clientX;
+        touchStartY = clientY;
 
-    window.addEventListener('touchend', (e) => {
-      if (!draggedPiece) return;
-      const touch = e.changedTouches[0];
-      endDrag(touch.clientX, touch.clientY);
+        const rect = el.getBoundingClientRect();
+        pieceInitialLeft = rect.left;
+        pieceInitialTop = rect.top;
+
+        const currentSlot = parseInt(el.dataset.currentSlot, 10);
+        if (currentSlot !== -1) {
+          gridState[currentSlot] = null;
+          el.dataset.currentSlot = -1;
+        }
+
+        document.body.appendChild(el);
+        el.style.left = `${pieceInitialLeft}px`;
+        el.style.top = `${pieceInitialTop}px`;
+        el.style.transform = 'scale(1.06) rotate(0deg)';
+        el.classList.add('dragging');
+        el.classList.remove('placed');
+      }
+
+      function handleMove(clientX, clientY) {
+        if (!draggedPiece) return;
+
+        const deltaX = clientX - touchStartX;
+        const deltaY = clientY - touchStartY;
+
+        draggedPiece.style.left = `${pieceInitialLeft + deltaX}px`;
+        draggedPiece.style.top = `${pieceInitialTop + deltaY}px`;
+
+        checkSlotHover(clientX, clientY);
+      }
+
+      function endDrag(clientX, clientY) {
+        if (!draggedPiece) return;
+        const el = draggedPiece;
+        el.classList.remove('dragging');
+
+        const targetSlotIndex = findTargetSlot(clientX, clientY);
+
+        if (targetSlotIndex !== -1) {
+          if (gridState[targetSlotIndex] !== null && gridState[targetSlotIndex] !== el) {
+            const occupiedPiece = gridState[targetSlotIndex];
+            returnPieceToArena(occupiedPiece);
+          }
+          snapPieceToSlot(el, targetSlotIndex);
+        } else {
+          dropPieceToArena(el, clientX, clientY);
+        }
+
+        clearSlotHover();
+        draggedPiece = null;
+        checkVictory();
+      }
+
+      function checkSlotHover(clientX, clientY) {
+        clearSlotHover();
+        const slotIdx = findTargetSlot(clientX, clientY);
+        if (slotIdx !== -1) {
+          slots[slotIdx].classList.add('hovered');
+          currentSlotHovered = slots[slotIdx];
+        }
+      }
+
+      function clearSlotHover() {
+        if (currentSlotHovered) {
+          currentSlotHovered.classList.remove('hovered');
+          currentSlotHovered = null;
+        }
+      }
+
+      function findTargetSlot(clientX, clientY) {
+        const boardRect = boardEl.getBoundingClientRect();
+        if (
+          clientX >= boardRect.left &&
+          clientX <= boardRect.right &&
+          clientY >= boardRect.top &&
+          clientY <= boardRect.bottom
+        ) {
+          const relX = clientX - boardRect.left;
+          const relY = clientY - boardRect.top;
+          const col = Math.floor(relX / PIECE_SIZE);
+          const row = Math.floor(relY / PIECE_SIZE);
+          const idx = row * GRID_SIZE + col;
+          if (idx >= 0 && idx < 9) return idx;
+        }
+        return -1;
+      }
+
+      function snapPieceToSlot(piece, slotIndex) {
+        const slot = slots[slotIndex];
+        slot.appendChild(piece);
+        piece.dataset.currentSlot = slotIndex;
+        gridState[slotIndex] = piece;
+
+        piece.style.left = '0px';
+        piece.style.top = '0px';
+        piece.style.transform = 'rotate(0deg)';
+        piece.classList.add('placed');
+      }
+
+      function dropPieceToArena(piece, clientX, clientY) {
+        arenaEl.appendChild(piece);
+        piece.dataset.currentSlot = -1;
+        piece.classList.remove('placed');
+
+        const arenaRect = arenaEl.getBoundingClientRect();
+        let localX = clientX - arenaRect.left - (PIECE_SIZE / 2);
+        let localY = clientY - arenaRect.top - (PIECE_SIZE / 2);
+
+        const maxW = Math.max(0, arenaRect.width - PIECE_SIZE);
+        const maxH = Math.max(0, 220 - PIECE_SIZE);
+
+        localX = Math.max(0, Math.min(localX, maxW));
+        localY = Math.max(0, Math.min(localY, maxH));
+
+        const rot = piece.dataset.rot || 0;
+        piece.style.left = `${localX}px`;
+        piece.style.top = `${localY}px`;
+        piece.style.transform = `rotate(${rot}deg)`;
+      }
+
+      function returnPieceToArena(piece) {
+        arenaEl.appendChild(piece);
+        piece.dataset.currentSlot = -1;
+        piece.classList.remove('placed');
+
+        const arenaRect = arenaEl.getBoundingClientRect();
+        const maxW = Math.max(0, arenaRect.width - PIECE_SIZE);
+        const maxH = Math.max(0, 220 - PIECE_SIZE);
+        const randomLeft = Math.floor(Math.random() * (maxW + 1));
+        const randomTop = Math.floor(Math.random() * (maxH + 1));
+        const rot = piece.dataset.rot || 0;
+
+        piece.style.left = `${randomLeft}px`;
+        piece.style.top = `${randomTop}px`;
+        piece.style.transform = `rotate(${rot}deg)`;
+      }
+
+      function checkVictory() {
+        for (let i = 0; i < 9; i++) {
+          const piece = gridState[i];
+          if (!piece) return false;
+          if (parseInt(piece.dataset.pieceIndex, 10) !== i) {
+            return false;
+          }
+        }
+
+        isGameFinished = true;
+        onPuzzleVictory();
+        return true;
+      }
+
+      async function onPuzzleVictory() {
+        try {
+          const dbBase = FIREBASE_DB_URL.replace(/\/+$/, '');
+          const endpoint = `${dbBase}/ganadores.json`;
+
+          const nuevoRegistro = {
+            timestamp: Date.now(),
+            fecha: new Date().toISOString(),
+            juego: "Rompecabezas El Rey",
+            imagen: currentImage
+          };
+
+          await fetch(endpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(nuevoRegistro)
+          });
+
+          const respuesta = await fetch(`${endpoint}?v=${Date.now()}`);
+          const datos = await respuesta.json();
+
+          let totalGanadores = 1;
+          if (datos && typeof datos === 'object') {
+            totalGanadores = Object.keys(datos).length;
+          }
+
+          ganadorCodigoActual = String(totalGanadores).padStart(4, '0');
+        } catch (error) {
+          console.warn("Firebase offline o error de red:", error);
+          ganadorCodigoActual = "0001";
+        }
+
+        codigoGanadorEl.textContent = `CÓDIGO: ${ganadorCodigoActual}`;
+        modalVictoria.classList.add('active');
+      }
     });
-
-    function startDrag(el, clientX, clientY) {
-      draggedPiece = el;
-      touchStartX = clientX;
-      touchStartY = clientY;
-
-      const rect = el.getBoundingClientRect();
-      pieceInitialLeft = rect.left;
-      pieceInitialTop = rect.top;
-
-      // Si estaba en una casilla del tablero, liberarla
-      const currentSlot = parseInt(el.dataset.currentSlot, 10);
-      if (currentSlot !== -1) {
-        gridState[currentSlot] = null;
-        el.dataset.currentSlot = -1;
-      }
-
-      // Mover temporalmente al body para libre arrastre
-      document.body.appendChild(el);
-      el.style.left = `${pieceInitialLeft}px`;
-      el.style.top = `${pieceInitialTop}px`;
-      el.style.transform = 'scale(1.06) rotate(0deg)';
-      el.classList.add('dragging');
-      el.classList.remove('placed');
-    }
-
-    function handleMove(clientX, clientY) {
-      if (!draggedPiece) return;
-
-      const deltaX = clientX - touchStartX;
-      const deltaY = clientY - touchStartY;
-
-      draggedPiece.style.left = `${pieceInitialLeft + deltaX}px`;
-      draggedPiece.style.top = `${pieceInitialTop + deltaY}px`;
-
-      checkSlotHover(clientX, clientY);
-    }
-
-    function endDrag(clientX, clientY) {
-      if (!draggedPiece) return;
-      const el = draggedPiece;
-      el.classList.remove('dragging');
-
-      const targetSlotIndex = findTargetSlot(clientX, clientY);
-
-      if (targetSlotIndex !== -1) {
-        // REGLA: Si la casilla está ocupada, devolver la pieza anterior a la arena
-        if (gridState[targetSlotIndex] !== null && gridState[targetSlotIndex] !== el) {
-          const occupiedPiece = gridState[targetSlotIndex];
-          returnPieceToArena(occupiedPiece);
-        }
-
-        // Alojar la pieza fijamente en la casilla seleccionada (incluso si es incorrecta)
-        snapPieceToSlot(el, targetSlotIndex);
-      } else {
-        // Soltada fuera del tablero: regresar y asentar en la arena
-        dropPieceToArena(el, clientX, clientY);
-      }
-
-      clearSlotHover();
-      draggedPiece = null;
-
-      // Validar si se completó el rompecabezas
-      checkVictory();
-    }
-
-    // =========================================================
-    // DETECCIÓN DE CASILLAS Y ALOJAMIENTO EN TABLERO
-    // =========================================================
-    function checkSlotHover(clientX, clientY) {
-      clearSlotHover();
-      const slotIdx = findTargetSlot(clientX, clientY);
-      if (slotIdx !== -1) {
-        slots[slotIdx].classList.add('hovered');
-        currentSlotHovered = slots[slotIdx];
-      }
-    }
-
-    function clearSlotHover() {
-      if (currentSlotHovered) {
-        currentSlotHovered.classList.remove('hovered');
-        currentSlotHovered = null;
-      }
-    }
-
-    function findTargetSlot(clientX, clientY) {
-      const boardRect = boardEl.getBoundingClientRect();
-      if (
-        clientX >= boardRect.left &&
-        clientX <= boardRect.right &&
-        clientY >= boardRect.top &&
-        clientY <= boardRect.bottom
-      ) {
-        const relX = clientX - boardRect.left;
-        const relY = clientY - boardRect.top;
-        const col = Math.floor(relX / PIECE_SIZE);
-        const row = Math.floor(relY / PIECE_SIZE);
-        const idx = row * GRID_SIZE + col;
-        if (idx >= 0 && idx < 9) return idx;
-      }
-      return -1;
-    }
-
-    function snapPieceToSlot(piece, slotIndex) {
-      const slot = slots[slotIndex];
-      slot.appendChild(piece);
-      piece.dataset.currentSlot = slotIndex;
-      gridState[slotIndex] = piece;
-
-      piece.style.left = '0px';
-      piece.style.top = '0px';
-      piece.style.transform = 'rotate(0deg)';
-      piece.classList.add('placed');
-    }
-
-    function dropPieceToArena(piece, clientX, clientY) {
-      arenaEl.appendChild(piece);
-      piece.dataset.currentSlot = -1;
-      piece.classList.remove('placed');
-
-      const arenaRect = arenaEl.getBoundingClientRect();
-      let localX = clientX - arenaRect.left - (PIECE_SIZE / 2);
-      let localY = clientY - arenaRect.top - (PIECE_SIZE / 2);
-
-      const maxW = Math.max(0, arenaRect.width - PIECE_SIZE);
-      const maxH = Math.max(0, 220 - PIECE_SIZE);
-
-      localX = Math.max(0, Math.min(localX, maxW));
-      localY = Math.max(0, Math.min(localY, maxH));
-
-      const rot = piece.dataset.rot || 0;
-      piece.style.left = `${localX}px`;
-      piece.style.top = `${localY}px`;
-      piece.style.transform = `rotate(${rot}deg)`;
-    }
-
-    function returnPieceToArena(piece) {
-      arenaEl.appendChild(piece);
-      piece.dataset.currentSlot = -1;
-      piece.classList.remove('placed');
-
-      const arenaRect = arenaEl.getBoundingClientRect();
-      const maxW = Math.max(0, arenaRect.width - PIECE_SIZE);
-      const maxH = Math.max(0, 220 - PIECE_SIZE);
-      const randomLeft = Math.floor(Math.random() * (maxW + 1));
-      const randomTop = Math.floor(Math.random() * (maxH + 1));
-      const rot = piece.dataset.rot || 0;
-
-      piece.style.left = `${randomLeft}px`;
-      piece.style.top = `${randomTop}px`;
-      piece.style.transform = `rotate(${rot}deg)`;
-    }
-
-    // =========================================================
-    // VALIDACIÓN DE GRILLA Y CONTEO INCREMENTAL GLOBAL FIREBASE
-    // =========================================================
-    function checkVictory() {
-      for (let i = 0; i < 9; i++) {
-        const piece = gridState[i];
-        if (!piece) return false;
-        if (parseInt(piece.dataset.pieceIndex, 10) !== i) {
-          return false;
-        }
-      }
-
-      isGameFinished = true;
-      onPuzzleVictory();
-      return true;
-    }
-
-    async function onPuzzleVictory() {
-      try {
-        const dbBase = FIREBASE_DB_URL.replace(/\/+$/, '');
-        const endpoint = `${dbBase}/ganadores.json`;
-
-        // 1. POST obligatorio para asentar nuevo registro histórico único
-        const nuevoRegistro = {
-          timestamp: Date.now(),
-          fecha: new Date().toISOString(),
-          juego: "Rompecabezas El Rey",
-          imagen: currentImage
-        };
-
-        await fetch(endpoint, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(nuevoRegistro)
-        });
-
-        // 2. GET forzando la anulación de caché (?v=Timestamp)
-        const respuesta = await fetch(`${endpoint}?v=${Date.now()}`);
-        const datos = await respuesta.json();
-
-        let totalGanadores = 1;
-        if (datos && typeof datos === 'object') {
-          totalGanadores = Object.keys(datos).length;
-        }
-
-        // Formateo estricto a 4 dígitos con ceros a la izquierda (ej: "0001", "0012")
-        ganadorCodigoActual = String(totalGanadores).padStart(4, '0');
-      } catch (error) {
-        console.warn("Error o modo offline en Firebase, generando código alternativo:", error);
-        const fallback = Math.floor(Math.random() * 900) + 1;
-        ganadorCodigoActual = String(fallback).padStart(4, '0');
-      }
-
-      // Mostrar código en cartel flotante
-      codigoGanadorEl.textContent = `CÓDIGO: ${ganadorCodigoActual}`;
-      modalVictoria.classList.add('active');
-    }
-  });
-</script>
+  </script>
+</body>
+</html>
