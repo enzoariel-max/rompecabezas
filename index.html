@@ -25,10 +25,10 @@
     }
 
     body {
-      display: flex;
-      justify-content: center;
       min-height: 100vh;
       min-height: 100dvh;
+      display: flex;
+      justify-content: center;
     }
 
     .game {
@@ -44,7 +44,7 @@
 
     .title {
       width: 100%;
-      margin: 0 0 14px;
+      margin: 0 0 7px;
       text-align: center;
       font-size: clamp(28px, 8vw, 42px);
       line-height: 1;
@@ -60,15 +60,18 @@
     }
 
     .subtitle {
-      margin: -4px 0 13px;
+      margin: 0 0 14px;
       color: #aaa;
-      font-size: 11px;
+      font-size: 10px;
       letter-spacing: 3px;
       text-transform: uppercase;
       font-weight: 700;
     }
 
-    /* TABLERO */
+    /* ==========================================================
+       TABLERO 330 x 330
+       ========================================================== */
+
     #board {
       position: relative;
       width: 330px;
@@ -76,8 +79,7 @@
       flex: 0 0 330px;
       border: 2px solid #a77a18;
       border-radius: 10px;
-      background:
-        linear-gradient(145deg, #191919, #080808);
+      background: #080808;
       box-shadow:
         0 0 0 2px #241900,
         0 0 20px rgba(230, 174, 48, .20),
@@ -105,30 +107,34 @@
     .slot:nth-child(8) { left: 110px; top: 220px; }
     .slot:nth-child(9) { left: 220px; top: 220px; }
 
-    /* PIEZAS */
+    /* ==========================================================
+       PIEZAS
+       ========================================================== */
+
     .piece {
       position: absolute;
       width: 110px;
       height: 110px;
       z-index: 20;
-      cursor: grab;
+
       user-select: none;
       -webkit-user-select: none;
       -webkit-touch-callout: none;
 
       background-repeat: no-repeat;
-      background-color: transparent;
+
+      cursor: grab;
+      touch-action: none;
+
+      will-change: left, top, transform;
 
       transition:
         box-shadow .15s ease,
         filter .15s ease;
-
-      touch-action: none;
-      will-change: left, top, transform;
     }
 
     .piece.dragging {
-      z-index: 9999;
+      z-index: 9999 !important;
       cursor: grabbing;
       filter: brightness(1.15);
       box-shadow:
@@ -146,99 +152,45 @@
     }
 
     /*
-      Moldes fijos para las 9 posiciones.
-
-      Cada pieza conserva siempre su índice visual.
-      El fondo completo mide exactamente 330x330.
+      Molde fijo.
+      Cada pieza utiliza exactamente el mismo molde geométrico.
+      El recorte NO modifica el fondo.
     */
 
-    .p0 {
+    .piece {
       clip-path: polygon(
-        0 0, 42% 0, 45% 8%, 55% 8%, 58% 0, 100% 0,
-        100% 42%, 92% 45%, 92% 55%, 100% 58%, 100% 100%,
-        58% 100%, 55% 92%, 45% 92%, 42% 100%, 0 100%,
-        0 58%, 8% 55%, 8% 45%, 0 42%
+        0 0,
+        42% 0,
+        45% 8%,
+        55% 8%,
+        58% 0,
+        100% 0,
+        100% 42%,
+        92% 45%,
+        92% 55%,
+        100% 58%,
+        100% 100%,
+        58% 100%,
+        55% 92%,
+        45% 92%,
+        42% 100%,
+        0 100%,
+        0 58%,
+        8% 55%,
+        8% 45%,
+        0 42%
       );
     }
 
-    .p1 {
-      clip-path: polygon(
-        0 0, 42% 0, 45% 8%, 55% 8%, 58% 0, 100% 0,
-        100% 42%, 92% 45%, 92% 55%, 100% 58%, 100% 100%,
-        58% 100%, 55% 92%, 45% 92%, 42% 100%, 0 100%,
-        0 58%, 8% 55%, 8% 45%, 0 42%
-      );
-    }
+    /* ==========================================================
+       ARENA
+       ========================================================== */
 
-    .p2 {
-      clip-path: polygon(
-        0 0, 42% 0, 45% 8%, 55% 8%, 58% 0, 100% 0,
-        100% 42%, 92% 45%, 92% 55%, 100% 58%, 100% 100%,
-        58% 100%, 55% 92%, 45% 92%, 42% 100%, 0 100%,
-        0 58%, 8% 55%, 8% 45%, 0 42%
-      );
-    }
-
-    .p3 {
-      clip-path: polygon(
-        0 0, 42% 0, 45% 8%, 55% 8%, 58% 0, 100% 0,
-        100% 42%, 92% 45%, 92% 55%, 100% 58%, 100% 100%,
-        58% 100%, 55% 92%, 45% 92%, 42% 100%, 0 100%,
-        0 58%, 8% 55%, 8% 45%, 0 42%
-      );
-    }
-
-    .p4 {
-      clip-path: polygon(
-        0 0, 42% 0, 45% 8%, 55% 8%, 58% 0, 100% 0,
-        100% 42%, 92% 45%, 92% 55%, 100% 58%, 100% 100%,
-        58% 100%, 55% 92%, 45% 92%, 42% 100%, 0 100%,
-        0 58%, 8% 55%, 8% 45%, 0 42%
-      );
-    }
-
-    .p5 {
-      clip-path: polygon(
-        0 0, 42% 0, 45% 8%, 55% 8%, 58% 0, 100% 0,
-        100% 42%, 92% 45%, 92% 55%, 100% 58%, 100% 100%,
-        58% 100%, 55% 92%, 45% 92%, 42% 100%, 0 100%,
-        0 58%, 8% 55%, 8% 45%, 0 42%
-      );
-    }
-
-    .p6 {
-      clip-path: polygon(
-        0 0, 42% 0, 45% 8%, 55% 8%, 58% 0, 100% 0,
-        100% 42%, 92% 45%, 92% 55%, 100% 58%, 100% 100%,
-        58% 100%, 55% 92%, 45% 92%, 42% 100%, 0 100%,
-        0 58%, 8% 55%, 8% 45%, 0 42%
-      );
-    }
-
-    .p7 {
-      clip-path: polygon(
-        0 0, 42% 0, 45% 8%, 55% 8%, 58% 0, 100% 0,
-        100% 42%, 92% 45%, 92% 55%, 100% 58%, 100% 100%,
-        58% 100%, 55% 92%, 45% 92%, 42% 100%, 0 100%,
-        0 58%, 8% 55%, 8% 45%, 0 42%
-      );
-    }
-
-    .p8 {
-      clip-path: polygon(
-        0 0, 42% 0, 45% 8%, 55% 8%, 58% 0, 100% 0,
-        100% 42%, 92% 45%, 92% 55%, 100% 58%, 100% 100%,
-        58% 100%, 55% 92%, 45% 92%, 42% 100%, 0 100%,
-        0 58%, 8% 55%, 8% 45%, 0 42%
-      );
-    }
-
-    /* ARENA */
     .arena-title {
-      margin-top: 18px;
+      margin-top: 17px;
       margin-bottom: 6px;
-      font-size: 12px;
       color: #d6ae4c;
+      font-size: 12px;
       font-weight: 800;
       letter-spacing: 2px;
       text-transform: uppercase;
@@ -250,17 +202,30 @@
       max-width: 460px;
       height: 220px;
       flex: 0 0 220px;
+
       overflow: visible;
+
       border: 1px solid rgba(193, 148, 42, .30);
       border-radius: 14px;
+
       background:
-        radial-gradient(circle at center, rgba(255, 195, 55, .045), transparent 65%),
+        radial-gradient(
+          circle at center,
+          rgba(255, 195, 55, .045),
+          transparent 65%
+        ),
         #0d0d0d;
+
       box-shadow:
         inset 0 0 25px rgba(0,0,0,.85),
         0 0 15px rgba(255,190,50,.05);
+
       touch-action: none;
     }
+
+    /* ==========================================================
+       BOTÓN REINICIAR
+       ========================================================== */
 
     .controls {
       display: flex;
@@ -272,12 +237,22 @@
       border: 0;
       border-radius: 9px;
       padding: 12px 25px;
+
       color: #080808;
-      background: linear-gradient(180deg, #ffe28a, #bd8519);
+
+      background:
+        linear-gradient(
+          180deg,
+          #ffe28a,
+          #bd8519
+        );
+
       font-weight: 900;
       font-size: 14px;
       letter-spacing: .5px;
+
       cursor: pointer;
+
       box-shadow:
         0 4px 15px rgba(226, 169, 43, .22),
         inset 0 1px rgba(255,255,255,.5);
@@ -285,90 +260,6 @@
 
     button:active {
       transform: scale(.96);
-    }
-
-    /* MODAL */
-    #victoryOverlay {
-      position: fixed;
-      inset: 0;
-      z-index: 20000;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-      background: rgba(0,0,0,.84);
-      backdrop-filter: blur(7px);
-      -webkit-backdrop-filter: blur(7px);
-    }
-
-    #victoryOverlay.show {
-      display: flex;
-    }
-
-    .victory {
-      width: min(380px, 94vw);
-      padding: 30px 22px 25px;
-      text-align: center;
-      border: 2px solid #d4a532;
-      border-radius: 20px;
-      background:
-        radial-gradient(circle at 50% 0, rgba(255,214,96,.14), transparent 50%),
-        linear-gradient(145deg, #181818, #070707);
-      box-shadow:
-        0 0 20px rgba(255,203,68,.45),
-        0 0 70px rgba(255,178,35,.20);
-      animation: victoryIn .4s ease-out;
-    }
-
-    @keyframes victoryIn {
-      from {
-        opacity: 0;
-        transform: scale(.75) translateY(20px);
-      }
-      to {
-        opacity: 1;
-        transform: scale(1) translateY(0);
-      }
-    }
-
-    .crown {
-      font-size: 45px;
-      line-height: 1;
-      margin-bottom: 8px;
-      filter: drop-shadow(0 0 9px rgba(255,211,75,.75));
-    }
-
-    .victory h2 {
-      margin: 0;
-      color: #ffdc71;
-      font-size: 29px;
-      font-weight: 1000;
-      text-transform: uppercase;
-      text-shadow: 0 0 15px rgba(255,201,52,.5);
-    }
-
-    .victory p {
-      color: #ddd;
-      margin: 10px 0 4px;
-      font-size: 13px;
-    }
-
-    #counterCode {
-      display: block;
-      margin: 8px 0 18px;
-      color: #ffe18a;
-      font-size: 38px;
-      line-height: 1;
-      font-weight: 1000;
-      letter-spacing: 5px;
-      text-shadow: 0 0 15px rgba(255,195,44,.7);
-    }
-
-    #claimButton {
-      width: 100%;
-      padding: 15px;
-      font-size: 17px;
-      background: linear-gradient(180deg, #ffe89b, #c99122);
     }
 
     #status {
@@ -379,22 +270,149 @@
       text-align: center;
     }
 
-    @media (max-height: 720px) {
+    /* ==========================================================
+       MODAL VICTORIA
+       ========================================================== */
+
+    #victoryOverlay {
+      position: fixed;
+      inset: 0;
+
+      z-index: 20000;
+
+      display: none;
+
+      align-items: center;
+      justify-content: center;
+
+      padding: 20px;
+
+      background: rgba(0,0,0,.84);
+
+      backdrop-filter: blur(7px);
+      -webkit-backdrop-filter: blur(7px);
+    }
+
+    #victoryOverlay.show {
+      display: flex;
+    }
+
+    .victory {
+      width: min(380px, 94vw);
+
+      padding: 30px 22px 25px;
+
+      text-align: center;
+
+      border: 2px solid #d4a532;
+      border-radius: 20px;
+
+      background:
+        radial-gradient(
+          circle at 50% 0,
+          rgba(255,214,96,.14),
+          transparent 50%
+        ),
+        linear-gradient(
+          145deg,
+          #181818,
+          #070707
+        );
+
+      box-shadow:
+        0 0 20px rgba(255,203,68,.45),
+        0 0 70px rgba(255,178,35,.20);
+
+      animation: victoryIn .4s ease-out;
+    }
+
+    @keyframes victoryIn {
+      from {
+        opacity: 0;
+        transform: scale(.75) translateY(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
+
+    .crown {
+      font-size: 45px;
+      line-height: 1;
+      margin-bottom: 8px;
+
+      filter:
+        drop-shadow(
+          0 0 9px
+          rgba(255,211,75,.75)
+        );
+    }
+
+    .victory h2 {
+      margin: 0;
+
+      color: #ffdc71;
+
+      font-size: 29px;
+      font-weight: 1000;
+
+      text-transform: uppercase;
+
+      text-shadow:
+        0 0 15px
+        rgba(255,201,52,.5);
+    }
+
+    .victory p {
+      color: #ddd;
+      margin: 10px 0 4px;
+      font-size: 13px;
+    }
+
+    #counterCode {
+      display: block;
+
+      margin: 8px 0 18px;
+
+      color: #ffe18a;
+
+      font-size: 38px;
+      line-height: 1;
+
+      font-weight: 1000;
+      letter-spacing: 5px;
+
+      text-shadow:
+        0 0 15px
+        rgba(255,195,44,.7);
+    }
+
+    #claimButton {
+      width: 100%;
+      padding: 15px;
+      font-size: 17px;
+    }
+
+    /* ==========================================================
+       PANTALLAS MUY PEQUEÑAS
+       ========================================================== */
+
+    @media (max-width: 360px) {
       .game {
-        padding-top: 10px;
+        padding-left: 8px;
+        padding-right: 8px;
       }
 
-      .title {
-        margin-bottom: 9px;
-      }
-
-      .arena-title {
-        margin-top: 10px;
+      #board {
+        transform: scale(.90);
+        transform-origin: top center;
+        margin-bottom: -33px;
       }
 
       #arena {
-        height: 180px;
-        flex-basis: 180px;
+        width: 100%;
       }
     }
   </style>
@@ -405,9 +423,15 @@
   <main class="game">
 
     <h1 class="title">Rompecabezas El Rey</h1>
-    <div class="subtitle">Completá las 9 piezas</div>
 
-    <section id="board" aria-label="Tablero del rompecabezas">
+    <div class="subtitle">
+      Completá las 9 piezas
+    </div>
+
+    <section
+      id="board"
+      aria-label="Tablero del rompecabezas"
+    >
       <div class="slot"></div>
       <div class="slot"></div>
       <div class="slot"></div>
@@ -419,975 +443,1772 @@
       <div class="slot"></div>
     </section>
 
-    <div class="arena-title">Piezas</div>
+    <div class="arena-title">
+      Piezas
+    </div>
 
-    <section id="arena" aria-label="Zona de piezas"></section>
+    <section
+      id="arena"
+      aria-label="Zona de piezas"
+    ></section>
 
     <div class="controls">
-      <button id="resetButton" type="button">REINICIAR JUEGO</button>
+      <button
+        id="resetButton"
+        type="button"
+      >
+        REINICIAR JUEGO
+      </button>
     </div>
 
     <div id="status"></div>
 
   </main>
 
+
+  <!-- ==========================================================
+       MODAL DE VICTORIA
+       ========================================================== -->
+
   <div id="victoryOverlay">
+
     <div class="victory">
-      <div class="crown">👑</div>
-      <h2>¡Ganaste!</h2>
-      <p>Completaste el rompecabezas.</p>
-      <span id="counterCode">0000</span>
-      <button id="claimButton" type="button">COBRAR</button>
+
+      <div class="crown">
+        👑
+      </div>
+
+      <h2>
+        ¡Ganaste!
+      </h2>
+
+      <p>
+        Completaste el rompecabezas.
+      </p>
+
+      <span id="counterCode">
+        0000
+      </span>
+
+      <button
+        id="claimButton"
+        type="button"
+      >
+        COBRAR
+      </button>
+
     </div>
+
   </div>
 
-  <!--
-    IMPORTANTE:
-    La lógica completa está en el BLOQUE 2.
-    Pegá ese JavaScript antes de cerrar </body>
-    si querés mantener todo en un único HTML.
-  -->
+
+  <!-- ==========================================================
+       JAVASCRIPT
+       ========================================================== -->
+
+  <script>
+
+    (() => {
+
+      "use strict";
+
+
+      /* ========================================================
+         CONFIGURACIÓN
+         ======================================================== */
+
+      const IMAGES = [
+        "imagen1.jpeg",
+        "imagen2.jpeg",
+        "imagen3.jpeg"
+      ];
+
+
+      /*
+       * IMPORTANTE:
+       *
+       * REEMPLAZÁ ESTA URL POR LA URL REAL DE TU FIREBASE
+       * REALTIME DATABASE.
+       *
+       * Ejemplo:
+       *
+       * https://mi-proyecto-default-rtdb.firebaseio.com
+       *
+       */
+
+      const FIREBASE_URL =
+        "https://firebaseio.com";
+
+      const FIREBASE_NODE =
+        "/ganadores.json";
+
+
+      const PUZZLE_SIZE = 330;
+      const PIECE_SIZE = 110;
+      const GRID_SIZE = 3;
+      const TOTAL_PIECES = 9;
+      const ARENA_HEIGHT = 220;
+
+
+      /* ========================================================
+         ELEMENTOS
+         ======================================================== */
+
+      const board =
+        document.getElementById("board");
+
+      const arena =
+        document.getElementById("arena");
+
+      const resetButton =
+        document.getElementById("resetButton");
+
+      const victoryOverlay =
+        document.getElementById("victoryOverlay");
+
+      const counterCode =
+        document.getElementById("counterCode");
+
+      const claimButton =
+        document.getElementById("claimButton");
+
+      const statusElement =
+        document.getElementById("status");
+
+
+      /* ========================================================
+         ESTADO
+         ======================================================== */
+
+      let currentImage = null;
+
+      let pieces = [];
+
+      let solved = false;
+
+      let winningCode = "0000";
+
+      let activeTouch = null;
+
+      let activeMouse = null;
+
+
+      /* ========================================================
+         UTILIDADES
+         ======================================================== */
+
+      function random(min, max) {
+        return Math.random() * (max - min) + min;
+      }
+
+
+      function randomInt(min, max) {
+        return Math.floor(
+          Math.random() * (max - min + 1)
+        ) + min;
+      }
+
+
+      function clamp(value, min, max) {
+        return Math.max(
+          min,
+          Math.min(max, value)
+        );
+      }
+
+
+      function formatCode(number) {
+        return String(number).padStart(4, "0");
+      }
+
+
+      function setStatus(message) {
+        statusElement.textContent =
+          message || "";
+      }
+
+
+      function chooseImage(forceDifferent = false) {
+
+        if (
+          !forceDifferent ||
+          IMAGES.length <= 1 ||
+          !currentImage
+        ) {
+          currentImage =
+            IMAGES[
+              randomInt(
+                0,
+                IMAGES.length - 1
+              )
+            ];
+
+          return;
+        }
+
+
+        const available =
+          IMAGES.filter(
+            image => image !== currentImage
+          );
+
+
+        currentImage =
+          available[
+            randomInt(
+              0,
+              available.length - 1
+            )
+          ];
+      }
+
+
+      /* ========================================================
+         FONDO DE CADA PIEZA
+         ======================================================== */
+
+      function applyPieceBackground(
+        piece,
+        index
+      ) {
+
+        const row =
+          Math.floor(
+            index / GRID_SIZE
+          );
+
+        const column =
+          index % GRID_SIZE;
+
+
+        /*
+         * DESFASE ABSOLUTO.
+         *
+         * Nunca usamos porcentajes.
+         */
+
+        const x =
+          column * -PIECE_SIZE;
+
+        const y =
+          row * -PIECE_SIZE;
+
+
+        piece.style.backgroundImage =
+          `url("${currentImage}")`;
+
+
+        piece.style.backgroundSize =
+          `${PUZZLE_SIZE}px ${PUZZLE_SIZE}px`;
+
+
+        piece.style.backgroundPosition =
+          `${x}px ${y}px`;
+
+
+        piece.style.backgroundRepeat =
+          "no-repeat";
+      }
+
+
+      /* ========================================================
+         CREACIÓN
+         ======================================================== */
+
+      function createPieces() {
+
+        pieces = [];
+
+
+        for (
+          let index = 0;
+          index < TOTAL_PIECES;
+          index++
+        ) {
+
+          const piece =
+            document.createElement("div");
+
+
+          piece.className =
+            `piece p${index}`;
+
+
+          piece.dataset.index =
+            String(index);
+
+
+          applyPieceBackground(
+            piece,
+            index
+          );
+
+
+          arena.appendChild(piece);
+
+
+          const item = {
+
+            element: piece,
+
+            index,
+
+            placed: false,
+
+            locked: false,
+
+            location: "arena",
+
+            x: 0,
+
+            y: 0,
+
+            rotation: 0
+
+          };
+
+
+          pieces.push(item);
+
+
+          setupTouchEvents(
+            piece,
+            index
+          );
+
+
+          setupMouseEvents(
+            piece,
+            index
+          );
+
+        }
+
+      }
+
+
+      /* ========================================================
+         DISPERSIÓN
+         ======================================================== */
+
+      function scatterPieces() {
+
+        const arenaWidth =
+          arena.clientWidth;
+
+
+        pieces.forEach(item => {
+
+          const piece =
+            item.element;
+
+
+          const maxX =
+            Math.max(
+              0,
+              arenaWidth - PIECE_SIZE
+            );
+
+
+          const maxY =
+            Math.max(
+              0,
+              ARENA_HEIGHT - PIECE_SIZE
+            );
+
+
+          const x =
+            random(0, maxX);
+
+
+          const y =
+            random(0, maxY);
+
+
+          const rotation =
+            random(-12, 12);
+
+
+          item.x = x;
+          item.y = y;
+
+          item.rotation =
+            rotation;
+
+          item.location =
+            "arena";
+
+          item.placed =
+            false;
+
+          item.locked =
+            false;
+
+
+          piece.classList.remove(
+            "dragging",
+            "locked"
+          );
+
+
+          piece.style.left =
+            `${x}px`;
+
+
+          piece.style.top =
+            `${y}px`;
+
+
+          piece.style.transform =
+            `rotate(${rotation}deg)`;
+
+
+          piece.style.zIndex =
+            "20";
+
+
+          arena.appendChild(piece);
+
+        });
+
+      }
+
+
+      /* ========================================================
+         POSICIÓN CORRECTA
+         ======================================================== */
+
+      function getBoardPosition(index) {
+
+        const row =
+          Math.floor(
+            index / GRID_SIZE
+          );
+
+
+        const column =
+          index % GRID_SIZE;
+
+
+        return {
+
+          x:
+            column * PIECE_SIZE,
+
+          y:
+            row * PIECE_SIZE
+
+        };
+
+      }
+
+
+      /* ========================================================
+         CASILLA DE DROP
+         ======================================================== */
+
+      function getDropCell(
+        clientX,
+        clientY
+      ) {
+
+        const rect =
+          board.getBoundingClientRect();
+
+
+        const x =
+          clientX - rect.left;
+
+        const y =
+          clientY - rect.top;
+
+
+        if (
+          x < 0 ||
+          y < 0 ||
+          x > rect.width ||
+          y > rect.height
+        ) {
+          return null;
+        }
+
+
+        /*
+         * Como el tablero puede tener una pequeña escala
+         * en pantallas menores, convertimos primero a las
+         * coordenadas internas de 330x330.
+         */
+
+        const scaleX =
+          PUZZLE_SIZE / rect.width;
+
+        const scaleY =
+          PUZZLE_SIZE / rect.height;
+
+
+        const internalX =
+          x * scaleX;
+
+        const internalY =
+          y * scaleY;
+
+
+        const column =
+          clamp(
+            Math.floor(
+              internalX / PIECE_SIZE
+            ),
+            0,
+            2
+          );
+
+
+        const row =
+          clamp(
+            Math.floor(
+              internalY / PIECE_SIZE
+            ),
+            0,
+            2
+          );
+
+
+        return {
+
+          index:
+            row * GRID_SIZE + column,
+
+          x:
+            column * PIECE_SIZE,
+
+          y:
+            row * PIECE_SIZE
+
+        };
+
+      }
+
+
+      /* ========================================================
+         PIEZA A ARENA
+         ======================================================== */
+
+      function returnToArena(
+        item,
+        clientX,
+        clientY
+      ) {
+
+        const arenaRect =
+          arena.getBoundingClientRect();
+
+
+        let x =
+          clientX -
+          arenaRect.left -
+          PIECE_SIZE / 2;
+
+
+        let y =
+          clientY -
+          arenaRect.top -
+          PIECE_SIZE / 2;
+
+
+        x =
+          clamp(
+            x,
+            0,
+            Math.max(
+              0,
+              arena.clientWidth -
+              PIECE_SIZE
+            )
+          );
+
+
+        y =
+          clamp(
+            y,
+            0,
+            Math.max(
+              0,
+              ARENA_HEIGHT -
+              PIECE_SIZE
+            )
+          );
+
+
+        item.x = x;
+        item.y = y;
+
+        item.rotation =
+          random(-12, 12);
+
+        item.location =
+          "arena";
+
+        item.placed =
+          false;
+
+        item.locked =
+          false;
+
+
+        item.element.classList.remove(
+          "locked"
+        );
+
+
+        item.element.style.left =
+          `${x}px`;
+
+
+        item.element.style.top =
+          `${y}px`;
+
+
+        item.element.style.transform =
+          `rotate(${item.rotation}deg)`;
+
+
+        item.element.style.zIndex =
+          "20";
+
+
+        arena.appendChild(
+          item.element
+        );
+
+      }
+
+
+      /* ========================================================
+         COMPROBAR SI HAY UNA PIEZA EN UNA CASILLA
+         ======================================================== */
+
+      function getPieceInCell(
+        cellIndex,
+        exceptItem = null
+      ) {
+
+        return pieces.find(item => {
+
+          if (
+            exceptItem &&
+            item === exceptItem
+          ) {
+            return false;
+          }
+
+
+          if (
+            item.location !== "board"
+          ) {
+            return false;
+          }
+
+
+          const left =
+            parseFloat(
+              item.element.style.left
+            ) || 0;
+
+
+          const top =
+            parseFloat(
+              item.element.style.top
+            ) || 0;
+
+
+          const column =
+            Math.round(
+              left / PIECE_SIZE
+            );
+
+
+          const row =
+            Math.round(
+              top / PIECE_SIZE
+            );
+
+
+          return (
+            row * GRID_SIZE +
+            column === cellIndex
+          );
+
+        });
+
+      }
+
+
+      /* ========================================================
+         SOLTAR EN TABLERO
+         ======================================================== */
+
+      function dropOnBoard(
+        item,
+        clientX,
+        clientY
+      ) {
+
+        const cell =
+          getDropCell(
+            clientX,
+            clientY
+          );
+
+
+        if (!cell) {
+          return false;
+        }
+
+
+        /*
+         * Si otra pieza ocupa esa casilla,
+         * la pieza anterior vuelve automáticamente
+         * a la arena.
+         *
+         * Esto evita que dos piezas queden físicamente
+         * una encima de otra y permite corregir errores.
+         */
+
+        const occupyingPiece =
+          getPieceInCell(
+            cell.index,
+            item
+          );
+
+
+        if (occupyingPiece) {
+
+          returnToArena(
+            occupyingPiece,
+            clientX,
+            clientY
+          );
+
+        }
+
+
+        item.x =
+          cell.x;
+
+        item.y =
+          cell.y;
+
+        item.location =
+          "board";
+
+
+        item.element.style.left =
+          `${cell.x}px`;
+
+
+        item.element.style.top =
+          `${cell.y}px`;
+
+
+        item.element.style.transform =
+          "rotate(0deg)";
+
+
+        board.appendChild(
+          item.element
+        );
+
+
+        /*
+         * SOLAMENTE la posición correcta bloquea
+         * la pieza.
+         */
+
+        if (
+          cell.index === item.index
+        ) {
+
+          item.placed =
+            true;
+
+          item.locked =
+            true;
+
+
+          item.element.classList.add(
+            "locked"
+          );
+
+        } else {
+
+          /*
+           * Error:
+           * permanece en el tablero.
+           * NO vuelve a la arena.
+           * Sigue siendo arrastrable.
+           */
+
+          item.placed =
+            false;
+
+          item.locked =
+            false;
+
+
+          item.element.classList.remove(
+            "locked"
+          );
+
+        }
+
+
+        checkVictory();
+
+        return true;
+
+      }
+
+
+      /* ========================================================
+         PROCESAR DROP
+         ======================================================== */
+
+      function processDrop(
+        item,
+        clientX,
+        clientY
+      ) {
+
+        if (
+          !item ||
+          item.locked ||
+          solved
+        ) {
+          return;
+        }
+
+
+        const cell =
+          getDropCell(
+            clientX,
+            clientY
+          );
+
+
+        if (cell) {
+
+          dropOnBoard(
+            item,
+            clientX,
+            clientY
+          );
+
+        } else {
+
+          returnToArena(
+            item,
+            clientX,
+            clientY
+          );
+
+        }
+
+      }
+
+
+      /* ========================================================
+         OBTENER PIEZA
+         ======================================================== */
+
+      function getPiece(index) {
+
+        return pieces.find(
+          item =>
+            item.index === index
+        );
+
+      }
+
+
+      /* ========================================================
+         TOUCH START
+         ======================================================== */
+
+      function handleTouchStart(
+        e,
+        index
+      ) {
+
+        if (solved) {
+          return;
+        }
+
+
+        const item =
+          getPiece(index);
+
+
+        if (
+          !item ||
+          item.locked
+        ) {
+          return;
+        }
+
+
+        if (
+          !e.touches ||
+          !e.touches.length
+        ) {
+          return;
+        }
+
+
+        /*
+         * Evita seleccionar texto o activar
+         * comportamiento táctil secundario.
+         */
+
+        e.preventDefault();
+
+
+        const touch =
+          e.touches[0];
+
+
+        const rect =
+          item.element.getBoundingClientRect();
+
+
+        activeTouch = {
+
+          item,
+
+          identifier:
+            touch.identifier,
+
+          offsetX:
+            touch.clientX -
+            rect.left,
+
+          offsetY:
+            touch.clientY -
+            rect.top
+
+        };
+
+
+        item.element.classList.add(
+          "dragging"
+        );
+
+
+        item.element.style.transform =
+          "rotate(0deg)";
+
+
+        item.element.style.zIndex =
+          "9999";
+
+      }
+
+
+      /* ========================================================
+         TOUCH MOVE
+         ======================================================== */
+
+      function handleTouchMove(e) {
+
+        if (!activeTouch) {
+          return;
+        }
+
+
+        let touch = null;
+
+
+        for (
+          const currentTouch
+          of e.touches
+        ) {
+
+          if (
+            currentTouch.identifier ===
+            activeTouch.identifier
+          ) {
+
+            touch =
+              currentTouch;
+
+            break;
+
+          }
+
+        }
+
+
+        if (!touch) {
+          return;
+        }
+
+
+        /*
+         * MUY IMPORTANTE:
+         * evita que el navegador desplace la página.
+         */
+
+        e.preventDefault();
+
+
+        const item =
+          activeTouch.item;
+
+
+        const parentRect =
+          item.location === "board"
+            ? board.getBoundingClientRect()
+            : arena.getBoundingClientRect();
+
+
+        const x =
+          touch.clientX -
+          parentRect.left -
+          activeTouch.offsetX;
+
+
+        const y =
+          touch.clientY -
+          parentRect.top -
+          activeTouch.offsetY;
+
+
+        item.element.style.left =
+          `${x}px`;
+
+
+        item.element.style.top =
+          `${y}px`;
+
+
+        item.x = x;
+        item.y = y;
+
+      }
+
+
+      /* ========================================================
+         TOUCH END
+         ======================================================== */
+
+      function handleTouchEnd(e) {
+
+        if (!activeTouch) {
+          return;
+        }
+
+
+        let touch = null;
+
+
+        if (
+          e.changedTouches &&
+          e.changedTouches.length
+        ) {
+
+          for (
+            const currentTouch
+            of e.changedTouches
+          ) {
+
+            if (
+              currentTouch.identifier ===
+              activeTouch.identifier
+            ) {
+
+              touch =
+                currentTouch;
+
+              break;
+
+            }
+
+          }
+
+        }
+
+
+        const item =
+          activeTouch.item;
+
+
+        if (touch) {
+
+          processDrop(
+            item,
+            touch.clientX,
+            touch.clientY
+          );
+
+        }
+
+
+        item.element.classList.remove(
+          "dragging"
+        );
+
+
+        item.element.style.zIndex =
+          item.locked
+            ? "50"
+            : "20";
+
+
+        activeTouch =
+          null;
+
+      }
+
+
+      /* ========================================================
+         REGISTRO TOUCH
+         ======================================================== */
+
+      function setupTouchEvents(
+        element,
+        index
+      ) {
+
+        element.addEventListener(
+          "touchstart",
+          e =>
+            handleTouchStart(
+              e,
+              index
+            ),
+          {
+            passive: false
+          }
+        );
+
+
+        element.addEventListener(
+          "touchmove",
+          handleTouchMove,
+          {
+            passive: false
+          }
+        );
+
+
+        element.addEventListener(
+          "touchend",
+          handleTouchEnd,
+          {
+            passive: false
+          }
+        );
+
+
+        element.addEventListener(
+          "touchcancel",
+          handleTouchEnd,
+          {
+            passive: false
+          }
+        );
+
+      }
+
+
+      /* ========================================================
+         MOUSE DOWN
+         ======================================================== */
+
+      function handleMouseDown(
+        e,
+        index
+      ) {
+
+        if (solved) {
+          return;
+        }
+
+
+        const item =
+          getPiece(index);
+
+
+        if (
+          !item ||
+          item.locked
+        ) {
+          return;
+        }
+
+
+        const rect =
+          item.element.getBoundingClientRect();
+
+
+        activeMouse = {
+
+          item,
+
+          offsetX:
+            e.clientX -
+            rect.left,
+
+          offsetY:
+            e.clientY -
+            rect.top
+
+        };
+
+
+        item.element.classList.add(
+          "dragging"
+        );
+
+
+        item.element.style.transform =
+          "rotate(0deg)";
+
+
+        item.element.style.zIndex =
+          "9999";
+
+
+        e.preventDefault();
+
+      }
+
+
+      /* ========================================================
+         MOUSE MOVE
+         ======================================================== */
+
+      function handleMouseMove(e) {
+
+        if (!activeMouse) {
+          return;
+        }
+
+
+        const item =
+          activeMouse.item;
+
+
+        const parentRect =
+          item.location === "board"
+            ? board.getBoundingClientRect()
+            : arena.getBoundingClientRect();
+
+
+        const x =
+          e.clientX -
+          parentRect.left -
+          activeMouse.offsetX;
+
+
+        const y =
+          e.clientY -
+          parentRect.top -
+          activeMouse.offsetY;
+
+
+        item.element.style.left =
+          `${x}px`;
+
+
+        item.element.style.top =
+          `${y}px`;
+
+
+        item.x = x;
+        item.y = y;
+
+      }
+
+
+      /* ========================================================
+         MOUSE UP
+         ======================================================== */
+
+      function handleMouseUp(e) {
+
+        if (!activeMouse) {
+          return;
+        }
+
+
+        const item =
+          activeMouse.item;
+
+
+        processDrop(
+          item,
+          e.clientX,
+          e.clientY
+        );
+
+
+        item.element.classList.remove(
+          "dragging"
+        );
+
+
+        item.element.style.zIndex =
+          item.locked
+            ? "50"
+            : "20";
+
+
+        activeMouse =
+          null;
+
+      }
+
+
+      /* ========================================================
+         REGISTRO MOUSE
+         ======================================================== */
+
+      function setupMouseEvents(
+        element,
+        index
+      ) {
+
+        element.addEventListener(
+          "mousedown",
+          e =>
+            handleMouseDown(
+              e,
+              index
+            )
+        );
+
+      }
+
+
+      document.addEventListener(
+        "mousemove",
+        handleMouseMove
+      );
+
+
+      document.addEventListener(
+        "mouseup",
+        handleMouseUp
+      );
+
+
+      /* ========================================================
+         VALIDACIÓN
+         ======================================================== */
+
+      function validatePuzzle() {
+
+        if (
+          pieces.length !==
+          TOTAL_PIECES
+        ) {
+          return false;
+        }
+
+
+        for (
+          let index = 0;
+          index < TOTAL_PIECES;
+          index++
+        ) {
+
+          const item =
+            getPiece(index);
+
+
+          if (!item) {
+            return false;
+          }
+
+
+          if (
+            !item.placed ||
+            !item.locked ||
+            item.location !== "board"
+          ) {
+            return false;
+          }
+
+
+          const expected =
+            getBoardPosition(index);
+
+
+          const actualLeft =
+            parseFloat(
+              item.element.style.left
+            ) || 0;
+
+
+          const actualTop =
+            parseFloat(
+              item.element.style.top
+            ) || 0;
+
+
+          if (
+            Math.abs(
+              actualLeft -
+              expected.x
+            ) > 1
+          ) {
+            return false;
+          }
+
+
+          if (
+            Math.abs(
+              actualTop -
+              expected.y
+            ) > 1
+          ) {
+            return false;
+          }
+
+        }
+
+
+        return true;
+
+      }
+
+
+      /* ========================================================
+         VICTORIA
+         ======================================================== */
+
+      function checkVictory() {
+
+        if (solved) {
+          return;
+        }
+
+
+        if (!validatePuzzle()) {
+          return;
+        }
+
+
+        solved = true;
+
+
+        setTimeout(
+          registerWinner,
+          250
+        );
+
+      }
+
+
+      /* ========================================================
+         FIREBASE
+         ======================================================== */
+
+      async function registerWinner() {
+
+        setStatus(
+          "Registrando victoria..."
+        );
+
+
+        try {
+
+          const firebaseBase =
+            FIREBASE_URL.replace(
+              /\/+$/,
+              ""
+            );
+
+
+          const postUrl =
+            `${firebaseBase}${FIREBASE_NODE}`;
+
+
+          /*
+           * POST:
+           * crea una nueva clave automática.
+           */
+
+          const postResponse =
+            await fetch(
+              postUrl,
+              {
+                method: "POST",
+
+                headers: {
+                  "Content-Type":
+                    "application/json"
+                },
+
+                body:
+                  JSON.stringify({
+                    timestamp:
+                      Date.now(),
+
+                    game:
+                      "rompecabezas-el-rey"
+                  }),
+
+                cache:
+                  "no-store"
+              }
+            );
+
+
+          if (
+            !postResponse.ok
+          ) {
+
+            throw new Error(
+              `Firebase POST ${postResponse.status}`
+            );
+
+          }
+
+
+          /*
+           * GET SIN CACHÉ.
+           */
+
+          const getUrl =
+            `${firebaseBase}${FIREBASE_NODE}?nocache=${Date.now()}`;
+
+
+          const getResponse =
+            await fetch(
+              getUrl,
+              {
+                method: "GET",
+
+                cache:
+                  "no-store",
+
+                headers: {
+                  "Cache-Control":
+                    "no-cache"
+                }
+              }
+            );
+
+
+          if (
+            !getResponse.ok
+          ) {
+
+            throw new Error(
+              `Firebase GET ${getResponse.status}`
+            );
+
+          }
+
+
+          const data =
+            await getResponse.json();
+
+
+          let total = 0;
+
+
+          if (
+            data &&
+            typeof data === "object" &&
+            !Array.isArray(data)
+          ) {
+
+            total =
+              Object.keys(data).length;
+
+          }
+
+
+          winningCode =
+            formatCode(total);
+
+
+          showVictory(
+            winningCode
+          );
+
+        }
+
+        catch (error) {
+
+          console.error(
+            "Error Firebase:",
+            error
+          );
+
+
+          /*
+           * Si Firebase falla NO mostramos
+           * un código falso.
+           */
+
+          setStatus(
+            "Error de conexión con el contador de victorias."
+          );
+
+
+          solved = false;
+
+        }
+
+      }
+
+
+      /* ========================================================
+         MOSTRAR VICTORIA
+         ======================================================== */
+
+      function showVictory(code) {
+
+        counterCode.textContent =
+          code;
+
+
+        victoryOverlay.classList.add(
+          "show"
+        );
+
+
+        setStatus("");
+
+      }
+
+
+      /* ========================================================
+         COBRAR POR WHATSAPP
+         ======================================================== */
+
+      function claimPrize() {
+
+        const phone =
+          "5491124050658";
+
+
+        const message =
+          `felicitaciones por finalizar el rompecabezas. Mi código es: ${winningCode}`;
+
+
+        const whatsappUrl =
+          `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+
+
+        window.location.href =
+          whatsappUrl;
+
+      }
+
+
+      claimButton.addEventListener(
+        "click",
+        claimPrize
+      );
+
+
+      /* ========================================================
+         REINICIAR
+         ======================================================== */
+
+      function resetGame() {
+
+        solved = false;
+
+        winningCode =
+          "0000";
+
+
+        victoryOverlay.classList.remove(
+          "show"
+        );
+
+
+        /*
+         * Elegimos otra imagen.
+         */
+
+        chooseImage(true);
+
+
+        /*
+         * Eliminamos piezas existentes.
+         */
+
+        pieces.forEach(
+          item => {
+            item.element.remove();
+          }
+        );
+
+
+        pieces = [];
+
+
+        /*
+         * Creamos nuevamente las 9.
+         */
+
+        createPieces();
+
+
+        /*
+         * Esperamos a que el navegador calcule
+         * correctamente el tamaño de la arena.
+         */
+
+        requestAnimationFrame(
+          () => {
+            scatterPieces();
+          }
+        );
+
+
+        setStatus("");
+
+      }
+
+
+      resetButton.addEventListener(
+        "click",
+        resetGame
+      );
+
+
+      /* ========================================================
+         INICIALIZACIÓN
+         ======================================================== */
+
+      function init() {
+
+        chooseImage(false);
+
+        createPieces();
+
+
+        requestAnimationFrame(
+          () => {
+            scatterPieces();
+          }
+        );
+
+      }
+
+
+      init();
+
+    })();
+
+  </script>
 
 </body>
 </html>
-/* ============================================================
-   ROMPECABEZAS EL REY
-   JavaScript Vanilla
-   ============================================================ */
-
-(() => {
-  "use strict";
-
-  /* ------------------------------------------------------------
-     CONFIGURACIÓN
-     ------------------------------------------------------------ */
-
-  const IMAGES = [
-    "imagen1.jpeg",
-    "imagen2.jpeg",
-    "imagen3.jpeg"
-  ];
-
-  /*
-   * IMPORTANTE:
-   *
-   * Firebase Realtime Database NO utiliza normalmente
-   * "https://firebaseio.com" como URL de base de datos.
-   *
-   * Debés reemplazar este valor por la URL de TU Realtime
-   * Database, por ejemplo:
-   *
-   * https://tu-proyecto-default-rtdb.firebaseio.com
-   *
-   * Se mantiene separado para que no haya que modificar
-   * ninguna otra parte del juego.
-   */
-  const FIREBASE_URL = "https://firebaseio.com";
-
-  const FIREBASE_NODE = "/ganadores.json";
-
-  const PUZZLE_SIZE = 330;
-  const PIECE_SIZE = 110;
-  const GRID_SIZE = 3;
-
-  const ARENA_HEIGHT = 220;
-
-  /* ------------------------------------------------------------
-     REFERENCIAS DOM
-     ------------------------------------------------------------ */
-
-  const board = document.getElementById("board");
-  const arena = document.getElementById("arena");
-  const resetButton = document.getElementById("resetButton");
-  const victoryOverlay = document.getElementById("victoryOverlay");
-  const counterCode = document.getElementById("counterCode");
-  const claimButton = document.getElementById("claimButton");
-  const statusElement = document.getElementById("status");
-
-  /* ------------------------------------------------------------
-     ESTADO
-     ------------------------------------------------------------ */
-
-  let currentImage = null;
-  let pieces = [];
-  let solved = false;
-  let winningCode = "0000";
-
-  let activeTouch = null;
-  let activeMouse = null;
-
-  /* ------------------------------------------------------------
-     UTILIDADES
-     ------------------------------------------------------------ */
-
-  function random(min, max) {
-    return Math.random() * (max - min) + min;
-  }
-
-  function randomInt(min, max) {
-    return Math.floor(random(min, max + 1));
-  }
-
-  function clamp(value, min, max) {
-    return Math.max(min, Math.min(max, value));
-  }
-
-  function formatCode(number) {
-    return String(number).padStart(4, "0");
-  }
-
-  function setStatus(message) {
-    statusElement.textContent = message || "";
-  }
-
-  function chooseImage(forceDifferent = false) {
-    if (!forceDifferent || IMAGES.length <= 1 || !currentImage) {
-      currentImage = IMAGES[randomInt(0, IMAGES.length - 1)];
-      return;
-    }
-
-    const available = IMAGES.filter(image => image !== currentImage);
-
-    currentImage = available[
-      randomInt(0, available.length - 1)
-    ];
-  }
-
-  /* ------------------------------------------------------------
-     FONDO DE CADA PIEZA
-     
-     NO SE UTILIZA background-position PORCENTUAL.
-     
-     El fondo completo es exactamente:
-       330px x 330px
-     
-     Cada pieza desplaza el fondo:
-       columna * -110px
-       fila    * -110px
-     ------------------------------------------------------------ */
-
-  function applyPieceBackground(piece, index) {
-    const row = Math.floor(index / GRID_SIZE);
-    const column = index % GRID_SIZE;
-
-    const x = column * -PIECE_SIZE;
-    const y = row * -PIECE_SIZE;
-
-    piece.style.backgroundImage = `url("${currentImage}")`;
-    piece.style.backgroundSize = `${PUZZLE_SIZE}px ${PUZZLE_SIZE}px`;
-    piece.style.backgroundPosition = `${x}px ${y}px`;
-    piece.style.backgroundRepeat = "no-repeat";
-  }
-
-  /* ------------------------------------------------------------
-     CREAR PIEZAS
-     ------------------------------------------------------------ */
-
-  function createPieces() {
-    pieces = [];
-
-    for (let index = 0; index < 9; index++) {
-      const piece = document.createElement("div");
-
-      piece.className = `piece p${index}`;
-      piece.dataset.index = String(index);
-
-      applyPieceBackground(piece, index);
-
-      /*
-       * Cada pieza empieza abajo, desordenada.
-       */
-      arena.appendChild(piece);
-
-      pieces.push({
-        element: piece,
-        index,
-        placed: false,
-        locked: false,
-        location: "arena",
-        x: 0,
-        y: 0,
-        rotation: 0
-      });
-
-      setupTouchEvents(piece, index);
-      setupMouseEvents(piece, index);
-    }
-  }
-
-  /* ------------------------------------------------------------
-     DISPERSIÓN INICIAL
-     ------------------------------------------------------------ */
-
-  function scatterPieces() {
-    const arenaWidth = arena.clientWidth;
-
-    pieces.forEach(item => {
-      const piece = item.element;
-
-      const maxX = Math.max(0, arenaWidth - PIECE_SIZE);
-      const maxY = Math.max(0, ARENA_HEIGHT - PIECE_SIZE);
-
-      const x = random(0, maxX);
-      const y = random(5, maxY);
-
-      const rotation = random(-12, 12);
-
-      item.x = x;
-      item.y = y;
-      item.rotation = rotation;
-      item.location = "arena";
-      item.placed = false;
-      item.locked = false;
-
-      piece.classList.remove("dragging", "locked");
-
-      piece.style.left = `${x}px`;
-      piece.style.top = `${y}px`;
-      piece.style.transform = `rotate(${rotation}deg)`;
-
-      arena.appendChild(piece);
-    });
-  }
-
-  /* ------------------------------------------------------------
-     POSICIÓN ABSOLUTA EN EL TABLERO
-     ------------------------------------------------------------ */
-
-  function getBoardPosition(index) {
-    const row = Math.floor(index / GRID_SIZE);
-    const column = index % GRID_SIZE;
-
-    return {
-      x: column * PIECE_SIZE,
-      y: row * PIECE_SIZE
-    };
-  }
-
-  /* ------------------------------------------------------------
-     DETECTAR SI LA PIEZA FUE SOLTADA SOBRE EL TABLERO
-     ------------------------------------------------------------ */
-
-  function getDropCell(clientX, clientY) {
-    const rect = board.getBoundingClientRect();
-
-    const x = clientX - rect.left;
-    const y = clientY - rect.top;
-
-    if (
-      x < 0 ||
-      y < 0 ||
-      x > rect.width ||
-      y > rect.height
-    ) {
-      return null;
-    }
-
-    const column = clamp(
-      Math.floor(x / PIECE_SIZE),
-      0,
-      2
-    );
-
-    const row = clamp(
-      Math.floor(y / PIECE_SIZE),
-      0,
-      2
-    );
-
-    return {
-      index: row * GRID_SIZE + column,
-      x: column * PIECE_SIZE,
-      y: row * PIECE_SIZE
-    };
-  }
-
-  /* ------------------------------------------------------------
-     SOLTAR EN ARENA
-     ------------------------------------------------------------ */
-
-  function returnToArena(item, clientX, clientY) {
-    const boardRect = board.getBoundingClientRect();
-    const arenaRect = arena.getBoundingClientRect();
-
-    /*
-     * Convertimos la coordenada de pantalla al sistema
-     * absoluto de la arena.
-     */
-    let x = clientX - arenaRect.left - PIECE_SIZE / 2;
-    let y = clientY - arenaRect.top - PIECE_SIZE / 2;
-
-    x = clamp(
-      x,
-      0,
-      Math.max(0, arena.clientWidth - PIECE_SIZE)
-    );
-
-    y = clamp(
-      y,
-      0,
-      Math.max(0, ARENA_HEIGHT - PIECE_SIZE)
-    );
-
-    item.x = x;
-    item.y = y;
-    item.rotation = random(-12, 12);
-    item.location = "arena";
-    item.placed = false;
-    item.locked = false;
-
-    item.element.classList.remove("locked");
-
-    item.element.style.left = `${x}px`;
-    item.element.style.top = `${y}px`;
-    item.element.style.transform =
-      `rotate(${item.rotation}deg)`;
-
-    arena.appendChild(item.element);
-  }
-
-  /* ------------------------------------------------------------
-     SOLTAR EN TABLERO
-     
-     REGLA IMPORTANTE:
-     Si es incorrecta, NO vuelve automáticamente abajo.
-     Se queda fija en esa casilla.
-     ------------------------------------------------------------ */
-
-  function dropOnBoard(item, clientX, clientY) {
-    const cell = getDropCell(clientX, clientY);
-
-    if (!cell) {
-      return false;
-    }
-
-    item.x = cell.x;
-    item.y = cell.y;
-    item.location = "board";
-
-    item.element.style.left = `${cell.x}px`;
-    item.element.style.top = `${cell.y}px`;
-    item.element.style.transform = "rotate(0deg)";
-
-    /*
-     * La pieza queda en el tablero independientemente de que
-     * sea correcta o incorrecta.
-     */
-    board.appendChild(item.element);
-
-    if (cell.index === item.index) {
-      item.placed = true;
-      item.locked = true;
-      item.element.classList.add("locked");
-    } else {
-      /*
-       * ERROR INTENCIONAL:
-       * La pieza permanece en la casilla incorrecta.
-       *
-       * NO se devuelve a la arena.
-       * Sigue siendo arrastrable porque locked = false.
-       */
-      item.placed = false;
-      item.locked = false;
-      item.element.classList.remove("locked");
-    }
-
-    checkVictory();
-
-    return true;
-  }
-
-  /* ------------------------------------------------------------
-     PROCESAR SOLTADO
-     ------------------------------------------------------------ */
-
-  function processDrop(item, clientX, clientY) {
-    if (!item || item.locked || solved) {
-      return;
-    }
-
-    const cell = getDropCell(clientX, clientY);
-
-    if (cell) {
-      dropOnBoard(item, clientX, clientY);
-    } else {
-      returnToArena(item, clientX, clientY);
-    }
-  }
-
-  /* ------------------------------------------------------------
-     OBTENER PIEZA
-     ------------------------------------------------------------ */
-
-  function getPiece(index) {
-    return pieces.find(item => item.index === index);
-  }
-
-  /* ------------------------------------------------------------
-     TOUCHSTART
-     
-     Evento exclusivamente táctil.
-     ------------------------------------------------------------ */
-
-  function handleTouchStart(e, index) {
-    if (solved) return;
-
-    const item = getPiece(index);
-
-    if (!item || item.locked) {
-      return;
-    }
-
-    if (!e.touches || !e.touches.length) {
-      return;
-    }
-
-    const touch = e.touches[0];
-    const rect = item.element.getBoundingClientRect();
-
-    activeTouch = {
-      item,
-      identifier: touch.identifier,
-      offsetX: touch.clientX - rect.left,
-      offsetY: touch.clientY - rect.top
-    };
-
-    item.element.classList.add("dragging");
-
-    /*
-     * Se quita la rotación durante el arrastre.
-     */
-    item.element.style.transform = "rotate(0deg)";
-
-    /*
-     * Elevamos visualmente la pieza.
-     */
-    item.element.style.zIndex = "9999";
-  }
-
-  /* ------------------------------------------------------------
-     TOUCHMOVE
-     
-     Evento exclusivamente táctil.
-     ------------------------------------------------------------ */
-
-  function handleTouchMove(e) {
-    if (!activeTouch) {
-      return;
-    }
-
-    let touch = null;
-
-    for (const currentTouch of e.touches) {
-      if (
-        currentTouch.identifier ===
-        activeTouch.identifier
-      ) {
-        touch = currentTouch;
-        break;
-      }
-    }
-
-    if (!touch) {
-      return;
-    }
-
-    /*
-     * Evita que el navegador haga scroll mientras arrastramos.
-     */
-    e.preventDefault();
-
-    const item = activeTouch.item;
-
-    let parentRect;
-
-    if (item.location === "board") {
-      parentRect = board.getBoundingClientRect();
-    } else {
-      parentRect = arena.getBoundingClientRect();
-    }
-
-    let x =
-      touch.clientX -
-      parentRect.left -
-      activeTouch.offsetX;
-
-    let y =
-      touch.clientY -
-      parentRect.top -
-      activeTouch.offsetY;
-
-    /*
-     * Permitimos mover la pieza libremente, incluso fuera
-     * del contenedor.
-     */
-    item.element.style.left = `${x}px`;
-    item.element.style.top = `${y}px`;
-
-    item.x = x;
-    item.y = y;
-  }
-
-  /* ------------------------------------------------------------
-     TOUCHEND
-     
-     Evento exclusivamente táctil.
-     ------------------------------------------------------------ */
-
-  function handleTouchEnd(e) {
-    if (!activeTouch) {
-      return;
-    }
-
-    let touch = null;
-
-    if (
-      e.changedTouches &&
-      e.changedTouches.length
-    ) {
-      for (const currentTouch of e.changedTouches) {
-        if (
-          currentTouch.identifier ===
-          activeTouch.identifier
-        ) {
-          touch = currentTouch;
-          break;
-        }
-      }
-    }
-
-    const item = activeTouch.item;
-
-    if (touch) {
-      processDrop(
-        item,
-        touch.clientX,
-        touch.clientY
-      );
-    }
-
-    item.element.classList.remove("dragging");
-
-    if (!item.locked) {
-      item.element.style.zIndex = "20";
-    } else {
-      item.element.style.zIndex = "50";
-    }
-
-    activeTouch = null;
-  }
-
-  /* ------------------------------------------------------------
-     REGISTRAR TOUCH EVENTS
-     ------------------------------------------------------------ */
-
-  function setupTouchEvents(element, index) {
-    element.addEventListener(
-      "touchstart",
-      e => handleTouchStart(e, index),
-      {
-        passive: false
-      }
-    );
-
-    element.addEventListener(
-      "touchmove",
-      handleTouchMove,
-      {
-        passive: false
-      }
-    );
-
-    element.addEventListener(
-      "touchend",
-      handleTouchEnd,
-      {
-        passive: false
-      }
-    );
-
-    element.addEventListener(
-      "touchcancel",
-      handleTouchEnd,
-      {
-        passive: false
-      }
-    );
-  }
-
-  /* ------------------------------------------------------------
-     MOUSE DOWN
-     
-     Separado completamente de TouchEvent.
-     ------------------------------------------------------------ */
-
-  function handleMouseDown(e, index) {
-    if (solved) return;
-
-    const item = getPiece(index);
-
-    if (!item || item.locked) {
-      return;
-    }
-
-    const rect = item.element.getBoundingClientRect();
-
-    activeMouse = {
-      item,
-      offsetX: e.clientX - rect.left,
-      offsetY: e.clientY - rect.top
-    };
-
-    item.element.classList.add("dragging");
-    item.element.style.transform = "rotate(0deg)";
-    item.element.style.zIndex = "9999";
-
-    e.preventDefault();
-  }
-
-  /* ------------------------------------------------------------
-     MOUSE MOVE
-     ------------------------------------------------------------ */
-
-  function handleMouseMove(e) {
-    if (!activeMouse) {
-      return;
-    }
-
-    const item = activeMouse.item;
-
-    const parentRect =
-      item.location === "board"
-        ? board.getBoundingClientRect()
-        : arena.getBoundingClientRect();
-
-    const x =
-      e.clientX -
-      parentRect.left -
-      activeMouse.offsetX;
-
-    const y =
-      e.clientY -
-      parentRect.top -
-      activeMouse.offsetY;
-
-    item.element.style.left = `${x}px`;
-    item.element.style.top = `${y}px`;
-
-    item.x = x;
-    item.y = y;
-  }
-
-  /* ------------------------------------------------------------
-     MOUSE UP
-     ------------------------------------------------------------ */
-
-  function handleMouseUp(e) {
-    if (!activeMouse) {
-      return;
-    }
-
-    const item = activeMouse.item;
-
-    processDrop(
-      item,
-      e.clientX,
-      e.clientY
-    );
-
-    item.element.classList.remove("dragging");
-
-    if (!item.locked) {
-      item.element.style.zIndex = "20";
-    } else {
-      item.element.style.zIndex = "50";
-    }
-
-    activeMouse = null;
-  }
-
-  /* ------------------------------------------------------------
-     REGISTRAR MOUSE EVENTS
-     ------------------------------------------------------------ */
-
-  function setupMouseEvents(element, index) {
-    element.addEventListener(
-      "mousedown",
-      e => handleMouseDown(e, index)
-    );
-  }
-
-  document.addEventListener(
-    "mousemove",
-    handleMouseMove
-  );
-
-  document.addEventListener(
-    "mouseup",
-    handleMouseUp
-  );
-
-  /* ------------------------------------------------------------
-     VALIDACIÓN DEL ROMPECABEZAS
-     ------------------------------------------------------------ */
-
-  function validatePuzzle() {
-    if (pieces.length !== 9) {
-      return false;
-    }
-
-    for (let index = 0; index < 9; index++) {
-      const item = getPiece(index);
-
-      if (!item) {
-        return false;
-      }
-
-      if (!item.placed) {
-        return false;
-      }
-
-      if (!item.locked) {
-        return false;
-      }
-
-      /*
-       * Validación adicional de posición:
-       */
-      const expected = getBoardPosition(index);
-
-      const actualLeft =
-        parseFloat(item.element.style.left) || 0;
-
-      const actualTop =
-        parseFloat(item.element.style.top) || 0;
-
-      if (
-        Math.abs(actualLeft - expected.x) > 1 ||
-        Math.abs(actualTop - expected.y) > 1
-      ) {
-        return false;
-      }
-    }
-
-    return true;
-  }
-
-  function checkVictory() {
-    if (solved) {
-      return;
-    }
-
-    if (!validatePuzzle()) {
-      return;
-    }
-
-    solved = true;
-
-    /*
-     * Pequeño retraso para permitir que el usuario vea
-     * la última pieza colocada.
-     */
-    setTimeout(() => {
-      registerWinner();
-    }, 250);
-  }
-
-  /* ------------------------------------------------------------
-     FIREBASE
-     
-     POST:
-       registra una victoria.
-
-     GET:
-       obtiene todas las claves actuales.
-
-     nocache:
-       evita respuestas almacenadas en caché.
-     ------------------------------------------------------------ */
-
-  async function registerWinner() {
-    setStatus("Registrando victoria...");
-
-    try {
-      const firebaseBase =
-        FIREBASE_URL.replace(/\/+$/, "");
-
-      const postUrl =
-        `${firebaseBase}${FIREBASE_NODE}`;
-
-      /*
-       * POST crea una nueva clave automática.
-       */
-      const postResponse = await fetch(
-        postUrl,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            timestamp: Date.now(),
-            game: "rompecabezas-el-rey"
-          }),
-          cache: "no-store"
-        }
-      );
-
-      if (!postResponse.ok) {
-        throw new Error(
-          `Firebase POST ${postResponse.status}`
-        );
-      }
-
-      /*
-       * GET limpio con parámetro único de caché.
-       */
-      const getUrl =
-        `${firebaseBase}${FIREBASE_NODE}?nocache=${Date.now()}`;
-
-      const getResponse = await fetch(
-        getUrl,
-        {
-          method: "GET",
-          cache: "no-store",
-          headers: {
-            "Cache-Control": "no-cache"
-          }
-        }
-      );
-
-      if (!getResponse.ok) {
-        throw new Error(
-          `Firebase GET ${getResponse.status}`
-        );
-      }
-
-      const data = await getResponse.json();
-
-      let total = 0;
-
-      if (
-        data &&
-        typeof data === "object" &&
-        !Array.isArray(data)
-      ) {
-        total = Object.keys(data).length;
-      }
-
-      winningCode = formatCode(total);
-
-      showVictory(winningCode);
-
-    } catch (error) {
-      console.error(
-        "Error registrando victoria:",
-        error
-      );
-
-      /*
-       * No inventamos un código si Firebase falló.
-       * Mostramos un mensaje para que el problema sea visible.
-       */
-      setStatus(
-        "No se pudo conectar con el contador. Revisá la URL de Firebase."
-      );
-
-      solved = false;
-    }
-  }
-
-  /* ------------------------------------------------------------
-     MODAL DE VICTORIA
-     ------------------------------------------------------------ */
-
-  function showVictory(code) {
-    counterCode.textContent = code;
-    victoryOverlay.classList.add("show");
-    setStatus("");
-  }
-
-  /* ------------------------------------------------------------
-     BOTÓN COBRAR
-     ------------------------------------------------------------ */
-
-  function claimPrize() {
-    const phone = "5491124050658";
-
-    const message =
-      `felicitaciones por finalizar el rompecabezas. Mi código es: ${winningCode}`;
-
-    const whatsappUrl =
-      `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
-
-    window.location.href = whatsappUrl;
-  }
-
-  claimButton.addEventListener(
-    "click",
-    claimPrize
-  );
-
-  /* ------------------------------------------------------------
-     REINICIAR
-     ------------------------------------------------------------ */
-
-  function resetGame() {
-    solved = false;
-    winningCode = "0000";
-
-    victoryOverlay.classList.remove("show");
-
-    /*
-     * Selecciona una imagen diferente a la anterior
-     * siempre que haya más de una disponible.
-     */
-    chooseImage(true);
-
-    /*
-     * Eliminamos las piezas antiguas.
-     */
-    pieces.forEach(item => {
-      item.element.remove();
-    });
-
-    pieces = [];
-
-    /*
-     * Creamos nuevamente las 9 piezas con los fondos
-     * correspondientes a sus índices.
-     */
-    createPieces();
-
-    /*
-     * Esperamos un frame para asegurar que arena.clientWidth
-     * esté calculado correctamente.
-     */
-    requestAnimationFrame(() => {
-      scatterPieces();
-    });
-
-    setStatus("");
-  }
-
-  resetButton.addEventListener(
-    "click",
-    resetGame
-  );
-
-  /* ------------------------------------------------------------
-     INICIALIZACIÓN
-     ------------------------------------------------------------ */
-
-  function init() {
-    chooseImage(false);
-    createPieces();
-
-    requestAnimationFrame(() => {
-      scatterPieces();
-    });
-  }
-
-  init();
-
-})();
