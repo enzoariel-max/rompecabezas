@@ -61,16 +61,16 @@
     /* ========================================================= */
     /* TABLERO 3x3 ENCAJADO EN EL RECUADRO SUPERIOR               */
     /* ========================================================= */
-    .board-container {
+  .board-container {
   position: absolute;
-  top: 32%;          /* Sube o baja el tablero para que coincida con la línea superior */
-  left: 11%;         /* Mueve a izquierda o derecha para centrarlo */
-  width: 78%;        /* El tamaño del tablero para que coincida con el ancho del marco */
+  top: 28.5%;                          /* Sube el tablero para centrarlo verticalmente */
+  left: 50%;                           /* Centrado horizontal automático perfecto */
+  transform: translateX(-50%);         /* Centrado horizontal automático perfecto */
+  width: 78%;                          /* Ancho exacto del marco dorado */
   aspect-ratio: 1 / 1;
   background: transparent;
   z-index: 2;
-    }
-
+}
 #board {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
