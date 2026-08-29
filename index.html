@@ -391,7 +391,7 @@
 <!-- ================================================================= -->
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      const NUMERO_WHATSAPP = "5491124050658";
+      const NUMERO_WHATSAPP = "";
       const IMAGES = ['imagen1.jpeg', 'imagen2.jpeg', 'imagen3.jpeg'];
       const FIREBASE_DB_URL = "https://rompecabeza-el-rey-default-rtdb.firebaseio.com";
       const GRID_SIZE = 3;
@@ -445,14 +445,13 @@
         modalVictoria.classList.remove('active');
         initGame();
       });
-        btnCobrar.addEventListener('click', () => {
-        const textoMensaje = `¡Hola! He completado el Rompecabezas Rey 👑. Mi código ganador es: ${ganadorCodigoActual}`;
-        const numeroLimpio = NUMERO_WHATSAPP.replace(/\D/g, '');
-
-        // Redirige directo a tu chat con el mensaje y código de canje
-        const urlWa = `https://wa.me/${numeroLimpio}?text=${encodeURIComponent(textoMensaje)}`;
-        window.location.href = urlWa;
-      });
+       btnCobrar.addEventListener('click', () => {
+  const textoMensaje = `¡Hola! He completado el Rompecabezas Rey 👑. Mi código ganador es: ${ganadorCodigoActual}`;
+  
+  // Abre WhatsApp con el mensaje listo y permite elegir cualquier contacto o grupo:
+  const urlWa = `https://api.whatsapp.com/send?text=${encodeURIComponent(textoMensaje)}`;
+  window.location.href = urlWa;
+});
 
       // Trazo de una arista curva de rompecabezas clásica
       // tab: 1 = saliente (hacia afuera en sentido horario), -1 = entrante (hacia adentro), 0 = recta
