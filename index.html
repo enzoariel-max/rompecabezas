@@ -28,6 +28,7 @@
     html, body {
       width: 100%;
       height: 100%;
+      height: 100dvh;
       background-color: #050505;
       overflow: hidden;
       display: flex;
@@ -40,12 +41,13 @@
     /* CONTENEDOR PRINCIPAL FIJO A LA PROPORCIÓN DE LA IMAGEN DE FONDO */
     .game-stage {
       position: relative;
-      width: 100%;
       height: 100%;
-      max-width: 480px;
-      max-height: 960px;
+      max-height: 100dvh;
+      aspect-ratio: 9 / 16;
+      width: auto;
+      max-width: 100vw;
       background-image: url('fondo.jpg');
-      background-size: 100% 100%;
+      background-size: contain;
       background-position: center;
       background-repeat: no-repeat;
       display: flex;
