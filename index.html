@@ -5,20 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Rompecabezas El Rey</title>
 
-  <!-- Tipografías Premium -->
+  <!-- Tipografías -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Montserrat:wght@400;600;700;900&display=swap" rel="stylesheet">
 
   <style>
-    /* ========================================================= */
-    /* VARIABLES Y ESTILOS GLOBALES                              */
-    /* ========================================================= */
     :root {
-      --bg: #0a0a0a;
       --gold: #d4af37;
       --gold-glow: rgba(212, 175, 55, 0.7);
-      --ink: #ffffff;
     }
 
     *, *::before, *::after {
@@ -32,129 +27,120 @@
 
     html, body {
       width: 100%;
-      min-height: 100vh;
-      color: var(--ink);
-      font-family: 'Montserrat', sans-serif;
-      overflow-x: hidden;
-      touch-action: pan-x pan-y;
-    }
-
-    body {
+      height: 100%;
+      background-color: #050505;
+      overflow: hidden;
       display: flex;
-      flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 10px;
-      /* Imagen de fondo principal adaptada */
-      background-image: url('fondo.jpg');
-      background-size: cover;
-      background-position: center center;
-      background-repeat: no-repeat;
-      background-attachment: fixed;
-      background-color: #070707;
+      font-family: 'Montserrat', sans-serif;
+      touch-action: none;
     }
 
-    .game-wrapper {
+    /* CONTENEDOR PRINCIPAL FIJO A LA PROPORCIÓN DE LA IMAGEN DE FONDO */
+    .game-stage {
+      position: relative;
       width: 100%;
-      max-width: 360px;
+      height: 100%;
+      max-width: 480px;
+      max-height: 960px;
+      background-image: url('fondo.jpg');
+      background-size: 100% 100%;
+      background-position: center;
+      background-repeat: no-repeat;
       display: flex;
       flex-direction: column;
       align-items: center;
-      position: relative;
-      /* Espacio superior para que el marco del rompecabezas encaje con el fondo */
-      padding-top: 75px;
+      overflow: hidden;
     }
 
     /* ========================================================= */
-    /* TABLERO 3x3 ADAPTADO AL MARCO DORADO DEL FONDO            */
+    /* TABLERO 3x3 ENCAJADO EN EL RECUADRO SUPERIOR               */
     /* ========================================================= */
     .board-container {
-      width: 330px;
-      height: 330px;
-      position: relative;
-      /* Fondo transparente para ver la imagen de fondo limpia */
-      background: transparent;
-      border: none;
-      box-shadow: none;
-      margin-bottom: 20px;
-      overflow: visible;
-    }
-
-    /* LÍNEAS DE GUÍA SVG EXACTAS (LÍNEAS DE CORTE DE ROMPECABEZAS) */
-    .board-grid-svg {
       position: absolute;
-      top: 0;
-      left: 0;
-      width: 330px;
-      height: 330px;
-      pointer-events: none;
-      z-index: 1;
-    }
-
-    .guide-cut-line {
-      fill: none;
-      stroke: rgba(212, 175, 55, 0.45);
-      stroke-width: 1.5;
-      stroke-dasharray: 4 3;
+      top: 17.5%;
+      left: 10.5%;
+      width: 79%;
+      aspect-ratio: 1 / 1;
+      background: transparent;
+      z-index: 2;
     }
 
     #board {
       display: grid;
-      grid-template-columns: repeat(3, 110px);
-      grid-template-rows: repeat(3, 110px);
-      width: 330px;
-      height: 330px;
-      position: absolute;
-      top: 0;
-      left: 0;
-      z-index: 2;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: repeat(3, 1fr);
+      width: 100%;
+      height: 100%;
+      position: relative;
     }
 
     .slot {
-      width: 110px;
-      height: 110px;
+      width: 100%;
+      height: 100%;
       position: relative;
       overflow: visible;
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: background-color 0.15s ease;
-      border-radius: 4px;
     }
 
     .slot.hovered {
-      background-color: rgba(212, 175, 55, 0.15);
+      background-color: rgba(212, 175, 55, 0.2);
+      border-radius: 6px;
     }
 
     /* ========================================================= */
-    /* ARENA DE PIEZAS ADAPTADA A LA BANDEJA 3D DEL FONDO        */
+    /* ARENA DE PIEZAS (BANDEJA 3D INFERIOR)                     */
     /* ========================================================= */
     .arena-section {
-      width: 100%;
-      max-width: 330px;
-      margin-bottom: 18px;
+      position: absolute;
+      top: 77.5%;
+      left: 10%;
+      width: 80%;
+      height: 10.5%;
+      z-index: 3;
     }
 
     #arena {
       width: 100%;
-      height: 155px;
+      height: 100%;
       position: relative;
       overflow: visible;
       background: transparent;
-      border: none;
-      box-shadow: none;
     }
 
-    /* PIEZAS REALES CON MOLDES CURVOS ORGÁNICOS */
+    /* ========================================================= */
+    /* BOTÓN REINICIAR (TRANSPARENTE SOBRE EL BOTÓN DE LA IMAGEN)*/
+    /* ========================================================= */
+    #btn-reset {
+      position: absolute;
+      top: 90.5%;
+      left: 23%;
+      width: 54%;
+      height: 6%;
+      background: transparent;
+      border: none;
+      outline: none;
+      cursor: pointer;
+      z-index: 10;
+      border-radius: 999px;
+      transition: background 0.15s ease, transform 0.1s ease;
+    }
+
+    #btn-reset:active {
+      background: rgba(212, 175, 55, 0.25);
+      transform: scale(0.97);
+    }
+
+    /* PIEZAS DEL ROMPECABEZAS */
     .piece-canvas {
-      width: 154px;
-      height: 154px;
       position: absolute;
       cursor: grab;
       touch-action: none;
       filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.85));
-      transition: transform 0.15s ease, filter 0.15s ease;
-      opacity: 1 !important;
+      transition: transform 0.15s ease;
       z-index: 10;
       pointer-events: auto;
     }
@@ -169,50 +155,15 @@
     .piece-canvas.dragging {
       cursor: grabbing;
       z-index: 9999 !important;
-      transform: scale(1.06) rotate(0deg) !important;
-      filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.95)) drop-shadow(0 0 12px var(--gold-glow));
+      transform: scale(1.08) rotate(0deg) !important;
+      filter: drop-shadow(0 12px 20px rgba(0, 0, 0, 0.95)) drop-shadow(0 0 10px var(--gold-glow));
       transition: none;
       pointer-events: none;
-      opacity: 1 !important;
     }
 
     /* ========================================================= */
-    /* BOTÓN REINICIAR INTEGRADO AL BOTÓN DORADO DEL FONDO       */
+    /* MODAL DE VICTORIA                                         */
     /* ========================================================= */
-    .controls {
-      width: 100%;
-      max-width: 220px;
-      display: flex;
-      justify-content: center;
-      margin-top: 2px;
-    }
-
-    .btn-reiniciar {
-      background: rgba(15, 12, 6, 0.65);
-      border: 1.5px solid var(--gold);
-      color: var(--gold);
-      padding: 10px 24px;
-      border-radius: 999px;
-      font-family: 'Cinzel', serif;
-      font-size: 13px;
-      font-weight: 900;
-      letter-spacing: 3px;
-      text-transform: uppercase;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      width: 100%;
-      text-align: center;
-      box-shadow: 0 0 15px rgba(212, 175, 55, 0.2), inset 0 0 10px rgba(0, 0, 0, 0.8);
-      backdrop-filter: blur(3px);
-    }
-
-    .btn-reiniciar:active {
-      transform: scale(0.96);
-      background: rgba(212, 175, 55, 0.25);
-      box-shadow: 0 0 25px var(--gold-glow);
-    }
-
-    /* MODAL DE VICTORIA */
     #modal-victoria {
       display: none;
       position: fixed;
@@ -232,17 +183,17 @@
     .victory-card {
       background: #111111;
       border: 2px solid var(--gold);
-      border-radius: 28px;
-      padding: 28px 22px;
+      border-radius: 24px;
+      padding: 24px 20px;
       width: 100%;
       max-width: 310px;
       text-align: center;
-      box-shadow: 0 0 50px rgba(0, 0, 0, 0.9), 0 0 20px var(--gold-glow);
+      box-shadow: 0 0 40px rgba(0, 0, 0, 0.9), 0 0 20px var(--gold-glow);
     }
 
     .victory-crown {
-      width: 48px;
-      height: 48px;
+      width: 46px;
+      height: 46px;
       margin: 0 auto 10px auto;
       border-radius: 50%;
       background: rgba(212, 175, 55, 0.15);
@@ -250,16 +201,15 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 24px;
-      box-shadow: 0 0 15px var(--gold-glow);
+      font-size: 22px;
     }
 
     .victory-title {
       font-family: 'Cinzel', serif;
-      font-size: 22px;
+      font-size: 20px;
       font-weight: 900;
       color: #ffffff;
-      letter-spacing: 3px;
+      letter-spacing: 2px;
       text-shadow: 0 0 15px var(--gold-glow);
       margin-bottom: 2px;
     }
@@ -269,8 +219,8 @@
       font-weight: 800;
       letter-spacing: 2px;
       text-transform: uppercase;
-      color: #888888;
-      margin-bottom: 14px;
+      color: #aaaaaa;
+      margin-bottom: 12px;
     }
 
     .code-box {
@@ -278,7 +228,7 @@
       border: 1px solid rgba(212, 175, 55, 0.4);
       border-radius: 12px;
       padding: 10px 14px;
-      margin-bottom: 18px;
+      margin-bottom: 16px;
     }
 
     .code-text {
@@ -296,11 +246,8 @@
       gap: 10px;
     }
 
-    .btn {
-      background: transparent;
-      border: 1px solid var(--gold);
-      color: var(--gold);
-      padding: 12px 28px;
+    .btn-modal {
+      padding: 12px 20px;
       border-radius: 999px;
       font-family: 'Cinzel', serif;
       font-size: 13px;
@@ -311,30 +258,24 @@
       transition: all 0.2s ease;
       width: 100%;
       text-align: center;
-    }
-
-    .btn:active {
-      transform: scale(0.96);
-      background: rgba(212, 175, 55, 0.15);
+      border: 1px solid var(--gold);
+      background: transparent;
+      color: var(--gold);
     }
 
     .btn-whatsapp {
       background: linear-gradient(135deg, #25d366 0%, #128c7e 100%);
       color: #ffffff;
       border: 1px solid #48e68b;
-      box-shadow: 0 4px 20px rgba(37, 211, 102, 0.4);
-      font-weight: 900;
+      box-shadow: 0 4px 15px rgba(37, 211, 102, 0.4);
     }
   </style>
 </head>
 <body>
 
-  <div class="game-wrapper">
-    <!-- TABLERO 3x3 CON LÍNEAS DE CORTE DE ROMPECABEZAS -->
+  <div class="game-stage">
+    <!-- TABLERO 3x3 -->
     <div class="board-container">
-      <svg id="board-svg" class="board-grid-svg" viewBox="0 0 330 330"></svg>
-
-      <!-- CASILLAS DONDE ENCAJAN LAS PIEZAS -->
       <div id="board">
         <div class="slot" data-index="0"></div>
         <div class="slot" data-index="1"></div>
@@ -348,17 +289,15 @@
       </div>
     </div>
 
-    <!-- ARENA DE PIEZAS DISPERSAS (INTEGRADA A LA BANDEJA DEL FONDO) -->
+    <!-- ARENA DE PIEZAS (BANDEJA 3D) -->
     <div class="arena-section">
       <div id="arena"></div>
     </div>
 
-    <!-- BOTÓN DE REINICIO -->
-    <div class="controls">
-      <button id="btn-reset" class="btn-reiniciar" type="button">Reiniciar</button>
-    </div>
+    <!-- BOTÓN REINICIAR (ZONA CLICKEABLE SOBRE EL BOTÓN DEL FONDO) -->
+    <button id="btn-reset" type="button" aria-label="Reiniciar Juego"></button>
 
-    <!-- MODAL FLOTANTE DE VICTORIA -->
+    <!-- MODAL DE VICTORIA -->
     <div id="modal-victoria">
       <div class="victory-card">
         <div class="victory-crown">👑</div>
@@ -368,27 +307,20 @@
           <div id="codigo-ganador" class="code-text">CÓDIGO: 0001</div>
         </div>
         <div class="modal-actions">
-          <button id="btn-cobrar" class="btn btn-whatsapp" type="button">Cobrar</button>
-          <button id="btn-modal-reiniciar" class="btn" type="button">Jugar de Nuevo</button>
+          <button id="btn-cobrar" class="btn-modal btn-whatsapp" type="button">Cobrar</button>
+          <button id="btn-modal-reiniciar" class="btn-modal" type="button">Jugar de Nuevo</button>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- LÓGICA DE JAVASCRIPT -->
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       const IMAGES = ['imagen1.jpeg', 'imagen2.jpeg', 'imagen3.jpeg'];
-      // URL de tu Firebase Realtime Database
       const FIREBASE_DB_URL = "https://rompecabeza-el-rey-default-rtdb.firebaseio.com";
       const GRID_SIZE = 3;
-      const PIECE_SIZE = 110;
-      const TOTAL_SIZE = 330;
-      const PADDING = 22; // Margen para pestañas salientes
-      const CANVAS_SIZE = PIECE_SIZE + (PADDING * 2); // 154px
 
       const boardEl = document.getElementById('board');
-      const boardSvg = document.getElementById('board-svg');
       const arenaEl = document.getElementById('arena');
       const slots = Array.from(document.querySelectorAll('.slot'));
       const btnReset = document.getElementById('btn-reset');
@@ -402,6 +334,10 @@
       let isGameFinished = false;
       let ganadorCodigoActual = '0001';
 
+      let pieceSize = 100;
+      let padding = 20;
+      let canvasSize = 140;
+
       let draggedPiece = null;
       let touchStartX = 0;
       let touchStartY = 0;
@@ -409,29 +345,24 @@
       let pieceInitialTop = 0;
       let currentSlotHovered = null;
 
-      // Matriz de pestañas: [Top, Right, Bottom, Left]
-      // 1 = Pestaña saliente (Tab hacia afuera), -1 = Hueco entrante (Hole hacia adentro), 0 = Borde recto
       const PIECE_EDGES = [
-        [0, 1, 1, 0],   // Pieza 0 (fila 0, col 0)
-        [0, 1, -1, -1], // Pieza 1 (fila 0, col 1)
-        [0, 0, 1, -1],  // Pieza 2 (fila 0, col 2)
-        [-1, 1, -1, 0], // Pieza 3 (fila 1, col 0)
-        [1, -1, 1, -1], // Pieza 4 (fila 1, col 1)
-        [-1, 0, -1, 1], // Pieza 5 (fila 1, col 2)
-        [1, 1, 0, 0],   // Pieza 6 (fila 2, col 0)
-        [-1, 1, 0, -1], // Pieza 7 (fila 2, col 1)
-        [1, 0, 0, -1]   // Pieza 8 (fila 2, col 2)
+        [0, 1, 1, 0],
+        [0, 1, -1, -1],
+        [0, 0, 1, -1],
+        [-1, 1, -1, 0],
+        [1, -1, 1, -1],
+        [-1, 0, -1, 1],
+        [1, 1, 0, 0],
+        [-1, 1, 0, -1],
+        [1, 0, 0, -1]
       ];
 
-      // ================================================================
-      // CONFIGURACIÓN DE NÚMERO DE WHATSAPP
-      // Si está vacío (""), permite al usuario elegir el contacto en WhatsApp.
-      // Si colocas un número (ej: "5491124050658"), irá directo a ese chat.
-      // ================================================================
-      const NUMERO_WHATSAPP = ""; 
+      const NUMERO_WHATSAPP = ""; // Pon tu número aquí o déjalo vacío para elegir contacto
 
-      renderBoardGuideLines();
       initGame();
+      window.addEventListener('resize', () => {
+        if (!isGameFinished) updateDimensions();
+      });
 
       btnReset.addEventListener('click', () => initGame());
       btnModalReiniciar.addEventListener('click', () => {
@@ -442,22 +373,23 @@
       btnCobrar.addEventListener('click', () => {
         const textoMensaje = `¡Hola! He completado el Rompecabezas El Rey 👑. Mi código ganador es: ${ganadorCodigoActual}`;
         const numeroLimpio = NUMERO_WHATSAPP.replace(/\D/g, '');
-
-        let urlWa = '';
-        if (numeroLimpio && numeroLimpio.length > 5) {
-          urlWa = `https://wa.me/${numeroLimpio}?text=${encodeURIComponent(textoMensaje)}`;
-        } else {
-          urlWa = `https://api.whatsapp.com/send?text=${encodeURIComponent(textoMensaje)}`;
-        }
-
+        let urlWa = (numeroLimpio && numeroLimpio.length > 5)
+          ? `https://wa.me/${numeroLimpio}?text=${encodeURIComponent(textoMensaje)}`
+          : `https://api.whatsapp.com/send?text=${encodeURIComponent(textoMensaje)}`;
         window.location.href = urlWa;
       });
 
-      function drawPuzzleEdge(ctxOrPath, x1, y1, x2, y2, tab, isSvg = false) {
+      function updateDimensions() {
+        const boardRect = boardEl.getBoundingClientRect();
+        pieceSize = boardRect.width / GRID_SIZE;
+        padding = pieceSize * 0.20;
+        canvasSize = pieceSize + (padding * 2);
+      }
+
+      function drawPuzzleEdge(ctx, x1, y1, x2, y2, tab) {
         if (tab === 0) {
-          if (isSvg) return `L ${x2.toFixed(2)} ${y2.toFixed(2)} `;
-          ctxOrPath.lineTo(x2, y2);
-          return '';
+          ctx.lineTo(x2, y2);
+          return;
         }
 
         const dx = x2 - x1;
@@ -465,7 +397,6 @@
         const len = Math.hypot(dx, dy);
         const ux = dx / len;
         const uy = dy / len;
-        
         const nx = uy * tab;
         const ny = -ux * tab;
 
@@ -482,46 +413,10 @@
         const cp5 = p(0.64, 0.04);
         const p1 = p(0.62, 0.0);
 
-        if (isSvg) {
-          return `L ${p0.x.toFixed(2)} ${p0.y.toFixed(2)} ` +
-                 `C ${cp1.x.toFixed(2)} ${cp1.y.toFixed(2)}, ${cp2.x.toFixed(2)} ${cp2.y.toFixed(2)}, ${cp3.x.toFixed(2)} ${cp3.y.toFixed(2)} ` +
-                 `C ${cp4.x.toFixed(2)} ${cp4.y.toFixed(2)}, ${cp5.x.toFixed(2)} ${cp5.y.toFixed(2)}, ${p1.x.toFixed(2)} ${p1.y.toFixed(2)} ` +
-                 `L ${x2.toFixed(2)} ${y2.toFixed(2)} `;
-        } else {
-          ctxOrPath.lineTo(p0.x, p0.y);
-          ctxOrPath.bezierCurveTo(cp1.x, cp1.y, cp2.x, cp2.y, cp3.x, cp3.y);
-          ctxOrPath.bezierCurveTo(cp4.x, cp4.y, cp5.x, cp5.y, p1.x, p1.y);
-          ctxOrPath.lineTo(x2, y2);
-        }
-      }
-
-      function renderBoardGuideLines() {
-        let v1 = `M 110 0 ` +
-                 drawPuzzleEdge(null, 110, 0, 110, 110, 1, true) +
-                 drawPuzzleEdge(null, 110, 110, 110, 220, 1, true) +
-                 drawPuzzleEdge(null, 110, 220, 110, 330, 1, true);
-
-        let v2 = `M 220 0 ` +
-                 drawPuzzleEdge(null, 220, 0, 220, 110, 1, true) +
-                 drawPuzzleEdge(null, 220, 110, 220, 220, -1, true) +
-                 drawPuzzleEdge(null, 220, 220, 220, 330, 1, true);
-
-        let h1 = `M 0 110 ` +
-                 drawPuzzleEdge(null, 0, 110, 110, 110, -1, true) +
-                 drawPuzzleEdge(null, 110, 110, 220, 110, 1, true) +
-                 drawPuzzleEdge(null, 220, 110, 330, 110, -1, true);
-
-        let h2 = `M 0 220 ` +
-                 drawPuzzleEdge(null, 0, 220, 110, 220, 1, true) +
-                 drawPuzzleEdge(null, 110, 220, 220, 220, -1, true) +
-                 drawPuzzleEdge(null, 220, 220, 330, 220, 1, true);
-
-        boardSvg.innerHTML = `
-          <path d="${v1}" class="guide-cut-line" />
-          <path d="${v2}" class="guide-cut-line" />
-          <path d="${h1}" class="guide-cut-line" />
-          <path d="${h2}" class="guide-cut-line" />
-        `;
+        ctx.lineTo(p0.x, p0.y);
+        ctx.bezierCurveTo(cp1.x, cp1.y, cp2.x, cp2.y, cp3.x, cp3.y);
+        ctx.bezierCurveTo(cp4.x, cp4.y, cp5.x, cp5.y, p1.x, p1.y);
+        ctx.lineTo(x2, y2);
       }
 
       function initGame() {
@@ -532,36 +427,40 @@
         slots.forEach(s => s.innerHTML = '');
         clearSlotHover();
 
+        updateDimensions();
+
         const randomIndex = Math.floor(Math.random() * IMAGES.length);
         currentImage = IMAGES[randomIndex];
 
         const img = new Image();
         img.crossOrigin = "anonymous";
-        img.onload = () => {
-          buildPuzzlePieces(img);
-        };
+        img.onload = () => buildPuzzlePieces(img);
         img.src = currentImage;
       }
 
       function buildPuzzlePieces(img) {
+        updateDimensions();
+        const totalSize = pieceSize * GRID_SIZE;
+
         for (let i = 0; i < 9; i++) {
           const col = i % GRID_SIZE;
           const row = Math.floor(i / GRID_SIZE);
           const [t, r, b, l] = PIECE_EDGES[i];
 
           const canvas = document.createElement('canvas');
-          canvas.width = CANVAS_SIZE;
-          canvas.height = CANVAS_SIZE;
+          canvas.width = canvasSize;
+          canvas.height = canvasSize;
+          canvas.style.width = `${canvasSize}px`;
+          canvas.style.height = `${canvasSize}px`;
           canvas.classList.add('piece-canvas');
           canvas.dataset.pieceIndex = i;
           canvas.dataset.currentSlot = -1;
 
           const ctx = canvas.getContext('2d');
-
-          const x0 = PADDING;
-          const y0 = PADDING;
-          const x1 = PADDING + PIECE_SIZE;
-          const y1 = PADDING + PIECE_SIZE;
+          const x0 = padding;
+          const y0 = padding;
+          const x1 = padding + pieceSize;
+          const y1 = padding + pieceSize;
 
           ctx.beginPath();
           ctx.moveTo(x0, y0);
@@ -574,38 +473,37 @@
           ctx.save();
           ctx.clip();
 
-          const srcX = (col * PIECE_SIZE) - PADDING;
-          const srcY = (row * PIECE_SIZE) - PADDING;
-          const scaleX = img.naturalWidth / TOTAL_SIZE;
-          const scaleY = img.naturalHeight / TOTAL_SIZE;
+          const srcX = (col * pieceSize) - padding;
+          const srcY = (row * pieceSize) - padding;
+          const scaleX = img.naturalWidth / totalSize;
+          const scaleY = img.naturalHeight / totalSize;
 
           ctx.drawImage(
             img,
             srcX * scaleX,
             srcY * scaleY,
-            CANVAS_SIZE * scaleX,
-            CANVAS_SIZE * scaleY,
+            canvasSize * scaleX,
+            canvasSize * scaleY,
             0,
             0,
-            CANVAS_SIZE,
-            CANVAS_SIZE
+            canvasSize,
+            canvasSize
           );
           ctx.restore();
 
           ctx.save();
-          ctx.lineWidth = 1;
-          ctx.strokeStyle = "rgba(212, 175, 55, 0.4)";
+          ctx.lineWidth = 1.5;
+          ctx.strokeStyle = "rgba(212, 175, 55, 0.5)";
           ctx.stroke();
           ctx.restore();
 
           const arenaRect = arenaEl.getBoundingClientRect();
-          const maxArenaW = arenaRect.width > 0 ? arenaRect.width : 330;
-          const maxLeft = Math.max(0, maxArenaW - CANVAS_SIZE - 4);
-          const maxTop = Math.max(0, 155 - CANVAS_SIZE - 4);
+          const maxLeft = Math.max(0, arenaRect.width - canvasSize);
+          const maxTop = Math.max(0, arenaRect.height - (canvasSize * 0.7));
 
           const randomLeft = Math.floor(Math.random() * (maxLeft + 1));
           const randomTop = Math.floor(Math.random() * (maxTop + 1));
-          const randomRotation = Math.floor(Math.random() * 20) - 10;
+          const randomRotation = Math.floor(Math.random() * 16) - 8;
 
           canvas.dataset.rot = randomRotation;
           canvas.style.left = `${randomLeft}px`;
@@ -628,10 +526,7 @@
           if (isGameFinished) return;
           startDrag(el, e.clientX, e.clientY);
 
-          const onMouseMove = (moveEvent) => {
-            handleMove(moveEvent.clientX, moveEvent.clientY);
-          };
-
+          const onMouseMove = (moveEvent) => handleMove(moveEvent.clientX, moveEvent.clientY);
           const onMouseUp = (upEvent) => {
             window.removeEventListener('mousemove', onMouseMove);
             window.removeEventListener('mouseup', onMouseUp);
@@ -674,14 +569,13 @@
         document.body.appendChild(el);
         el.style.left = `${pieceInitialLeft}px`;
         el.style.top = `${pieceInitialTop}px`;
-        el.style.transform = 'scale(1.06) rotate(0deg)';
+        el.style.transform = 'scale(1.08) rotate(0deg)';
         el.classList.add('dragging');
         el.classList.remove('placed');
       }
 
       function handleMove(clientX, clientY) {
         if (!draggedPiece) return;
-
         const deltaX = clientX - touchStartX;
         const deltaY = clientY - touchStartY;
         draggedPiece.style.left = `${pieceInitialLeft + deltaX}px`;
@@ -698,8 +592,7 @@
 
         if (targetSlotIndex !== -1) {
           if (gridState[targetSlotIndex] !== null && gridState[targetSlotIndex] !== el) {
-            const occupiedPiece = gridState[targetSlotIndex];
-            returnPieceToArena(occupiedPiece);
+            returnPieceToArena(gridState[targetSlotIndex]);
           }
           snapPieceToSlot(el, targetSlotIndex);
         } else {
@@ -737,8 +630,8 @@
         ) {
           const relX = clientX - boardRect.left;
           const relY = clientY - boardRect.top;
-          const col = Math.floor(relX / PIECE_SIZE);
-          const row = Math.floor(relY / PIECE_SIZE);
+          const col = Math.floor(relX / pieceSize);
+          const row = Math.floor(relY / pieceSize);
           const idx = row * GRID_SIZE + col;
           if (idx >= 0 && idx < 9) return idx;
         }
@@ -751,8 +644,8 @@
         piece.dataset.currentSlot = slotIndex;
         gridState[slotIndex] = piece;
 
-        piece.style.left = `-${PADDING}px`;
-        piece.style.top = `-${PADDING}px`;
+        piece.style.left = `-${padding}px`;
+        piece.style.top = `-${padding}px`;
         piece.style.transform = 'rotate(0deg)';
         piece.classList.add('placed');
       }
@@ -763,11 +656,11 @@
         piece.classList.remove('placed');
 
         const arenaRect = arenaEl.getBoundingClientRect();
-        let localX = clientX - arenaRect.left - (CANVAS_SIZE / 2);
-        let localY = clientY - arenaRect.top - (CANVAS_SIZE / 2);
+        let localX = clientX - arenaRect.left - (canvasSize / 2);
+        let localY = clientY - arenaRect.top - (canvasSize / 2);
 
-        const maxW = Math.max(0, arenaRect.width - CANVAS_SIZE);
-        const maxH = Math.max(0, 155 - CANVAS_SIZE);
+        const maxW = Math.max(0, arenaRect.width - canvasSize);
+        const maxH = Math.max(0, arenaRect.height - (canvasSize * 0.7));
 
         localX = Math.max(0, Math.min(localX, maxW));
         localY = Math.max(0, Math.min(localY, maxH));
@@ -784,8 +677,8 @@
         piece.classList.remove('placed');
 
         const arenaRect = arenaEl.getBoundingClientRect();
-        const maxW = Math.max(0, arenaRect.width - CANVAS_SIZE);
-        const maxH = Math.max(0, 155 - CANVAS_SIZE);
+        const maxW = Math.max(0, arenaRect.width - canvasSize);
+        const maxH = Math.max(0, arenaRect.height - (canvasSize * 0.7));
         const randomLeft = Math.floor(Math.random() * (maxW + 1));
         const randomTop = Math.floor(Math.random() * (maxH + 1));
         const rot = piece.dataset.rot || 0;
