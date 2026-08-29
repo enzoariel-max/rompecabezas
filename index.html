@@ -81,29 +81,31 @@
     }
 
     /* 👇 AQUÍ VA EL BLOQUE */
-    .slot {
-      width: 100%;
-      height: 100%;
-      position: relative;
-      overflow: visible;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      /* Líneas punteadas doradas guía */
-      border: 1.5px dashed rgba(212, 175, 55, 0.45);
-      box-sizing: border-box;
-    }
+   .slot {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: visible;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none; /* Quitamos el borde cuadrado */
+}
 
-    /* Quitar el borde punteado cuando la pieza ya está encajada */
-    .slot:has(.piece-canvas.placed) {
-      border: none;
-    }
+/* El lienzo de la silueta punteada */
+.slot-guide-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 1;
+}
 
-    .slot.hovered {
-      background-color: rgba(212, 175, 55, 0.2);
-      border-radius: 6px;
-    }
 
+.slot.hovered {
+  background-color: rgba(212, 175, 55, 0.15);
+  border-radius: 8px;
+}
     /* ========================================================= */
     /* ARENA DE PIEZAS (BANDEJA 3D INFERIOR)                     */
     /* ========================================================= */
@@ -139,7 +141,7 @@
     /* ========================================================= */
     /* BOTÓN REINICIAR (TRANSPARENTE SOBRE EL BOTÓN DE LA IMAGEN)*/
     /* ========================================================= */
-    #btn-reset {
+#btn-reset {
   position: absolute;
   top: 91%;
   left: 50%;
@@ -156,12 +158,20 @@
   justify-content: center;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.8), inset 0 1px 2px rgba(212, 175, 55, 0.4);
   transition: all 0.2s ease;
+  outline: none;
+  /* Tipografía y color del texto */
+  font-family: 'Cinzel', serif;
+  font-size: 14px;
+  font-weight: 900;
+  letter-spacing: 3px;
+  color: var(--gold);
+  text-shadow: 0 0 8px var(--gold-glow);
+  text-transform: uppercase;
 }
 
 #btn-reset:active {
   transform: translateX(-50%) scale(0.96);
   background: linear-gradient(180deg, #1f180a 0%, #0d0a04 100%);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.9), inset 0 0 10px rgba(212, 175, 55, 0.2);
 }
 
 .btn-text {
@@ -335,8 +345,7 @@
     </div>
 
     <!-- BOTÓN REINICIAR (ZONA CLICKEABLE SOBRE EL BOTÓN DEL FONDO) -->
-    <button id="btn-reset" type="button" aria-label="Reiniciar Juego"></button>
-
+ <button id="btn-reset" type="button" aria-label="Reiniciar Juego">REINICIAR</button>
     <!-- MODAL DE VICTORIA -->
     <div id="modal-victoria">
       <div class="victory-card">
@@ -426,7 +435,7 @@
         canvasSize = pieceSize + (padding * 2);
       }
 
-      function drawPuzzleEdge(ctx, x1, y1, x2, y2, tab) {
+function drawPuzzleEdge(ctx, x1, y1, x2, y2, tab) {
         if (tab === 0) {
           ctx.lineTo(x2, y2);
           return;
@@ -459,6 +468,47 @@
         ctx.lineTo(x2, y2);
       }
 
+      /* 👇 PEGA AQUÍ LA NUEVA FUNCIÓN drawSlotGuides 👇 */
+      function drawSlotGuides() {
+        updateDimensions();
+        slots.forEach((slot, i) => {
+          const existingGuide = slot.querySelector('.slot-guide-canvas');
+          if (existingGuide) existingGuide.remove();
+
+          const [t, r, b, l] = PIECE_EDGES[i];
+          const canvas = document.createElement('canvas');
+          canvas.width = canvasSize;
+          canvas.height = canvasSize;
+          canvas.style.width = `${canvasSize}px`;
+          canvas.style.height = `${canvasSize}px`;
+          canvas.style.left = `-${padding}px`;
+          canvas.style.top = `-${padding}px`;
+          canvas.classList.add('slot-guide-canvas');
+
+          const ctx = canvas.getContext('2d');
+          const x0 = padding;
+          const y0 = padding;
+          const x1 = padding + pieceSize;
+          const y1 = padding + pieceSize;
+
+          ctx.beginPath();
+          ctx.moveTo(x0, y0);
+          drawPuzzleEdge(ctx, x0, y0, x1, y0, t);
+          drawPuzzleEdge(ctx, x1, y0, x1, y1, r);
+          drawPuzzleEdge(ctx, x1, y1, x0, y1, b);
+          drawPuzzleEdge(ctx, x0, y1, x0, y0, l);
+          ctx.closePath();
+
+          ctx.setLineDash([4, 4]);
+          ctx.lineWidth = 1.5;
+          ctx.strokeStyle = "rgba(212, 175, 55, 0.55)";
+          ctx.stroke();
+
+          slot.appendChild(canvas);
+        });
+      }
+
+      /* 👇 Y EN initGame() AGREGA LA LLAMADA A drawSlotGuides() 👇 */
       function initGame() {
         isGameFinished = false;
         modalVictoria.classList.remove('active');
@@ -468,6 +518,7 @@
         clearSlotHover();
 
         updateDimensions();
+        drawSlotGuides(); // 👈 Añade esta línea aquí
 
         const randomIndex = Math.floor(Math.random() * IMAGES.length);
         currentImage = IMAGES[randomIndex];
